@@ -2,22 +2,25 @@ import * as cheerio from 'cheerio';
 
 const getHtml = async () => {
   try {
-    // 1
-    const html = await fetch('https://www.genie.co.kr/chart/top200').then(response => response.ok && response.text());
-    const ulList = [];
+    // 요청할 URL 정의
+    const url = 'https://www.genie.co.kr/chart/top200';
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+    }
+
+    const html = await response.text();
     const $ = cheerio.load(html);
     const bodyList = $('tr.list');
-    // eslint-disable-next-line array-callback-return
-    bodyList.map((i, element) => {
-      ulList[i] = {
-        rank: i + 1,
-        title: $(element).find('td.info a.title').text().replace(/\s/g, ''),
-        artist: $(element).find('td.info a.artist').text().replace(/\s/g, ''),
-      };
-    });
-    // console.log('bodyList : ', ulList);
+    const ulList = bodyList.map((i, element) => ({
+      rank: i + 1,
+      title: $(element).find('td.info a.title').text().trim(),
+      artist: $(element).find('td.info a.artist').text().trim(),
+    })).get();
+
+    console.log('Chart List:', ulList);
   } catch (error) {
-    console.error(error);
+    console.error('Error occurred:', error);
   }
 };
 
