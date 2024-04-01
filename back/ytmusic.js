@@ -32,3 +32,10 @@ async function extractDataFromPage(url) {
 // 실행 함수 호출
 const url = 'https://charts.youtube.com/charts/TopSongs/kr/weekly';
 extractDataFromPage(url);
+
+// { rank: '1', singer: '(G)I-DLE', title: 'Fate' },
+//   { rank: '2', singer: 'TWS', title: 'plot twist' },
+//   { rank: '3', singer: 'LE SSERAFIM', title: 'EASY' },
+//   { rank: '4', singer: 'LE SSERAFIM', title: 'Smart' },
+//   { rank: '5', singer: 'Creepy Nuts', title: 'Bling-Bang-Bang-Born' },
+//   { rank: '6', singer: 'BIBI', title: '밤양갱' },

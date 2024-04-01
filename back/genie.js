@@ -12,12 +12,11 @@ const getHtml = async () => {
     const html = await response.text();
     const $ = cheerio.load(html);
     const bodyList = $('tr.list');
-    const ulList = bodyList.map((i, element) => ({
-      rank: i + 1,
+    const ulList = bodyList.map((_i, element) => ({
+      rank: $(element).find('td.number').text().match(/\d+/)[0],
       title: $(element).find('td.info a.title').text().trim(),
       artist: $(element).find('td.info a.artist').text().trim(),
     })).get();
-
     console.log('Chart List:', ulList);
   } catch (error) {
     console.error('Error occurred:', error);
