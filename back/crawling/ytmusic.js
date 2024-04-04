@@ -19,8 +19,8 @@ async function extractDataFromPage(url) {
     const divChartTableContainer = $('ytmc-entry-row');
     const list = divChartTableContainer.map((i, element) => ({
       rank: $(element).find('span#rank').text().trim(),
-      singer: $(element).find('span.artistName').text().trim(), // 가수 이름에서는 띄어쓰기를 유지
       title: $(element).find('div#entity-title').text().trim(),
+      artist: $(element).find('span.artistName').text().trim(), // 가수 이름에서는 띄어쓰기를 유지
     })).get(); // Cheerio의 map 사용 후 get()으로 배열로 변환
 
     console.log(list);
@@ -32,10 +32,3 @@ async function extractDataFromPage(url) {
 // 실행 함수 호출
 const url = 'https://charts.youtube.com/charts/TopSongs/kr/weekly';
 extractDataFromPage(url);
-
-// { rank: '1', singer: '(G)I-DLE', title: 'Fate' },
-//   { rank: '2', singer: 'TWS', title: 'plot twist' },
-//   { rank: '3', singer: 'LE SSERAFIM', title: 'EASY' },
-//   { rank: '4', singer: 'LE SSERAFIM', title: 'Smart' },
-//   { rank: '5', singer: 'Creepy Nuts', title: 'Bling-Bang-Bang-Born' },
-//   { rank: '6', singer: 'BIBI', title: '밤양갱' },

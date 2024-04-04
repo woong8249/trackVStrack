@@ -7,7 +7,4 @@
             "path": "./back"
         },
     ],
-    "settings": {
-        "liveServer.settings.multiRootWorkspaceName": "music-chart-compare"
-    },
 }
