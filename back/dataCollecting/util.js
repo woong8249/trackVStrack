@@ -1,12 +1,10 @@
 import puppeteer from 'puppeteer';
 
 export async function getHtml(url, opt = undefined) {
-  console.log(opt);
   const response = await fetch(url, opt);
-
   if (!response.ok) {
-    console.log(response.status);
-    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+    throw new Error(`Failed to fetch ${url}: ${response.statusText}
+    statusCode:${response.status}`);
   }
   return response.text();
 }
@@ -84,4 +82,17 @@ export function addSixDaysToYYYYMMDD(inputYYYYMMDD) {
   resultDay = resultDay < 10 ? `0${resultDay}` : `${resultDay}`;
 
   return `${resultYear}${resultMonth}${resultDay}`;
+}
+
+export function arrayToChunk(array, size) {
+  return Array.from(
+    { length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size),
+  );
+}
+
+export function extractYearMonthDay(date) {
+  const year = date.getFullYear();
+  const month = (`0${date.getMonth() + 1}`).slice(-2);
+  const day = (`0${date.getDate()}`).slice(-2);
+  return { year, month, day };
 }
