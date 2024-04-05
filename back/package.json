@@ -5,13 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "NODE_OPTIONS=--experimental-import-meta-resolve nextlab-eslint **/*.js ",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cheerio": "1.0.0-rc.12",
-    "puppeteer": "^22.6.1"
+    "puppeteer": "^22.6.1",
+    "vitest": "^1.4.0"
   }
 }

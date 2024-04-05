@@ -85,9 +85,7 @@ export function addSixDaysToYYYYMMDD(inputYYYYMMDD) {
 }
 
 export function arrayToChunk(array, size) {
-  return Array.from(
-    { length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size),
-  );
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size));
 }
 
 export function extractYearMonthDay(date) {
