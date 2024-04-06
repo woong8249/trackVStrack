@@ -2,13 +2,16 @@
 /* eslint-disable no-restricted-syntax */
 import * as cheerio from 'cheerio';
 
+import winLogger from '../util/winston.js';
+
 import {
-  addSixDaysToYYYYMMDD, arrayToChunk, createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay, getHtml,
+  addSixDaysToYYYYMMDD, arrayToChunk, createMonthlyFirstDatesBetween,
+  createWeeklyDatesBetween, extractYearMonthDay, getHtml,
 } from './util.js';
 
 const ERRORS = {
   CHART_WE: 'The Melon weekly chart has been available since January 3, 2010.',
-  CHART_MO: 'The Melon monthly chart has been available since January 1, 2010',
+  CHART_MO: 'The Melon monthly chart has been available since January 1, 2010.',
   MAX_CHUNK: 'max 30',
   CHECK_CHART_TYPE: 'check chartType',
 };
@@ -21,10 +24,11 @@ const options = {
   },
 };
 
+const minDateWE = new Date('2010-01-03').getTime();
+const minDateMO = new Date('2010-01-01').getTime();
+
 function validateDateAvailability(year, month, day, chartType) {
   const inputDate = new Date(`${year}-${month}-${day}`).getTime();
-  const minDateWE = new Date('2010-01-03').getTime();
-  const minDateMO = new Date('2010-01-01').getTime();
   if (chartType === 'WE' && inputDate < minDateWE)
     throw new Error(ERRORS.CHART_WE);
   if (chartType === 'MO' && inputDate < minDateMO)
@@ -92,11 +96,10 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
 
   const dates = generateDatesForChartType(startDate, endDate, chartType);
   const dateChunks = arrayToChunk(dates, chunkSize);
-
   const result = await Promise.all(dateChunks.map(async chunk => {
     const chunkResults = await Promise.all(chunk.map(date => {
       const { year, month, day } = extractYearMonthDay(date);
-      return fetchChart(year, month, day, chartType);
+      return fetchChart(year, month, day, chartType).catch(err => winLogger.error(err));
     }));
     return chunkResults.flat();
   }));

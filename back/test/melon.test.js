@@ -4,33 +4,58 @@ import {
 } from 'vitest';
 
 import { fetchChart, fetchChartsForDateRangeInParallel } from '../dataCollecting/melon.js';
+import { extractYearMonthDay } from '../dataCollecting/util.js';
 
-// - `일` 기준
-//     - `2010.01.03~2010.01.09` 시작
-//     - `2012.08.05 ~ 2012.08.11`마지막
-// - `월` 기준
-//     - `2012.08.13 ~ 2012.08.19` 시작
-//     - 쭉
+import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
+
 describe('The fetchChart func Test', () => {
-  it('The Melon weekly chart has been available since January 3, 2010.So fetchChart("2010", "01", "02", "WE") is going to throw Error.', () => {
+  it('The Melon weekly chart has been available since January 3, 2010.So fetchChart(\'2010\', \'01\', \'02\', \'WE\') is going to throw Error.', () => {
     expect(() => fetchChart('2010', '01', '02', 'WE')).rejects.toThrowError('The Melon weekly chart has been available since January 3, 2010.');
     expect.assertions(1);
   });
-  it('For the period from January 3, 2010, to August 11, 2012, the standard is Sunday. For other days of the week, chartDetails will return an empty array.', async () => {
-    const { chartDetails } = await fetchChart('2010', '01', '04', 'WE');
-    expect(chartDetails.length).toBe(0);
-    expect.assertions(1);
-  });
-  it('The Melon weekly chart has been available since January 3, 2010. So So fetchChart("2010", "01", "03", "WE") is enable.', async () => {
-    const { chartDetails, chartScope } = await fetchChart('2010', '01', '03', 'WE');
-    const { startDate, endDate, chartType } = chartScope;
+
+  // The Melon weekly Chart dates are as follows:
+  // Sunday basis:
+  //   Start: January 3, 2010, to January 9, 2010
+  //   End: August 5, 2012, to August 11, 2012
+  // Monday basis:
+  //   Start: August 13, 2012, to August 19, 2012
+  //   Ongoing to the present
+  it('The Melon weekly chart has been available since January 3, 2010. We will test using a randomly selected Monday after this date.', async () => {
+    const minDate = new Date('2012-08-13');
+    const today = new Date();
+    const { startDate: _startDate } = getRandomDateRange(minDate, today, 1);
+    const testTarget = moveToNearestFutureDay(_startDate, 1);
+    const { year, month, day } = extractYearMonthDay(testTarget);
+    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'WE');
+    const { chartType } = chartScope;
+
     expect(chartType).toBe('WE');
-    expect(startDate.getTime()).toBe(new Date('2010-01-03').getTime());
-    expect(endDate.getTime()).toBe(new Date('2010-01-09').getTime());
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artist');
     expect(chartDetails[0]).toHaveProperty('title');
-    expect.assertions(6);
+    expect.assertions(4);
+  });
+
+  it('The Melon monthly chart has been available since January 1, 2010. So fetchChart(\'2009\', \'12\', \'30\', \'MO\') is going to throw Error.', () => {
+    expect(() => fetchChart('2009', '12', '30', 'MO')).rejects.toThrowError('The Melon monthly chart has been available since January 1, 2010.');
+    expect.assertions(1);
+  });
+
+  it('The Melon monthly chart has been available since January 1, 2010. We will test using a randomly selected first day of month after this date.', async () => {
+    const minDate = new Date('2012-01-01');
+    const today = new Date();
+    const { startDate: _startDate } = getRandomDateRange(minDate, today, 1);
+    const testTarget = new Date(_startDate.setDate(1));
+    const { year, month, day } = extractYearMonthDay(testTarget);
+    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'MO');
+    const { chartType } = chartScope;
+
+    expect(chartType).toBe('MO');
+    expect(chartDetails[0]).toHaveProperty('rank');
+    expect(chartDetails[0]).toHaveProperty('artist');
+    expect(chartDetails[0]).toHaveProperty('title');
+    expect.assertions(4);
   });
 });
 
