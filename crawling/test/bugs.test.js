@@ -9,8 +9,8 @@ import { extractYearMonthDay } from '../src/util/time.js';
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
 
 describe('The fetchChart func Test', () => {
-  it('The Bugs daily chart has been available since September 22, 2006. So fetchChart(\'2006\', \'03\', \'21\', \'day\') is going to throw Error.', () => {
-    expect(() => fetchChart('2006', '03', '21', 'day')).rejects.toThrowError('The Bugs daily chart has been available since September 22, 2006.');
+  it('The Bugs daily chart has been available since September 22, 2006. So fetchChart(\'2006\', \'03\', \'21\', \'d\') is going to throw Error.', () => {
+    expect(() => fetchChart('2006', '03', '21', 'd')).rejects.toThrowError('The Bugs daily chart has been available since September 22, 2006.');
     expect.assertions(1);
   });
 
@@ -20,18 +20,18 @@ describe('The fetchChart func Test', () => {
     const { startDate: _startDate } = getRandomDateRange(minDate, today, 1);
     const testTarget = moveToNearestFutureDay(_startDate, 1);
     const { year, month, day } = extractYearMonthDay(testTarget);
-    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'day');
+    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'd');
     const { chartType } = chartScope;
 
-    expect(chartType).toBe('day');
+    expect(chartType).toBe('d');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artist');
     expect(chartDetails[0]).toHaveProperty('title');
     expect.assertions(4);
   });
 
-  it('The Bugs weekly chart has been available since August 29, 2003. So fetchChart(\'2003\', \'08\', \'28\', \'week\') is going to throw Error.', () => {
-    expect(() => fetchChart('2003', '08', '28', 'week')).rejects.toThrowError('The Bugs weekly chart has been available since August 29, 2003.');
+  it('The Bugs weekly chart has been available since August 29, 2003. So fetchChart(\'2003\', \'08\', \'28\', \'w\') is going to throw Error.', () => {
+    expect(() => fetchChart('2003', '08', '28', 'w')).rejects.toThrowError('The Bugs weekly chart has been available since August 29, 2003.');
     expect.assertions(1);
   });
 
@@ -41,20 +41,23 @@ describe('The fetchChart func Test', () => {
     const { startDate: _startDate } = getRandomDateRange(minDate, today, 1);
     const testTarget = new Date(_startDate.setDate(1));
     const { year, month, day } = extractYearMonthDay(testTarget);
-    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'week');
-    const { chartType } = chartScope;
+    const { chartDetails, chartScope } = await fetchChart(year, month, day, 'w');
+    const { chartType, weekOfMonth } = chartScope;
 
-    expect(chartType).toBe('week');
+    expect(chartType).toBe('w');
+    expect(weekOfMonth).toHaveProperty('week');
+    expect(weekOfMonth).toHaveProperty('month');
+    expect(weekOfMonth).toHaveProperty('year');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artist');
     expect(chartDetails[0]).toHaveProperty('title');
-    expect.assertions(4);
+    expect.assertions(7);
   });
 });
 
 describe('fetchChartsForDateRangeInParallel', () => {
   it('It can obtain daily charts for a specific period.', async () => {
-    const result = await fetchChartsForDateRangeInParallel(new Date('2024-02-21'), new Date('2024-03-01'), 'day');
+    const result = await fetchChartsForDateRangeInParallel(new Date('2024-02-21'), new Date('2024-03-01'), 'd');
     const { chartScope: chartScope2M } = result.find(item => item.chartScope.date.getDate() === new Date('2024-02-01').getDate());
     const { chartScope: chartScope3M } = result.find(item => item.chartScope.date.getDate() === new Date('2024-03-01').getDate());
     expect(result.length).toBe(10);
@@ -63,7 +66,7 @@ describe('fetchChartsForDateRangeInParallel', () => {
     expect.assertions(3);
   });
   it('It can obtain weekly charts for a specific period.', async () => {
-    const result = await fetchChartsForDateRangeInParallel(new Date('2024-02-05'), new Date('2024-02-16'), 'week');
+    const result = await fetchChartsForDateRangeInParallel(new Date('2024-02-05'), new Date('2024-02-16'), 'w');
     const { chartScope: chartScope2M2W } = result.find(item => item.chartScope.startDate.getDate() === new Date('2024-02-05').getDate());
     const { chartScope: chartScope2M3W } = result.find(item => item.chartScope.startDate.getDate() === new Date('2024-02-12').getDate());
     expect(result.length).toBe(2);

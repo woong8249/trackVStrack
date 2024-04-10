@@ -73,3 +73,29 @@ export function extractYearMonthDay(date) {
   const day = (`0${date.getDate()}`).slice(-2);
   return { year, month, day };
 }
+
+export function calculateWeekOfMonth(startDate, endDate) {
+  const diff = (endDate - startDate) / (1000 * 60 * 60 * 24);
+
+  if (diff !== 6) {
+    throw new Error('The interval between startDate and endDate must be exactly 7 days.');
+  }
+
+  // Determine the month and year based on the majority of the week
+  const majorityDate = new Date(startDate);
+  majorityDate.setDate(startDate.getDate() + 3); // Adding 3 days to get to the majority day of the week
+  const month = majorityDate.getMonth() + 1;
+  const year = majorityDate.getFullYear();
+
+  // Calculate the first day of the week's month
+  const firstDayOfMonth = new Date(year, month - 1, 1);
+  // Find out the week of the month for the majority date
+  let week = Math.ceil(((majorityDate - firstDayOfMonth) / (86400000) + firstDayOfMonth.getDay() + 1) / 7);
+
+  // Adjust for weeks that might be considered the first week of the next month
+  if (majorityDate.getMonth() !== startDate.getMonth()) {
+    week = 1; // If the majority of the week falls into the next month, it's considered the first week
+  }
+
+  return { year, month, week };
+}
