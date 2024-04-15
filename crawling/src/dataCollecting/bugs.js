@@ -1,6 +1,5 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable newline-per-chained-call */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-restricted-syntax */
 import * as cheerio from 'cheerio';
 
 import {
@@ -15,7 +14,6 @@ const ERRORS = {
   MAX_CHUNK: 'max 30',
   CHECK_CHART_TYPE: 'check chartType',
 };
-
 const minDateDA = new Date('2006-03-22').getTime();
 const minDateWE = new Date('2003-08-29').getTime();
 
@@ -63,49 +61,6 @@ function determineChartScope(year, month, day, chartType) {
   return chartScope;
 }
 
-function extractAndRemoveBrackets(str) {
-  const bracketContent = [];
-  let resultStr = str;
-  let lastIndex = 0;
-  let depth = 0;
-  for (let i = 0; i < str.length; i += 1) {
-    if (str[i] === '(') {
-      depth += 1;
-      if (depth === 1)
-        lastIndex = i; // 첫 괄호 시작 인덱스
-    } else if (str[i] === ')') {
-      depth -= 1;
-      if (depth === 0) {
-        // 가장 바깥쪽 괄호 내용 추출
-        bracketContent.push(str.substring(lastIndex + 1, i));
-        resultStr = resultStr.substring(0, lastIndex) + resultStr.substring(i + 1);
-        i = lastIndex;
-      }
-    }
-  }
-  return { content: bracketContent, text: resultStr.trim() };
-}
-
-function normalization(rank, title, artist) {
-  const additionalInformation = {};
-  title = title.replace(/19금\s*/g, '');
-  // title과 artist의 괄호 처리
-  const titleResult = extractAndRemoveBrackets(title);
-  const artistResult = extractAndRemoveBrackets(artist);
-  // 추출된 괄호 내용이 있으면 additionalInformation에 추가
-  if (titleResult.content.length)
-    additionalInformation.title = titleResult.content;
-  if (artistResult.content.length)
-    additionalInformation.artist = artistResult.content;
-  title = titleResult.text;
-  artist = artistResult.text;
-  const detailObject = { rank, title, artist };
-  // 추가 정보가 있을 경우만 객체에 추가
-  if (Object.keys(additionalInformation).length) {
-    detailObject.additionalInformation = additionalInformation;
-  }
-  return detailObject;
-}
 /**
  * @param {string} year
  * @param {string} month
@@ -121,13 +76,20 @@ export async function fetchChart(year, month, day, chartType) {
   const $ = cheerio.load(bugsHtml);
   const list = $('tr');
   const chartDetails = list.map((_i, element) => {
-    const artist = $(element).find('p.artist').find('a').length === 1
+    const rank = $(element).find('div.ranking strong').text().trim();
+    const artist = $(element).find('p.artist a').length === 1
       ? $(element).find('p.artist').text().trim()
       : $(element).find('p.artist').find('a').eq(0).text().trim();
-    const rank = $(element).find('div.ranking').find('strong').text().trim();
-    const title = $(element).find('p.title').text().trim();
-    const detailObject = normalization(rank, title, artist);
-    return detailObject;
+    const title = $(element).find('p.title a').text().trim();
+    // const detailObject = extractBracketsAndNormalize(rank, title, artist);
+    // return detailObject;
+
+    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    const albumID = $(element).attr('albumid');
+
+    return {
+      rank, title, artist, keyword, albumID,
+    };
   }).get();
 
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'bugs' };
@@ -166,4 +128,16 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   }));
 
   return result.flat();
+}
+
+export async function fetchReleaseDate(albumID) {
+  const url = `https://music.bugs.co.kr/album/${albumID}`;
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  // eslint-disable-next-line func-names
+  const releaseDate = $('table.info th').filter(function () {
+    return $(this).text().trim() === '발매일';
+  }).next('td').find('time').text().trim();
+
+  return releaseDate;
 }

@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-useless-escape */
 /* eslint-disable no-restricted-syntax */
 import * as cheerio from 'cheerio';
 
@@ -8,6 +8,8 @@ import {
 } from '../util/time.js';
 import { getHtml } from '../util/fetch.js';
 import winLogger from '../util/winston.js';
+
+// import { extractBracketsAndNormalize } from './commonChartUtils.js';
 
 const ERRORS = {
   CHART_DA: 'The Genie daily chart is available starting from March 28, 2012.',
@@ -56,53 +58,6 @@ function determineChartScope(year, month, day, chartType) {
   return chartScope;
 }
 
-function extractAndRemoveBrackets(str) {
-  const bracketContent = [];
-  let resultStr = str;
-  let lastIndex = 0;
-  let depth = 0;
-  for (let i = 0; i < str.length; i += 1) {
-    if (str[i] === '(') {
-      depth += 1;
-      if (depth === 1)
-        lastIndex = i; // 첫 괄호 시작 인덱스
-    } else if (str[i] === ')') {
-      depth -= 1;
-      if (depth === 0) {
-        // 가장 바깥쪽 괄호 내용 추출
-        bracketContent.push(str.substring(lastIndex + 1, i));
-        resultStr = resultStr.substring(0, lastIndex) + resultStr.substring(i + 1);
-        i = lastIndex;
-      }
-    }
-  }
-  return { content: bracketContent, text: resultStr.trim() };
-}
-
-function normalization(rank, title, artist) {
-  const additionalInformation = {};
-  title = title.replace(/19금\s*/g, '');
-  // title과 artist의 괄호 처리
-  const titleResult = extractAndRemoveBrackets(title);
-  const artistResult = extractAndRemoveBrackets(artist);
-  // 추출된 괄호 내용이 있으면 additionalInformation에 추가
-  if (titleResult.content.length)
-    additionalInformation.title = titleResult.content;
-  if (artistResult.content.length)
-    additionalInformation.artist = artistResult.content;
-  title = titleResult.text;
-  artist = artistResult.text;
-  const detailObject = { rank, title, artist };
-  // 추가 정보가 있을 경우만 객체에 추가
-  if (Object.keys(additionalInformation).length) {
-    detailObject.additionalInformation = additionalInformation;
-  }
-  return detailObject;
-}
-
-/**
- * @param { 'd' | 'w'| 'm'} chartType - default is MO
-  */
 function standardizeChartType(chartType) {
   if (chartType === 'd')
     return 'D';
@@ -132,16 +87,28 @@ export async function fetchChart(year, month, day, chartType) {
     `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=1`,
     `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=2`,
   ];
+  console.log(urls);
   const htmlContents = await Promise.all(urls.map(url => getHtml(url)));
   const combinedHtml = htmlContents.join(' ');
   const $ = cheerio.load(combinedHtml);
   const bodyList = $('tr.list');
   const chartDetails = bodyList.map((_i, element) => {
     const rank = $(element).find('td.number').text().match(/\d+/)[0];
-    const title = $(element).find('td.info a.title').text().trim();
-    const artist = $(element).find('td.info a.artist').text().trim();
-    const detailObject = normalization(rank, title, artist);
-    return detailObject;
+    const title = $(element).find('td.info a.title')
+      .children('span.icon-19')
+      .remove()
+      .end() // '19금' 텍스트를 포함하는 span 제거
+      .text()
+      .trim();
+
+    const artist = $(element).find('td.info a.artist').text().trim()
+      .split('&');
+    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    const albumID = $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
+
+    return {
+      rank, title, artist, keyword, albumID,
+    };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'genie' };
 }
@@ -183,4 +150,17 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   }));
 
   return result.flat();
+}
+
+export async function fetchReleaseDate(albumID) {
+  const url = `https://www.genie.co.kr/detail/albumInfo?axnm=${albumID}`;
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  // eslint-disable-next-line func-names
+  const releaseDate = $('.info-data li').filter(function () {
+    return $(this).find('img').attr('alt') === '발매일';
+  }).find('.value').text()
+    .trim();
+
+  return releaseDate;
 }

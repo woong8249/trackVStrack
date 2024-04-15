@@ -1,6 +1,5 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-useless-escape */
 /* eslint-disable max-len */
-/* eslint-disable no-restricted-syntax */
 import * as cheerio from 'cheerio';
 
 import {
@@ -9,6 +8,8 @@ import {
 } from '../util/time.js';
 import { getHtml } from '../util/fetch.js';
 import winLogger from '../util/winston.js';
+
+// import { extractBracketsAndNormalize } from './commonChartUtils.js';
 
 const ERRORS = {
   CHART_WE: 'The Melon weekly chart has been available since January 3, 2010.',
@@ -28,9 +29,6 @@ const options = {
 const minDateWE = new Date('2010-01-03').getTime();
 const minDateMO = new Date('2010-01-01').getTime();
 
-/**
- * @param { 'm' | 'w'} chartType - default is MO
-  */
 function standardizeChartType(chartType) {
   if (chartType === 'm')
     return 'MO';
@@ -57,48 +55,17 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-function extractAndRemoveBrackets(str) {
-  const bracketContent = [];
-  let resultStr = str;
-  let lastIndex = 0;
-  let depth = 0;
-  for (let i = 0; i < str.length; i += 1) {
-    if (str[i] === '(') {
-      depth += 1;
-      if (depth === 1)
-        lastIndex = i; // 첫 괄호 시작 인덱스
-    } else if (str[i] === ')') {
-      depth -= 1;
-      if (depth === 0) {
-        // 가장 바깥쪽 괄호 내용 추출
-        bracketContent.push(str.substring(lastIndex + 1, i));
-        resultStr = resultStr.substring(0, lastIndex) + resultStr.substring(i + 1);
-        i = lastIndex;
-      }
-    }
-  }
-  return { content: bracketContent, text: resultStr.trim() };
-}
+export async function fetchReleaseDate(songID) {
+  const url = `https://www.melon.com/song/detail.htm?songId=${songID}`;
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  // eslint-disable-next-line func-names
+  const releaseDate = $('dt').filter(function () {
+    return $(this).text().trim() === '발매일';
+  }).next('dd').text()
+    .trim();
 
-function normalization(rank, title, artist) {
-  const additionalInformation = {};
-  title = title.replace(/19금\s*/g, '');
-  // title과 artist의 괄호 처리
-  const titleResult = extractAndRemoveBrackets(title);
-  const artistResult = extractAndRemoveBrackets(artist);
-  // 추출된 괄호 내용이 있으면 additionalInformation에 추가
-  if (titleResult.content.length)
-    additionalInformation.title = titleResult.content;
-  if (artistResult.content.length)
-    additionalInformation.artist = artistResult.content;
-  title = titleResult.text;
-  artist = artistResult.text;
-  const detailObject = { rank, title, artist };
-  // 추가 정보가 있을 경우만 객체에 추가
-  if (Object.keys(additionalInformation).length) {
-    detailObject.additionalInformation = additionalInformation;
-  }
-  return detailObject;
+  return releaseDate;
 }
 
 /**
@@ -128,13 +95,18 @@ export async function fetchChart(year, month, day, chartType) {
   const melonHtml = await getHtml(url, options);
   const $ = cheerio.load(melonHtml);
   const songSelectors = $('tr.lst50, tr.lst100');
-  // const chartDetails = normalization($, songSelectors);
   const chartDetails = songSelectors.map((_i, element) => {
     const rank = $(element).find('span.rank').text().match(/\d+/)[0];
-    const title = $(element).find('div.ellipsis.rank01').text().trim();
-    const artist = $(element).find('div.ellipsis.rank02 span.checkEllipsis').text().trim();
-    const detailObject = normalization(rank, title, artist);
-    return detailObject;
+    const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
+    const artist = $(element).find('div.ellipsis.rank02 span.checkEllipsis').text().trim()
+      .split(',');
+    const songID = $(element).find('input.input_check').val();
+    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    return {
+      rank, title, artist, keyword, songID,
+    };
+    // const detailObject = extractBracketsAndNormalize(rank, title, artist);
+    // return detailObject;
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'melon' };
 }
