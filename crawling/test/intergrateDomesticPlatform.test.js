@@ -9,7 +9,7 @@ import {
 import * as bugs from '../src/dataCollecting/domestic/bugs.js';
 import * as genie from '../src/dataCollecting/domestic/genie.js';
 import * as melon from '../src/dataCollecting/domestic/melon.js';
-import { integrateDomesticPlatformChart, mappingChartDataToTrack } from '../src/dataCollecting/domestic/Integrate.js';
+import { integrateDomesticPlatformChart, mappingChartDataToTrack } from '../src/dataCollecting/domestic/integrate.js';
 import redisClient from '../src/redis/redisClient.js';
 
 import { checkForDuplicates } from './util.js';
