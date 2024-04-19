@@ -5,11 +5,9 @@ import * as cheerio from 'cheerio';
 import {
   arrayToChunk, calculateWeekOfMonth, createAllDatesBetween,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
-} from '../util/time.js';
-import { getHtml } from '../util/fetch.js';
-import winLogger from '../util/winston.js';
-
-// import { extractBracketsAndNormalize } from './commonChartUtils.js';
+} from '../../util/time.js';
+import { getHtml } from '../../util/fetch.js';
+import winLogger from '../../util/winston.js';
 
 const ERRORS = {
   CHART_DA: 'The Genie daily chart is available starting from March 28, 2012.',
@@ -87,7 +85,6 @@ export async function fetchChart(year, month, day, chartType) {
     `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=1`,
     `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=2`,
   ];
-  console.log(urls);
   const htmlContents = await Promise.all(urls.map(url => getHtml(url)));
   const combinedHtml = htmlContents.join(' ');
   const $ = cheerio.load(combinedHtml);
@@ -100,14 +97,15 @@ export async function fetchChart(year, month, day, chartType) {
       .end() // '19금' 텍스트를 포함하는 span 제거
       .text()
       .trim();
-
-    const artist = $(element).find('td.info a.artist').text().trim()
+    const artists = $(element).find('td.info a.artist').text().trim()
       .split('&');
-    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    const titleKeyword = title.replace(/\s*[\(\[-].*$/, '');
+    const artistKeyword = artists[0].replace(/\s*[\(\[-].*$/, '');
     const albumID = $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
+    const thumbnail = 'https:' + $(element).find('a.cover img').attr('src');
 
     return {
-      rank, title, artist, keyword, albumID,
+      rank, title, artists, titleKeyword, albumID, thumbnail, artistKeyword,
     };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'genie' };
@@ -126,19 +124,22 @@ export async function fetchChart(year, month, day, chartType) {
  * @param {number} chunkSize - default is 10, max30
   */
 export async function fetchChartsForDateRangeInParallel(startDate, endDate, chartType, chunkSize = 10) {
+  const copiedStartDate = new Date(startDate);
+  const copiedEndDate = new Date(endDate);
   if (chunkSize > 31) {
     throw Error('max 30');
   }
   let dates;
   if (chartType === 'd') {
-    dates = createAllDatesBetween(startDate, endDate);
+    dates = createAllDatesBetween(copiedStartDate, copiedEndDate);
   } else if (chartType === 'w') {
-    dates = createWeeklyDatesBetween(startDate, endDate, 1);
+    dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 1);
   } else if (chartType === 'm') {
-    dates = createMonthlyFirstDatesBetween(startDate, endDate);
+    dates = createMonthlyFirstDatesBetween(copiedStartDate, copiedEndDate);
   } else {
     throw Error('check chartType');
   }
+
   const dateChunks = arrayToChunk(dates, chunkSize);
 
   const result = await Promise.all(dateChunks.map(async chunk => {

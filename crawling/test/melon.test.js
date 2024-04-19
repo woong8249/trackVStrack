@@ -3,7 +3,7 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/melon.js';
+import { fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/domestic/melon.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
@@ -35,7 +35,7 @@ describe('The fetchChart func Test', () => {
     expect(weekOfMonth).toHaveProperty('month');
     expect(weekOfMonth).toHaveProperty('year');
     expect(chartDetails[0]).toHaveProperty('rank');
-    expect(chartDetails[0]).toHaveProperty('artist');
+    expect(chartDetails[0]).toHaveProperty('artists');
     expect(chartDetails[0]).toHaveProperty('title');
     expect.assertions(7);
   });
@@ -56,7 +56,7 @@ describe('The fetchChart func Test', () => {
 
     expect(chartType).toBe('m');
     expect(chartDetails[0]).toHaveProperty('rank');
-    expect(chartDetails[0]).toHaveProperty('artist');
+    expect(chartDetails[0]).toHaveProperty('artists');
     expect(chartDetails[0]).toHaveProperty('title');
     expect.assertions(4);
   });

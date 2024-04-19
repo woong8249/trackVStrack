@@ -2,8 +2,9 @@ import winLogger from '../src/util/winston';
 
 function required(key, defaultValue = undefined) {
   const value = import.meta.env?.[key] ?? process.env[key] ?? defaultValue;
-  if (value === undefined)
+  if (value === undefined) {
     throw new Error(`config ${key} is undefined`);
+  }
   return value;
 }
 

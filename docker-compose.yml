@@ -1,0 +1,22 @@
+version: '3'
+
+name: chart
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+
+  mysql:
+    image: mysql:latest
+    platform: linux/arm64  #
+    environment:
+     MYSQL_ROOT_PASSWORD: 12345678  
+     MYSQL_DATABASE: chartchart  
+     MYSQL_USER: jiwoong
+    ports:
+      - "3306:3306"  
+    volumes:
+      - mysql-data:/var/lib/mysql  
+

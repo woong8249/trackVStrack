@@ -4,7 +4,13 @@
             "path": "./"
         },
         {
-            "path": "./back"
+            "path": "./crawling"
+        },
+        {
+            "path": "./APIServer"
         },
     ],
+    "settings": {
+        "liveServer.settings.multiRootWorkspaceName": "music-chart-compare"
+    },
 }

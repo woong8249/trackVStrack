@@ -34,3 +34,16 @@ export function moveToNearestFutureDay(date, targetDay) {
   newDate.setDate(newDate.getDate() + daysToAdd);
   return newDate;
 }
+
+export function checkForDuplicates(tracks, platform) {
+  const uniqueCombinations = new Set();
+
+  tracks.forEach(track => {
+    if (track.platforms[platform]) {
+      const key = `${track.titleKeyword}-${track.artistKeyword}`;
+      uniqueCombinations.add(key);
+    }
+  });
+
+  return uniqueCombinations.size === tracks.filter(track => track.platforms[platform]).length;
+}

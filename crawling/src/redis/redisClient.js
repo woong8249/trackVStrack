@@ -5,10 +5,10 @@ import winLogger from '../util/winston';
 
 const { socket } = config.redis;
 
-const client = createClient({
+const redisClient = createClient({
   socket,
 });
-client.on('connect', () => winLogger.info('Redis connected!'));
-await client.connect();
+redisClient.on('connect', () => winLogger.info('Redis connected!'));
+await redisClient.connect();
 
-export default client;
+export default redisClient;

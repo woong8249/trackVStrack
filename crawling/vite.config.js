@@ -1,11 +1,16 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, loadEnv } from 'vite';
 
-export default defineConfig({
-  test: {
-    root: 'test',
-    reporters: 'verbose',
-    coverage: {
-      provider: 'v8',
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  return {
+    test: {
+      env,
+      root: 'test',
+      reporters: 'verbose',
+      watch: false,
+      coverage: {
+        provider: 'v8',
+      },
     },
-  },
+  };
 });

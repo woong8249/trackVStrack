@@ -5,9 +5,9 @@ import * as cheerio from 'cheerio';
 import {
   addSixDaysToYYYYMMDD, arrayToChunk, calculateWeekOfMonth,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
-} from '../util/time.js';
-import { getHtml } from '../util/fetch.js';
-import winLogger from '../util/winston.js';
+} from '../../util/time.js';
+import { getHtml } from '../../util/fetch.js';
+import winLogger from '../../util/winston.js';
 
 // import { extractBracketsAndNormalize } from './commonChartUtils.js';
 
@@ -55,8 +55,8 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-export async function fetchReleaseDate(songID) {
-  const url = `https://www.melon.com/song/detail.htm?songId=${songID}`;
+export async function fetchReleaseDate(trackID) {
+  const url = `https://www.melon.com/song/detail.htm?trackID=${trackID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   // eslint-disable-next-line func-names
@@ -98,15 +98,15 @@ export async function fetchChart(year, month, day, chartType) {
   const chartDetails = songSelectors.map((_i, element) => {
     const rank = $(element).find('span.rank').text().match(/\d+/)[0];
     const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
-    const artist = $(element).find('div.ellipsis.rank02 span.checkEllipsis').text().trim()
+    const artists = $(element).find('div.ellipsis.rank02 span.checkEllipsis').text().trim()
       .split(',');
-    const songID = $(element).find('input.input_check').val();
-    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    const trackID = $(element).find('input.input_check').val();
+    const thumbnail = $(element).find('img').attr('src');
+    const titleKeyword = title.replace(/\s*[\(\[-].*$/, '');
+    const artistKeyword = artists[0].replace(/\s*[\(\[-].*$/, '');
     return {
-      rank, title, artist, keyword, songID,
+      rank, title, artists, titleKeyword, trackID, thumbnail, artistKeyword,
     };
-    // const detailObject = extractBracketsAndNormalize(rank, title, artist);
-    // return detailObject;
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'melon' };
 }
@@ -120,11 +120,13 @@ export async function fetchChart(year, month, day, chartType) {
  * @param {number} chunkSize - default =10, max=30
  */
 export async function fetchChartsForDateRangeInParallel(startDate, endDate, chartType, chunkSize = 10) {
+  const copiedStartDate = new Date(startDate);
+  const copiedEndDate = new Date(endDate);
   if (chunkSize > 31) {
     throw Error('max 30');
   }
 
-  const dates = generateDatesForChartType(startDate, endDate, chartType);
+  const dates = generateDatesForChartType(copiedStartDate, copiedEndDate, chartType);
   const dateChunks = arrayToChunk(dates, chunkSize);
   const result = await Promise.all(dateChunks.map(async chunk => {
     const chunkResults = await Promise.all(chunk.map(date => {

@@ -5,8 +5,9 @@ import * as cheerio from 'cheerio';
 import {
   arrayToChunk, calculateWeekOfMonth, createAllDatesBetween, createWeeklyDatesBetween,
   extractYearMonthDay,
-} from '../util/time.js';
-import { getHtml } from '../util/fetch.js';
+} from '../../util/time.js';
+import { getHtml } from '../../util/fetch.js';
+import winLogger from '../../util/winston.js';
 
 const ERRORS = {
   CHART_DA: 'The Bugs daily chart has been available since September 22, 2006.',
@@ -77,18 +78,17 @@ export async function fetchChart(year, month, day, chartType) {
   const list = $('tr');
   const chartDetails = list.map((_i, element) => {
     const rank = $(element).find('div.ranking strong').text().trim();
-    const artist = $(element).find('p.artist a').length === 1
+    const artists = $(element).find('p.artist a').length === 1
       ? $(element).find('p.artist').text().trim()
       : $(element).find('p.artist').find('a').eq(0).text().trim();
     const title = $(element).find('p.title a').text().trim();
-    // const detailObject = extractBracketsAndNormalize(rank, title, artist);
-    // return detailObject;
-
-    const keyword = title.replace(/\s*[\(\[-].*$/, '');
+    const thumbnail = $(element).find('a.thumbnail img').attr('src');
+    const titleKeyword = title.replace(/\s*[\(\[-].*$/, '');
+    const artistKeyword = artists.replace(/\s*[\(\[-].*$/, '');
     const albumID = $(element).attr('albumid');
 
     return {
-      rank, title, artist, keyword, albumID,
+      rank, title, artists: [artists], albumID, thumbnail, titleKeyword, artistKeyword,
     };
   }).get();
 
@@ -102,27 +102,29 @@ export async function fetchChart(year, month, day, chartType) {
  * @param {number} chunkSize - default is 10, max30
   */
 export async function fetchChartsForDateRangeInParallel(startDate, endDate, chartType, chunkSize = 10) {
+  const copiedStartDate = new Date(startDate);
+  const copiedEndDate = new Date(endDate);
   if (chunkSize > 31) {
     throw Error('max 30');
   }
   let dates;
   if (chartType === 'd') {
-    dates = createAllDatesBetween(startDate, endDate);
-  } else if (chartType === 'w' && startDate.getTime() <= new Date('2010-11-10').getTime()) {
-    dates = createWeeklyDatesBetween(startDate, endDate, 5);
-  } else if (chartType === 'w' && startDate.getTime() <= new Date('2012-08-12').getTime()) {
-    dates = createWeeklyDatesBetween(startDate, endDate, 1);
-  } else if (chartType === 'w' && startDate.getTime() <= new Date('2014-08-04').getTime()) {
-    dates = createWeeklyDatesBetween(startDate, endDate, 2);
+    dates = createAllDatesBetween(copiedStartDate, copiedEndDate);
+  } else if (chartType === 'w' && copiedStartDate.getTime() <= new Date('2010-11-10').getTime()) {
+    dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 5);
+  } else if (chartType === 'w' && copiedStartDate.getTime() <= new Date('2012-08-12').getTime()) {
+    dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 1);
+  } else if (chartType === 'w' && copiedStartDate.getTime() <= new Date('2014-08-04').getTime()) {
+    dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 2);
   } else {
-    dates = createWeeklyDatesBetween(startDate, endDate, 1);
+    dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 1);
   }
   const dateChunks = arrayToChunk(dates, chunkSize);
 
   const result = await Promise.all(dateChunks.map(async chunk => {
     const chunkResults = await Promise.all(chunk.map(date => {
       const { year, month, day } = extractYearMonthDay(date);
-      return fetchChart(year, month, day, chartType).catch(err => console.error(err));
+      return fetchChart(year, month, day, chartType).catch(err => winLogger.error(err));
     }));
     return chunkResults.flat();
   }));
