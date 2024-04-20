@@ -1,7 +1,7 @@
-import config from '../../config/config.js';
-import redisClient from '../redis/redisClient.js';
-import redisKey from '../../config/redisKey.js';
-import winLogger from '../util/winston.js';
+import config from '../../../config/config.js';
+import redisClient from '../../redis/redisClient.js';
+import redisKey from '../../../config/redisKey.js';
+import winLogger from '../../util/winston.js';
 
 const { spotify } = config;
 

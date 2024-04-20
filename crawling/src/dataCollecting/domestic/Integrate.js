@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-
 import redisClient from '../../redis/redisClient.js';
 
 import * as bugs from './bugs.js';
@@ -31,7 +30,6 @@ function removeDuplicates(chartData) {
       uniqueCharts.push(chart);
     }
   }
-
   return uniqueCharts;
 }
 
@@ -69,14 +67,14 @@ async function alreadySavedTrack(track, redisKeyName, number) {
   const platformName = Object.keys(platforms)[0];
 
   const { platforms: savedPlatformsStr, artistKeyword: savedArtistKeyword } = await redisClient.hGetAll(redisKeyName);
-  let savedPlatform = JSON.parse(savedPlatformsStr);
+  const savedPlatform = JSON.parse(savedPlatformsStr);
   const savedPlatformKeyList = Object.keys(savedPlatform);
   const isSamePlatform = savedPlatformKeyList.some(savedPlatformName => savedPlatformName === platformName);
   const isSameArtist = savedArtistKeyword === artistKeyword;
 
   if (isSameArtist && isSamePlatform) { // 같은 곡 같은 플랫폼인경우
     savedPlatform[platformName].chartInfos.push(platforms[platformName].chartInfos[0]);
-    savedPlatform = removeDuplicates(savedPlatform[platformName].chartInfos);
+    savedPlatform[platformName].chartInfos = removeDuplicates(savedPlatform[platformName].chartInfos);
   } else if (isSameArtist && !isSamePlatform) { // 같은 곡 다른 플랫폼인경우
     savedPlatform[platformName] = platforms[platformName];
     savedPlatformKeyList.length === 1 // 기존 저장된 플랫폼이 유일하게 bugs인 경우

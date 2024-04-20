@@ -11,6 +11,7 @@ import * as genie from '../src/dataCollecting/domestic/genie.js';
 import * as melon from '../src/dataCollecting/domestic/melon.js';
 import { integrateDomesticPlatformChart, mappingChartDataToTrack } from '../src/dataCollecting/domestic/integrate.js';
 import redisClient from '../src/redis/redisClient.js';
+// import flushAllRedisData from '../src/redis/flushAllRedisData.js';
 
 import { checkForDuplicates } from './util.js';
 
@@ -38,11 +39,12 @@ describe('Test func mappingChartDataToTrack', async () => {
 
 describe('function integrateDomesticPlatformChart', () => {
   it('Chart information will not be duplicated in the Redis hash.', async () => {
-    await integrateDomesticPlatformChart(new Date('2023-10-16'), new Date('2023-10-31'), 'w');
-    await integrateDomesticPlatformChart(new Date('2023-10-16'), new Date('2023-10-31'), 'w');
+    // await flushAllRedisData();
+    await integrateDomesticPlatformChart(new Date('2023-01-02'), new Date('2023-06-25'), 'w');
     const trackNamedSpicy = await redisClient.hGetAll('Spicy/0');
     const platformsOfSpicy = JSON.parse(trackNamedSpicy.platforms);
     const platformsListOfSpicy = Object.keys(platformsOfSpicy);
     expect(platformsListOfSpicy.length).toBe(3);
-  });
+    console.log(platformsOfSpicy, trackNamedSpicy);
+  }, 50000);
 });
