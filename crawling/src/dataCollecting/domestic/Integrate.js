@@ -142,19 +142,21 @@ async function fetchAndSaveWithRetry(fetchFunction, platformName, id, track, ret
       winLogger.info('delay...', { delay, count });
       setTimeout(resolve, delay);
     });
-    const result = await fetchFunction(id);
-    await saveToRedis(Object.assign(track, result));
+    const fetchResult = await fetchFunction(id);
+    const trackResult = Object.assign(track, fetchResult);
+    await saveToRedis(trackResult);
+    return trackResult;
   } catch (error) {
     if (retries <= 1) {
       winLogger.error('Final attempt failed:', { error });
-    } else {
-      winLogger.info(`Retrying after delay. Attempts left: ${retries - 1}`);
-      await new Promise(resolve => {
-        winLogger.info('delay...', { delay });
-        setTimeout(resolve, delay);
-      });
-      fetchAndSaveWithRetry(fetchFunction, platformName, id, track, retries - 1, delay);
+      return null;
     }
+    winLogger.info(`Retrying after delay. Attempts left: ${retries - 1}`);
+    await new Promise(resolve => {
+      winLogger.info('delay...', { delay });
+      setTimeout(resolve, delay);
+    });
+    return fetchAndSaveWithRetry(fetchFunction, platformName, id, track, retries - 1, delay);
   }
 }
 

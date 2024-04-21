@@ -79,7 +79,6 @@ describe('fetchChartsForDateRangeInParallel', () => {
 describe('func fetchReleaseDateAndImage', () => {
   it('This function can fetch the releaseDate and trackImage.', async () => {
     const { releaseDate, trackImage } = await fetchReleaseDateAndImage(4091551);
-    console.log(releaseDate, trackImage);
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
     const isURL = urlPattern.test(trackImage);
     expect(releaseDate.getTime()).toBe(new Date('2023-10-13').getTime());

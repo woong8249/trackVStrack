@@ -9,9 +9,12 @@ import {
 import * as bugs from '../src/dataCollecting/domestic/bugs.js';
 import * as genie from '../src/dataCollecting/domestic/genie.js';
 import * as melon from '../src/dataCollecting/domestic/melon.js';
-import { integrateDomesticPlatformChart, mappingChartDataToTrack } from '../src/dataCollecting/domestic/integrate.js';
-import redisClient from '../src/redis/redisClient.js';
+import {
+  // fetchReleaseDateAndImageInParallel, getAllTrackFromRedis,
+  integrateDomesticPlatformChart, mappingChartDataToTrack,
+} from '../src/dataCollecting/domestic/integrate.js';
 // import flushAllRedisData from '../src/redis/flushAllRedisData.js';
+import redisClient from '../src/redis/redisClient.js';
 
 import { checkForDuplicates } from './util.js';
 
@@ -42,9 +45,34 @@ describe('function integrateDomesticPlatformChart', () => {
   it('Chart information will not be duplicated in the Redis hash.', async () => {
     // await flushAllRedisData();
     await integrateDomesticPlatformChart(new Date('2023-01-02'), new Date('2023-01-08'), 'w');
-    const trackNamedSpicy = await redisClient.hGetAll('Spicy/0');
-    const platformsOfSpicy = JSON.parse(trackNamedSpicy.platforms);
-    const platformsListOfSpicy = Object.keys(platformsOfSpicy);
-    expect(platformsListOfSpicy.length).toBe(3);
+    const trackNamedDitto = await redisClient.hGetAll('Ditto/0');
+    const platformsOfDitto = JSON.parse(trackNamedDitto.platforms);
+    const platformsListOfDitto = Object.keys(platformsOfDitto);
+    expect(platformsListOfDitto.length).toBe(3);
   }, 50000);
 });
+
+//  레디스 데이터를 날리기때문에 주석 걸어놨습니다.
+// it('All processes to integrate charts on all domestic platforms', async () => {
+//   await flushAllRedisData();
+//   await integrateDomesticPlatformChart(new Date('2023-01-02'), new Date('2023-01-08'), 'w');
+//   const tracks = await getAllTrackFromRedis();
+//   const someTrack = tracks[0];
+//   expect(someTrack).toHaveProperty('title');
+//   expect(someTrack).toHaveProperty('titleKeyword');
+//   expect(someTrack).toHaveProperty('artists');
+//   expect(someTrack).toHaveProperty('artistKeyword');
+//   expect(someTrack).toHaveProperty('platforms');
+
+//   const result = await fetchReleaseDateAndImageInParallel(tracks);
+//   const tracksAddedRelDateAndImg = (await getAllTrackFromRedis());
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('title');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('titleKeyword');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('artists');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('artistKeyword');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('platforms');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('releaseDate');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('trackImage');
+//   expect.assertions(12);
+//   console.log(result);
+// }, 50000);

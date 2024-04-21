@@ -6,6 +6,7 @@ import {
   addSixDaysToYYYYMMDD, arrayToChunk, calculateWeekOfMonth,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
 } from '../../util/time.js';
+import extractKeyword from '../../util/regex.js';
 import { getHtml } from '../../util/fetch.js';
 import winLogger from '../../util/winston.js';
 
@@ -103,8 +104,8 @@ export async function fetchChart(year, month, day, chartType) {
       .split(',');
     const trackID = $(element).find('input.input_check').val();
     const thumbnail = $(element).find('img').attr('src');
-    const titleKeyword = title.replace(/\s*[\(\[-].*$/, '');
-    const artistKeyword = artists[0].replace(/\s*[\(\[-].*$/, '');
+    const titleKeyword = extractKeyword(title);
+    const artistKeyword = extractKeyword(artists[0]);
     return {
       rank, title, artists, titleKeyword, trackID, thumbnail, artistKeyword,
     };

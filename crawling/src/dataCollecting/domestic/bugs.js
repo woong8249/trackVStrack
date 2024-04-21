@@ -7,6 +7,7 @@ import {
   arrayToChunk, calculateWeekOfMonth, createAllDatesBetween, createWeeklyDatesBetween,
   extractYearMonthDay,
 } from '../../util/time.js';
+import extractKeyword from '../../util/regex.js';
 import { getHtml } from '../../util/fetch.js';
 import winLogger from '../../util/winston.js';
 
@@ -84,8 +85,8 @@ export async function fetchChart(year, month, day, chartType) {
       : $(element).find('p.artist').find('a').eq(0).text().trim();
     const title = $(element).find('p.title a').text().trim();
     const thumbnail = $(element).find('a.thumbnail img').attr('src');
-    const titleKeyword = title.replace(/\s*[\(\[-].*$/, '');
-    const artistKeyword = artists.replace(/\s*[\(\[-].*$/, '');
+    const titleKeyword = extractKeyword(title);
+    const artistKeyword = extractKeyword(artists);
     const albumID = $(element).attr('albumid');
 
     return {
