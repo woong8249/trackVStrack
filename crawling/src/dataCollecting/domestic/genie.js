@@ -153,15 +153,19 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   return result.flat();
 }
 
-export async function fetchReleaseDate(albumID) {
+export async function fetchReleaseDateAndImage(albumID) {
   const url = `https://www.genie.co.kr/detail/albumInfo?axnm=${albumID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   // eslint-disable-next-line func-names
-  const releaseDate = $('.info-data li').filter(function () {
+  let releaseDate = $('.info-data li').filter(function () {
     return $(this).find('img').attr('alt') === '발매일';
   }).find('.value').text()
     .trim();
-
-  return releaseDate;
+  releaseDate = new Date(releaseDate.split('.').join('-'));
+  let trackImage = $('div.album-detail-infos img').attr('src');
+  if (!trackImage.startsWith('https:')) {
+    trackImage = 'https:' + trackImage;
+  }
+  return { releaseDate, trackImage };
 }

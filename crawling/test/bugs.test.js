@@ -3,7 +3,7 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/domestic/bugs.js';
+import { fetchChart, fetchChartsForDateRangeInParallel, fetchReleaseDateAndImage } from '../src/dataCollecting/domestic/bugs.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
@@ -73,5 +73,17 @@ describe('fetchChartsForDateRangeInParallel', () => {
     expect(chartScope2M2W.startDate.getTime() === new Date('2024-02-05').getDate());
     expect(chartScope2M3W.startDate.getTime() === new Date('2024-02-12').getDate());
     expect.assertions(3);
+  });
+});
+
+describe('func fetchReleaseDateAndImage', () => {
+  it('This function can fetch the releaseDate and trackImage.', async () => {
+    const { releaseDate, trackImage } = await fetchReleaseDateAndImage(4091551);
+    console.log(releaseDate, trackImage);
+    const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
+    const isURL = urlPattern.test(trackImage);
+    expect(releaseDate.getTime()).toBe(new Date('2023-10-13').getTime());
+    expect(isURL).toBe(true);
+    expect.assertions(2);
   });
 });

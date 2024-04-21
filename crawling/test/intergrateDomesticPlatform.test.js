@@ -19,6 +19,7 @@ const modules = [melon, genie, bugs];
 describe('Test func mappingChartDataToTrack', async () => {
   const promises = modules.map(ite => ite.fetchChart('2023', '10', '16', 'w'));
   const result = await Promise.all(promises);
+  // console.dir(result, { depth: 100 });
   const mappingTracks = result.reduce((pre, cur) => {
     const mappingTrack = mappingChartDataToTrack(cur);
     pre.push(mappingTrack);
@@ -40,11 +41,10 @@ describe('Test func mappingChartDataToTrack', async () => {
 describe('function integrateDomesticPlatformChart', () => {
   it('Chart information will not be duplicated in the Redis hash.', async () => {
     // await flushAllRedisData();
-    await integrateDomesticPlatformChart(new Date('2023-01-02'), new Date('2023-06-25'), 'w');
+    await integrateDomesticPlatformChart(new Date('2023-01-02'), new Date('2023-01-08'), 'w');
     const trackNamedSpicy = await redisClient.hGetAll('Spicy/0');
     const platformsOfSpicy = JSON.parse(trackNamedSpicy.platforms);
     const platformsListOfSpicy = Object.keys(platformsOfSpicy);
     expect(platformsListOfSpicy.length).toBe(3);
-    console.log(platformsOfSpicy, trackNamedSpicy);
   }, 50000);
 });

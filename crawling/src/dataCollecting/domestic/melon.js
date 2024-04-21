@@ -55,17 +55,18 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-export async function fetchReleaseDate(trackID) {
-  const url = `https://www.melon.com/song/detail.htm?trackID=${trackID}`;
+export async function fetchReleaseDateAndImage(trackID) {
+  const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   // eslint-disable-next-line func-names
-  const releaseDate = $('dt').filter(function () {
+  let releaseDate = $('dt').filter(function () {
     return $(this).text().trim() === '발매일';
   }).next('dd').text()
     .trim();
-
-  return releaseDate;
+  releaseDate = new Date(releaseDate.split('.').join('-'));
+  const trackImage = $('div.thumb img').attr('src');
+  return { releaseDate, trackImage };
 }
 
 /**

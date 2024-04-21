@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint-disable no-useless-escape */
 /* eslint-disable newline-per-chained-call */
 import * as cheerio from 'cheerio';
@@ -132,14 +133,15 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   return result.flat();
 }
 
-export async function fetchReleaseDate(albumID) {
+export async function fetchReleaseDateAndImage(albumID) {
   const url = `https://music.bugs.co.kr/album/${albumID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
-  // eslint-disable-next-line func-names
-  const releaseDate = $('table.info th').filter(function () {
+
+  let releaseDate = $('table.info th').filter(function () {
     return $(this).text().trim() === '발매일';
   }).next('td').find('time').text().trim();
-
-  return releaseDate;
+  const trackImage = $('div.innerContainer img').attr('src');
+  releaseDate = new Date(releaseDate.split('.').join('-'));
+  return { releaseDate, trackImage };
 }

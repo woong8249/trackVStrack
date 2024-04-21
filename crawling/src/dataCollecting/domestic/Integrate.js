@@ -1,22 +1,18 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import { parseJSONProperties, stringifyMembers } from '../../util/json.js';
 import redisClient from '../../redis/redisClient.js';
+import redisKey from '../../../config/redisKey.js';
+import winLogger from '../../util/winston.js';
 
 import * as bugs from './bugs.js';
 import * as genie from './genie.js';
 import * as melon from './melon.js';
 
-const modules = [melon, bugs, genie];
-
-function stringifyMembers(input) {
-  if (Array.isArray(input)) {
-    return input.map(item => Object.fromEntries(Object.entries(item)
-      .map(([key, value]) => [key, typeof value !== 'string' ? JSON.stringify(value) : value])));
-  }
-  return Object.fromEntries(Object.entries(input)
-    .map(([key, value]) => [key, typeof value !== 'string' ? JSON.stringify(value) : value]));
-}
+// const modules = [melon, bugs, genie];
+const modules = { melon, bugs, genie };
+const { trackList } = redisKey;
 
 function removeDuplicates(chartData) {
   const seen = new Set();
@@ -93,22 +89,88 @@ async function saveToRedis(tracksOrTrack, number = 0) {
       throw new Error('something is wrong');
     }
     const redisKeyName = track.titleKeyword + `/${number}`;
-    const isSavedTrack = await redisClient.sIsMember('trackList', redisKeyName);
-    if (isSavedTrack) {
+    const isSavedTrack = await redisClient.sIsMember(trackList, redisKeyName);
+    const hasReleaseDate = Boolean(track.releaseDate);
+    if (hasReleaseDate) {
+      await redisClient.HSET(redisKeyName, stringifyMembers(track));
+    } else if (isSavedTrack) {
       alreadySavedTrack(track, redisKeyName, number);
     } else {
-      await redisClient.sAdd('trackList', redisKeyName);
+      await redisClient.sAdd(trackList, redisKeyName);
       await redisClient.HSET(redisKeyName, stringifyMembers(track));
     }
   }
 }
 
 export async function integrateDomesticPlatformChart(startDate, endDate, chartType) {
-  const promises = modules.map(it => it.fetchChartsForDateRangeInParallel(startDate, endDate, chartType));
+  const promises = Object.values(modules).map(it => it.fetchChartsForDateRangeInParallel(startDate, endDate, chartType));
   const [melonCharts, bugsCharts, genieCharts] = await Promise.all(promises);
   const integrate = [...melonCharts, ...bugsCharts, ...genieCharts];
   for await (const chart of integrate) {
     const tracksArray = mappingChartDataToTrack(chart);
     await saveToRedis(tracksArray);
   }
+}
+
+export async function getAllTrackFromRedis() {
+  const trackKeywordList = await redisClient.sMembers('trackList');
+  const promises = trackKeywordList.map(trackKeyword => redisClient.hGetAll(trackKeyword));
+  const tracks = await Promise.all(promises);
+  const mappingTracks = tracks.map(track => parseJSONProperties(track));
+  return mappingTracks;
+}
+
+export async function loadBalancingFuncFetchReleaseDateAndImage(possiblePlatforms) {
+  const moduleObjects = await Promise.all(possiblePlatforms.map(async name => ({
+    name,
+    fetchReleaseDateAndImage: modules[name].fetchReleaseDateAndImage,
+    numberOfCalls: Number(await redisClient.get(`${name}FetchReleaseDateAndImage`)) || 0,
+  })));
+
+  const selectedModule = moduleObjects.reduce((prev, current) => (prev.numberOfCalls < current.numberOfCalls ? prev : current));
+  selectedModule.numberOfCalls += 1;
+  const { fetchReleaseDateAndImage } = selectedModule;
+  await redisClient.set(`${selectedModule.name}FetchReleaseDateAndImage`, JSON.stringify(selectedModule.numberOfCalls));
+  await redisClient.expire(`${selectedModule.name}FetchReleaseDateAndImage`, 30);
+  return { platformName: selectedModule.name, fetchReleaseDateAndImage };
+}
+
+async function fetchAndSaveWithRetry(fetchFunction, platformName, id, track, retries = 2, delay = 30_000, numberOfTimes = 100) {
+  try {
+    const count = await redisClient.get(`${platformName}FetchReleaseDateAndImage`);
+    count > numberOfTimes && await new Promise(resolve => {
+      winLogger.info('delay...', { delay, count });
+      setTimeout(resolve, delay);
+    });
+    const result = await fetchFunction(id);
+    await saveToRedis(Object.assign(track, result));
+  } catch (error) {
+    if (retries <= 1) {
+      winLogger.error('Final attempt failed:', { error });
+    } else {
+      winLogger.info(`Retrying after delay. Attempts left: ${retries - 1}`);
+      await new Promise(resolve => {
+        winLogger.info('delay...', { delay });
+        setTimeout(resolve, delay);
+      });
+      fetchAndSaveWithRetry(fetchFunction, platformName, id, track, retries - 1, delay);
+    }
+  }
+}
+
+export async function fetchReleaseDateAndImageInParallel(tracks) {
+  const array = [];
+  for (let i = 0; i < tracks.length; i += 1) {
+    const { platforms: savedPlatforms } = tracks[i];
+    const { platformName, fetchReleaseDateAndImage } = await loadBalancingFuncFetchReleaseDateAndImage(Object.keys(savedPlatforms));
+    const id = savedPlatforms[platformName].trackInfo[platformName === 'melon' ? 'trackID' : 'albumID'];
+    array.push({
+      fetchReleaseDateAndImage, platformName, id, track: tracks[i],
+    });
+  }
+  const promises = array.map(({
+    fetchReleaseDateAndImage, platformName, id, track,
+  }) => fetchAndSaveWithRetry(fetchReleaseDateAndImage, platformName, id, track));
+
+  return Promise.all(promises);
 }
