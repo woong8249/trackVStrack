@@ -105,9 +105,9 @@ export async function fetchChart(year, month, day, chartType) {
     const trackID = $(element).find('input.input_check').val();
     const thumbnail = $(element).find('img').attr('src');
     const titleKeyword = extractKeyword(title);
-    const artistKeyword = extractKeyword(artists[0]);
+    const artistKeywords = extractKeyword(artists);
     return {
-      rank, title, artists, titleKeyword, trackID, thumbnail, artistKeyword,
+      rank, title, titleKeyword, artists, artistKeywords, trackID, thumbnail,
     };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'melon' };

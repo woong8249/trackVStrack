@@ -34,52 +34,77 @@ export function mappingChartDataToTrack(chartOrCharts) {
   const mappedTracks = [];
   charts.forEach(chart => {
     const { chartScope, chartDetails, platform } = chart;
-    const tracks = chartDetails.map(track => {
-      const mappingTrack = {
-        title: track.title,
-        titleKeyword: track.titleKeyword,
-        artists: track.artists,
-        artistKeyword: track.artistKeyword,
-        platforms: {
-          [platform]: {
-            trackInfo: {
-              trackID: track.trackID,
-              albumID: track.albumID,
-              thumbnail: track.thumbnail,
-            },
-            chartInfos: [chartScope],
+    const tracks = chartDetails.map(({
+      title, titleKeyword, artists, artistKeywords, thumbnail, trackID, albumID, rank,
+    }) => ({
+      title,
+      titleKeyword,
+      artists,
+      artistKeywords,
+      thumbnails: [thumbnail],
+      platforms: {
+        [platform]: {
+          trackInfo: {
+            trackID: trackID || null,
+            albumID: albumID || null,
           },
+          chartInfos: [{ ...chartScope, rank }],
         },
-      };
-      return mappingTrack;
-    });
+      },
+    }
+    ));
     mappedTracks.push(...tracks);
   });
   return mappedTracks;
 }
 
 async function alreadySavedTrack(track, redisKeyName, number) {
-  const { artistKeyword, platforms } = track;
+  const {
+    artistKeywords, platforms, thumbnails, artists, title,
+  } = track;
   const platformName = Object.keys(platforms)[0];
 
-  const { platforms: savedPlatformsStr, artistKeyword: savedArtistKeyword } = await redisClient.hGetAll(redisKeyName);
-  const savedPlatform = JSON.parse(savedPlatformsStr);
-  const savedPlatformKeyList = Object.keys(savedPlatform);
-  const isSamePlatform = savedPlatformKeyList.some(savedPlatformName => savedPlatformName === platformName);
-  const isSameArtist = savedArtistKeyword === artistKeyword;
+  // eslint-disable-next-line prefer-const
+  const savedInfo = parseJSONProperties(await redisClient.hGetAll(redisKeyName));
+  const { platforms: savedPlatforms } = savedInfo;
+  let {
+    artistKeywords: savedArtistKeywords, thumbnails: savedThumbnails, artists: savedArtists, title: savedTitle,
+  } = savedInfo;
 
-  if (isSameArtist && isSamePlatform) { // 같은 곡 같은 플랫폼인경우
-    savedPlatform[platformName].chartInfos.push(platforms[platformName].chartInfos[0]);
-    savedPlatform[platformName].chartInfos = removeDuplicates(savedPlatform[platformName].chartInfos);
-  } else if (isSameArtist && !isSamePlatform) { // 같은 곡 다른 플랫폼인경우
-    savedPlatform[platformName] = platforms[platformName];
-    savedPlatformKeyList.length === 1 // 기존 저장된 플랫폼이 유일하게 bugs인 경우
-    && savedPlatformKeyList[0] === 'bugs'
-    && await redisClient.HSET(redisKeyName, { artists: JSON.stringify(track.artists) });
+  const savedPlatformKeyList = Object.keys(savedPlatforms);
+  const isSamePlatform = savedPlatformKeyList.some(savedPlatformName => savedPlatformName === platformName);
+  const isSameArtist = savedArtistKeywords[0] === artistKeywords[0];
+
+  // eslint-disable-next-line no-unsafe-optional-chaining
+  const compareTarget = savedPlatforms?.[platformName]?.trackInfo?.albumID || savedPlatforms?.[platformName]?.trackInfo?.trackID;
+  const { albumID: _albumID, trackID: _trackID } = platforms[platformName].trackInfo;
+  const compareTarget2 = _albumID || _trackID;
+  const isSameTrack = compareTarget === compareTarget2;
+
+  if (isSameTrack) { // 같은 곡 같은 플랫폼인경우
+    savedPlatforms[platformName].chartInfos.push(platforms[platformName].chartInfos[0]);
+    savedPlatforms[platformName].chartInfos = removeDuplicates(savedPlatforms[platformName].chartInfos);
+  } else if (isSameArtist && !isSamePlatform) { // 같은 곡 다른 플랫폼이라 판단되는 경우
+    savedPlatforms[platformName] = platforms[platformName];
+    savedThumbnails = [...savedThumbnails, ...thumbnails];
+    if (platformName === 'melon') {
+      savedArtistKeywords = artistKeywords;
+      savedArtists = artists;
+      savedTitle = title;
+      await redisClient.HSET(redisKeyName, stringifyMembers({
+        artists: savedArtists,
+        thumbnails: savedThumbnails,
+        artistKeywords: savedArtistKeywords,
+        title: savedTitle,
+      }));
+    }
+    await redisClient.HSET(redisKeyName, stringifyMembers({
+      thumbnails: savedThumbnails,
+    }));
   } else if (!isSameArtist && isSamePlatform) { // 다른 곡인경우
     saveToRedis(track, number + 1);
   }
-  await redisClient.HSET(redisKeyName, 'platforms', JSON.stringify(savedPlatform));
+  await redisClient.HSET(redisKeyName, { platforms: JSON.stringify(savedPlatforms) });
 }
 
 async function saveToRedis(tracksOrTrack, number = 0) {
@@ -97,6 +122,7 @@ async function saveToRedis(tracksOrTrack, number = 0) {
       alreadySavedTrack(track, redisKeyName, number);
     } else {
       await redisClient.sAdd(trackList, redisKeyName);
+      console.log(track);
       await redisClient.HSET(redisKeyName, stringifyMembers(track));
     }
   }

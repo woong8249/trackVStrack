@@ -15,6 +15,7 @@ import {
 } from '../src/dataCollecting/domestic/integrate.js';
 // import flushAllRedisData from '../src/redis/flushAllRedisData.js';
 import redisClient from '../src/redis/redisClient.js';
+// import { parseJSONProperties } from '../src/util/json.js';
 
 import { checkForDuplicates } from './util.js';
 
@@ -61,18 +62,23 @@ describe('function integrateDomesticPlatformChart', () => {
 //   expect(someTrack).toHaveProperty('title');
 //   expect(someTrack).toHaveProperty('titleKeyword');
 //   expect(someTrack).toHaveProperty('artists');
-//   expect(someTrack).toHaveProperty('artistKeyword');
+//   expect(someTrack).toHaveProperty('artistKeywords');
 //   expect(someTrack).toHaveProperty('platforms');
+//   expect(someTrack).toHaveProperty('thumbnails');
 
 //   const result = await fetchReleaseDateAndImageInParallel(tracks);
 //   const tracksAddedRelDateAndImg = (await getAllTrackFromRedis());
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('title');
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('titleKeyword');
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('artists');
-//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('artistKeyword');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('artistKeywords');
+//   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('thumbnails');
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('platforms');
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('releaseDate');
 //   expect(tracksAddedRelDateAndImg[0]).toHaveProperty('trackImage');
-//   expect.assertions(12);
-//   console.log(result);
+//   expect.assertions(14);
+//   console.dir(result, { depth: 100 });
 // }, 50000);
+
+// const tracks = parseJSONProperties(await getAllTrackFromRedis());
+// console.dir(tracks.find(({ titleKeyword }) => titleKeyword === 'Love Lee'), { depth: 100 });

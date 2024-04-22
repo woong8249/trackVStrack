@@ -101,12 +101,12 @@ export async function fetchChart(year, month, day, chartType) {
     const artists = $(element).find('td.info a.artist').text().trim()
       .split('&');
     const titleKeyword = extractKeyword(title);
-    const artistKeyword = extractKeyword(artists[0]);
+    const artistKeywords = extractKeyword(artists);
     const albumID = $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
     const thumbnail = 'https:' + $(element).find('a.cover img').attr('src');
 
     return {
-      rank, title, artists, titleKeyword, albumID, thumbnail, artistKeyword,
+      rank, title, titleKeyword, artists, artistKeywords, albumID, thumbnail,
     };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'genie' };

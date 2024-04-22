@@ -86,11 +86,11 @@ export async function fetchChart(year, month, day, chartType) {
     const title = $(element).find('p.title a').text().trim();
     const thumbnail = $(element).find('a.thumbnail img').attr('src');
     const titleKeyword = extractKeyword(title);
-    const artistKeyword = extractKeyword(artists);
+    const artistKeywords = extractKeyword([artists]);
     const albumID = $(element).attr('albumid');
 
     return {
-      rank, title, artists: [artists], albumID, thumbnail, titleKeyword, artistKeyword,
+      rank, title, titleKeyword, artists: [artists], artistKeywords, albumID, thumbnail,
     };
   }).get();
 
