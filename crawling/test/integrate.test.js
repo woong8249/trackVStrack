@@ -1,29 +1,36 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
+import { expect, it } from 'vitest';
 
-// import {
-//   describe,
-//   expect, it,
-// } from 'vitest';
-// import ss from 'string-similarity';
+import { getItemsWithSameKeyword } from '../src/dataCollecting/domestic/integrate';
+import jsonFile20230102_20231231 from '../src/dataCollecting/domestic/dataAfterIntegration/20230102-20231231-w.json';
+import redisKeys from '../config/redisKey';
 
-import { crawlingDomesticPlatformCharts, integrateAllDomesticTracks } from '../src/services/collectData.js';
-import flushAllRedisData from '../src/redis/flushAllRedisData.js';
-// import jsonFIle from '../src/dataCollecting/domestic/dataAfterIntegration/20230102-20231231-w.json';
+const { trackList } = redisKeys;
 
-// Object.entries(jsonFIle).forEach(([key, value]) => {
-//   if (key.split('/')[2] > 0) {
-//     console.log(value);
-//   }
-// });
+// JSON파일들을 계속 추가할 것임
+it('If the subFix of trackKey is different, the artistKey will be different.', async () => {
+  const tracksWithSubFixOverZero = Object.entries(jsonFile20230102_20231231).filter(([key]) => {
+    if (key.split('/')[2] > 0) {
+      return true;
+    }
+    return false;
+  });
+  let allCount = 1;
+  for await (const [_key, value] of tracksWithSubFixOverZero) {
+    const { titleKeyword } = value;
+    const tracksWithSameKeyword = await getItemsWithSameKeyword(trackList, titleKeyword);
+    const representativeArtists = tracksWithSameKeyword.map(track => track.artistKey);
+    const uniqueElements = new Set();
+    representativeArtists.forEach(element => {
+      expect(uniqueElements.has(element)).toBe(false);
+      uniqueElements.add(element);
+    });
 
-// 1.  분류된곡의 경우 무조건 같은 가사를 가졌을 것이다.
-// 2.  만약 artistKeyword가 같다면 무조건 id는 같을 것이다.
-
-await flushAllRedisData();
-const startDate = new Date('2023-01-02');
-const endDate = new Date('2023-12-31');
-const chartType = 'w';
-
-// // await crawlingDomesticPlatformCharts(startDate, endDate, chartType);
-await integrateAllDomesticTracks(startDate, endDate, chartType);
+    expect(uniqueElements.size).toBe(representativeArtists.length);
+    allCount += (representativeArtists.length + 1);
+  }
+  expect(allCount > 2).toBe(true);
+  expect.assertions(allCount);
+});

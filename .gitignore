@@ -1,4 +1,5 @@
 node_modules
-DS_Store
-legacy
+.DS_Store
+dataCollectedBeforeIntegration
 .env.*
+*.json
