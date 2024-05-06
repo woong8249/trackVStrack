@@ -1,8 +1,12 @@
 import { createLogger, format, transports } from 'winston';
 import { consoleFormat } from 'winston-console-format';
 
+import config from '../../config/config.js';
+
+const { logLevel } = config;
+
 const winLogger = createLogger({
-  level: 'info',
+  level: logLevel,
   format: format.combine(
     format.errors({ stack: true }),
     format.splat(),

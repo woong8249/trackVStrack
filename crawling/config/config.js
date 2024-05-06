@@ -1,5 +1,3 @@
-import winLogger from '../src/util/winston';
-
 function required(key, defaultValue = undefined) {
   const value = import.meta.env?.[key] ?? process.env[key] ?? defaultValue;
   if (value === undefined) {
@@ -9,8 +7,9 @@ function required(key, defaultValue = undefined) {
 }
 
 const config = {
+  logLevel: required('VITE_LOG_LEVEL', 'info'),
   node: {
-    nodeEnv: required('VITE_NODE_ENV'),
+    nodeEnv: required('VITE_NODE_ENV', 'production'),
     nodePort: Number(required('VITE_NODE_PORT')),
   },
   spotify: {
@@ -23,7 +22,14 @@ const config = {
       host: required('VITE_REDIS_SOCKET_HOST', 'redis'),
     },
   },
+  mysql: {
+    host: required('VITE_MYSQL_HOST', 'mysql'),
+    database: required('VITE_MYSQL_DATABASE', 'chartchart'),
+    user: required('VITE_MYSQL_USER', 'production'),
+    password: required('VITE_MYSQL_PASSWORD', 123456789),
+    port: required('VITE_MYSQL_PORT', 3306),
+    connectionLimit: parseInt(required('VITE_MYSQL_POOL_LIMIT'), 10),
+  },
 };
 
-winLogger.info('config', { config });
 export default config;

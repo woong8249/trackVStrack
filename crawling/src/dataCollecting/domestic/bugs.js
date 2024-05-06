@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable func-names */
 /* eslint-disable no-useless-escape */
 /* eslint-disable newline-per-chained-call */
@@ -80,20 +81,27 @@ export async function fetchChart(year, month, day, chartType) {
   const list = $('tr');
   const chartDetails = list.map((_i, element) => {
     const rank = $(element).find('div.ranking strong').text().trim();
-    const artists = $(element).find('p.artist a').length === 1
+    const artistName = $(element).find('p.artist a').length === 1
       ? $(element).find('p.artist').text().trim()
       : $(element).find('p.artist').find('a').eq(0).text().trim();
+    const artistID = $(element).find('p.artist a').length === 1
+      ? $(element).find('p.artist a').attr('href')?.match(/artist\/(\d+)/)[1]
+      : $(element).find('p.artist a').eq(0).attr('href')?.match(/artist\/(\d+)/)[1];
     const title = $(element).find('p.title a').text().trim();
     const thumbnail = $(element).find('a.thumbnail img').attr('src');
     const titleKeyword = extractKeyword(title);
-    const artistKeywords = extractKeyword([artists]);
     const albumID = $(element).attr('albumid');
-
+    const trackID = $(element).attr('trackid');
     return {
-      rank, title, titleKeyword, artists: [artists], artistKeywords, albumID, thumbnail,
+      rank,
+      title,
+      titleKeyword,
+      artists: [{ artistID, artistName, artistKeyword: extractKeyword(artistName) }],
+      albumID,
+      trackID,
+      thumbnail,
     };
   }).get();
-
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'bugs' };
 }
 
@@ -134,15 +142,18 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   return result.flat();
 }
 
-export async function fetchReleaseDateAndImage(albumID) {
+export async function fetchAdditionalInformationOfTrack(trackID, albumID) {
   const url = `https://music.bugs.co.kr/album/${albumID}`;
-  const html = await getHtml(url);
+  const url2 = `https://music.bugs.co.kr/track/${trackID}?wl_ref=list_tr_08_ab`;
+  const [html, html2] = await Promise.all([getHtml(url), getHtml(url2)]);
   const $ = cheerio.load(html);
-
+  const $2 = cheerio.load(html2);
+  const lyrics = $2('div.lyricsContainer xmp').text().trim();
   let releaseDate = $('table.info th').filter(function () {
     return $(this).text().trim() === '발매일';
   }).next('td').find('time').text().trim();
+
   const trackImage = $('div.innerContainer img').attr('src');
   releaseDate = new Date(releaseDate.split('.').join('-'));
-  return { releaseDate, trackImage };
+  return { releaseDate, trackImage, lyrics };
 }

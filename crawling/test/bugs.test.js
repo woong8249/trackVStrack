@@ -3,7 +3,7 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchChart, fetchChartsForDateRangeInParallel, fetchReleaseDateAndImage } from '../src/dataCollecting/domestic/bugs.js';
+import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/domestic/bugs.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
@@ -35,7 +35,7 @@ describe('The fetchChart func Test', () => {
     expect.assertions(1);
   });
 
-  it('The Bugs monthly chart has been available since January 1, 2010. We will test using a randomly selected first day of month after this date.', async () => {
+  it('The Bugs weekly chart has been available since January 1, 2010. We will test using a randomly selected first day of month after this date.', async () => {
     const minDate = new Date('2003-08-29');
     const today = new Date();
     const { startDate: _startDate } = getRandomDateRange(minDate, today, 1);
@@ -43,7 +43,6 @@ describe('The fetchChart func Test', () => {
     const { year, month, day } = extractYearMonthDay(testTarget);
     const { chartDetails, chartScope } = await fetchChart(year, month, day, 'w');
     const { chartType, weekOfMonth } = chartScope;
-
     expect(chartType).toBe('w');
     expect(weekOfMonth).toHaveProperty('week');
     expect(weekOfMonth).toHaveProperty('month');
@@ -76,13 +75,14 @@ describe('fetchChartsForDateRangeInParallel', () => {
   });
 });
 
-describe('func fetchReleaseDateAndImage', () => {
-  it('This function can fetch the releaseDate and trackImage.', async () => {
-    const { releaseDate, trackImage } = await fetchReleaseDateAndImage(4091551);
+describe('func fetchAdditionalInformationOfTrack', () => {
+  it('This function can fetch the releaseDate,trackImage and lyrics.', async () => {
+    const { releaseDate, trackImage, lyrics } = await fetchAdditionalInformationOfTrack(6218218, 4091551);
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
     const isURL = urlPattern.test(trackImage);
     expect(releaseDate.getTime()).toBe(new Date('2023-10-13').getTime());
+    expect(lyrics.length > 100).toBe(true);
     expect(isURL).toBe(true);
-    expect.assertions(2);
+    expect.assertions(3);
   });
 });

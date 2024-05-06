@@ -98,15 +98,21 @@ export async function fetchChart(year, month, day, chartType) {
       .end() // '19금' 텍스트를 포함하는 span 제거
       .text()
       .trim();
-    const artists = $(element).find('td.info a.artist').text().trim()
-      .split('&');
+    const artistID = $(element).find('a.artist.ellipsis').attr('onclick').toString()
+      .match(/fnViewArtist\('(\d+)'\)/)[1];
+    let artists = $(element).find('td.info a.artist').text().split('&');
+    if (artists.length === 1) {
+      artists = artists.map(item => ({ artistName: item.trim(), artistKeyword: extractKeyword(item), artistID }));
+    } else {
+      artists = artists.map(item => ({ artistName: item.trim(), artistKeyword: extractKeyword(item), artistID: null }));
+    }
     const titleKeyword = extractKeyword(title);
-    const artistKeywords = extractKeyword(artists);
     const albumID = $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
+    const trackID = $(element).attr('songid');
     const thumbnail = 'https:' + $(element).find('a.cover img').attr('src');
 
     return {
-      rank, title, titleKeyword, artists, artistKeywords, albumID, thumbnail,
+      rank, title, titleKeyword, artists, albumID, trackID, thumbnail,
     };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'genie' };
@@ -154,10 +160,13 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   return result.flat();
 }
 
-export async function fetchReleaseDateAndImage(albumID) {
+export async function fetchAdditionalInformationOfTrack(trackID, albumID) {
   const url = `https://www.genie.co.kr/detail/albumInfo?axnm=${albumID}`;
-  const html = await getHtml(url);
+  const url2 = `https://www.genie.co.kr/detail/songInfo?xgnm=${trackID}`;
+  const [html, html2] = await Promise.all([getHtml(url), getHtml(url2)]);
   const $ = cheerio.load(html);
+  const $2 = cheerio.load(html2);
+  const lyrics = $2('pre#pLyrics p').text().trim();
   // eslint-disable-next-line func-names
   let releaseDate = $('.info-data li').filter(function () {
     return $(this).find('img').attr('alt') === '발매일';
@@ -168,5 +177,5 @@ export async function fetchReleaseDateAndImage(albumID) {
   if (!trackImage.startsWith('https:')) {
     trackImage = 'https:' + trackImage;
   }
-  return { releaseDate, trackImage };
+  return { releaseDate, trackImage, lyrics };
 }

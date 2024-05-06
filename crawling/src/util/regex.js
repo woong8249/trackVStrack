@@ -8,5 +8,5 @@ export default function extractKeyword(textOrTextArray) {
   if (keyword === '') {
     keyword = textOrTextArray;
   }
-  return keyword;
+  return keyword.trim();
 }

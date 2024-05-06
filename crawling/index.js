@@ -1,3 +1,3 @@
-import config from './config/config';
+import createTable from './src/mysql/createTables';
 
-console.log(config);
+await createTable();

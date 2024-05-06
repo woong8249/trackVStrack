@@ -3,7 +3,7 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchChart, fetchChartsForDateRangeInParallel, fetchReleaseDateAndImage } from '../src/dataCollecting/domestic/genie.js';
+import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/domestic/genie.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
@@ -106,12 +106,14 @@ describe('fetchChartsForDateRangeInParallel', () => {
   });
 });
 
-describe('func fetchReleaseDateAndImage', () => {
-  it('This function can fetch the releaseDate and trackImage.', async () => {
-    const { releaseDate, trackImage } = await fetchReleaseDateAndImage(84181610);
+describe('func fetchAdditionalInformationOfTrack', () => {
+  it('This function can fetch the releaseDate,trackImage and lyrics.', async () => {
+    const { releaseDate, trackImage, lyrics } = await fetchAdditionalInformationOfTrack(103151984, 84181610);
     const urlPattern = /^https?:\/\/[\w-]+(\.[\w-]+)+\/[\w-\\/]+\.JPG(\/[\w-]+\/[\w-]+\/[\w-]+,[\w-]+)?$/;
     const isURL = urlPattern.test(trackImage);
     expect(releaseDate.getTime()).toBe(new Date('2023-08-21').getTime());
     expect(isURL).toBe(true);
+    expect(lyrics.length > 100).toBe(true);
+    expect.assertions(3);
   });
 });

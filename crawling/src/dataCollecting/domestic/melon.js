@@ -56,20 +56,6 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-export async function fetchReleaseDateAndImage(trackID) {
-  const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
-  const html = await getHtml(url);
-  const $ = cheerio.load(html);
-  // eslint-disable-next-line func-names
-  let releaseDate = $('dt').filter(function () {
-    return $(this).text().trim() === '발매일';
-  }).next('dd').text()
-    .trim();
-  releaseDate = new Date(releaseDate.split('.').join('-'));
-  const trackImage = $('div.thumb img').attr('src');
-  return { releaseDate, trackImage };
-}
-
 /**
 - The Melon weekly chart has been available since January 3, 2010.
 - The Melon monthly chart has been available since January 1, 2010.
@@ -100,14 +86,24 @@ export async function fetchChart(year, month, day, chartType) {
   const chartDetails = songSelectors.map((_i, element) => {
     const rank = $(element).find('span.rank').text().match(/\d+/)[0];
     const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
-    const artists = $(element).find('div.ellipsis.rank02 span.checkEllipsis').text().trim()
-      .split(',');
+
+    const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
+    const artistNames = artistElements.text().trim().split(',');
+    const artistIDs = artistElements.find('a').map((i, el) => {
+      const href = $(el).attr('href');
+      const match = href.match(/goArtistDetail\('(\d+)'\)/);
+      return match ? match[1] : null;
+    }).get();
+    const artists = artistNames.map((artistName, index) => ({
+      artistName: artistName.trim(),
+      artistKeyword: extractKeyword(artistName),
+      artistID: artistIDs[index],
+    }));
     const trackID = $(element).find('input.input_check').val();
     const thumbnail = $(element).find('img').attr('src');
     const titleKeyword = extractKeyword(title);
-    const artistKeywords = extractKeyword(artists);
     return {
-      rank, title, titleKeyword, artists, artistKeywords, trackID, thumbnail,
+      rank, title, titleKeyword, artists, trackID, thumbnail,
     };
   }).get();
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'melon' };
@@ -139,4 +135,19 @@ export async function fetchChartsForDateRangeInParallel(startDate, endDate, char
   }));
 
   return result.flat();
+}
+
+export async function fetchAdditionalInformationOfTrack(trackID) {
+  const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  // eslint-disable-next-line func-names
+  let releaseDate = $('dt').filter(function () {
+    return $(this).text().trim() === '발매일';
+  }).next('dd').text()
+    .trim();
+  releaseDate = new Date(releaseDate.split('.').join('-'));
+  const trackImage = $('div.thumb img').attr('src');
+  const lyrics = $('div.lyric').text();
+  return { releaseDate, trackImage, lyrics };
 }
