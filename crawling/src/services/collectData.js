@@ -32,8 +32,8 @@ export async function crawlingDomesticPlatformCharts(startDate, endDate, chartTy
   winLogger.info('Start chart crawling and classification', { startDate, endDate, chartType });
   const firstCrawlingPromises = Object.entries(modules)
     .map(([key, value]) => value.fetchChartsForDateRangeInParallel(startDate, endDate, chartType)
-      .then(result => {
-        const classifiedTracks = classifyTracks(mappingChartDataToTrack(result), key);
+      .then(async result => {
+        const classifiedTracks = classifyTracks(await mappingChartDataToTrack(result), key);
         winLogger.debug(`Number of tracks on ${key} platform`, { numberOfTracks: Object.keys(classifiedTracks).length });
         return classifiedTracks;
       }));
@@ -89,9 +89,6 @@ export async function integrateAllDomesticTracks(startDate, endDate, chartType) 
       if (artist.artistKey.split('/')[2] > 0) {
         winLogger.warn('SubFix of artistKey is over zero', { artistKey: artist.artistKey });
       }
-      // if (Object.keys(artist.platforms).length !== 3) {
-      //   winLogger.warn('check', { artist });
-      // }
     });
   });
   const fileNameToWrite = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')

@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-undef */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
@@ -21,7 +23,7 @@ const { trackList, artistList } = redisKey;
 
 export function isSameLyrics(lyrics1, lyrics2) {
   const similarity = ss.compareTwoStrings(lyrics1, lyrics2);
-  if (similarity > 0.8)
+  if (similarity > 0.75)
     return true;
   return false;
 }
@@ -60,19 +62,20 @@ export async function getItemsWithSameKeyword(listKey, keyword) {
 export async function decideKeyNameOfArtist(artist) {
   const { artistKeyword, platforms } = artist;
   const platformName = Object.keys(platforms)[0];
-  const artistsWithSameKeyword = await getItemsWithSameKeyword(artistList, artistKeyword);
+  const artistsWithSameKeyword = await getItemsWithSameKeyword(artistList, artistKeyword.toLowerCase());
   const { artistID: artistID1, artistName: artistName1 } = platforms[platformName];
   const artistDefaultKeyName = `artist/${artistKeyword.toLowerCase()}/0`;
   const result = { artistKey: artistsWithSameKeyword.length > 0 ? undefined : artistDefaultKeyName };
   const decidedArtist = Object.assign(artist, result);
 
-  // 같은 artistKeyword가 없는경우
+  // 같은 artistKeyword가 없는경우 (null인경우 어떻게하나?)
   if (artistsWithSameKeyword.length === 0) {
     await redisClient.sAdd(artistList, artistDefaultKeyName);
     await redisClient.hSet(artistDefaultKeyName, stringifyMembers(decidedArtist));
     return decidedArtist;
   }
 
+  // 같은 플랫폼인경우 정확히 비교
   for (const savedArtist of artistsWithSameKeyword) {
     const { platforms: savedPlatforms } = savedArtist;
     const savedPlatformKeyList = Object.keys(savedPlatforms);
@@ -84,7 +87,7 @@ export async function decideKeyNameOfArtist(artist) {
     }
   }
 
-  // 다픈 플랫폼중에 유사도가 가장 높은것 선별
+  // 다픈 플랫폼인경우 유사도가 가장 높은것 선별
   const artistWithHighestSimilarity = artistsWithSameKeyword.map(savedArtist => {
     const { platforms: savedPlatforms } = savedArtist;
     let finalSimilarity = 0;
@@ -133,7 +136,7 @@ export async function decideKeyNameOfTrack(track) {
   const platformName = Object.keys(platforms)[0];
   const deepCopiedPlatform = JSON.parse(JSON.stringify(platforms));
   delete deepCopiedPlatform[platformName].chartInfos;
-  const tracksWithSameTitleKeyword = await getItemsWithSameKeyword(trackList, titleKeyword);
+  const tracksWithSameTitleKeyword = await getItemsWithSameKeyword(trackList, titleKeyword.toLowerCase());
   const trackSubFixes = tracksWithSameTitleKeyword.map(item => item.trackKey.split('/')[2]);
   const trackDefaultKeyName = `track/${titleKeyword.toLowerCase()}/0`;
   const result = {
@@ -206,6 +209,7 @@ export async function decideKeyNameOfTrack(track) {
   await redisClient.hSet(newKey, stringifyMembers(trackToSave));
   return decidedTrack;
 }
+
 function checkException(artists) {
   artists.forEach(artist => {
     const isException = exception[artist.artistKeyword];
@@ -214,6 +218,23 @@ function checkException(artists) {
       artist.artistKeyword = isException;
     }
   });
+  return artists;
+}
+
+export async function findArtistID(artists, platformName) {
+  for await (const artist of artists) {
+    const { artistKeyword } = artist;
+    const { artistID } = artist;
+    if (!artistID) {
+      const sameArtistKeywordList = await getItemsWithSameKeyword(artistList, artistKeyword.toLowerCase());
+      for (const artistWithSameKeyword of sameArtistKeywordList) {
+        const { platforms } = artistWithSameKeyword;
+        if (platforms[platformName]?.artistID) {
+          artist.artistID = platforms[platformName].artistID;
+        }
+      }
+    }
+  }
   return artists;
 }
 
@@ -257,7 +278,6 @@ export function mappingTrackBeforeIntegrate(tracksOrTracksArray) {
         trackImages: [trackImage],
         thumbnails: [thumbnail],
       };
-
       result.push(mappingResult);
     }
   }
@@ -289,32 +309,35 @@ export async function addAdditionalInfoToTracks(classifiedTracks, platformName, 
   }
 }
 
-export function mappingChartDataToTrack(chartOrCharts) {
+export async function mappingChartDataToTrack(chartOrCharts) {
   const charts = Array.isArray(chartOrCharts) ? chartOrCharts : [chartOrCharts];
   const mappedTracks = [];
-  charts.forEach(chart => {
+  for await (const chart of charts) {
     const { chartScope, chartDetails, platform } = chart;
-    const tracks = chartDetails.map(({
-      title, titleKeyword, artists, thumbnail, trackID, albumID, rank,
-    }) => ({
-      titleKeyword,
-      platforms: {
-        [platform]: {
-          trackInfo: {
-            title,
-            artists,
-            trackID: trackID || null,
-            albumID: albumID || null,
-            thumbnail,
+    const tracks = [];
+    for await (const chart of chartDetails) {
+      const {
+        title, titleKeyword, artists, thumbnail, trackID, albumID, rank,
+      } = chart;
+      const track = {
+        titleKeyword,
+        platforms: {
+          [platform]: {
+            trackInfo: {
+              title,
+              artists: await findArtistID(artists, platform),
+              trackID: trackID || null,
+              albumID: albumID || null,
+              thumbnail,
+            },
+            chartInfos: [{ rank, ...chartScope }],
           },
-          chartInfos: [{ rank, ...chartScope }],
         },
-      },
+      };
+      tracks.push(track);
     }
-    ));
     mappedTracks.push(...tracks);
-  });
-  winLogger.error('맵핑 시키고 나서 의 개수', { count: mappedTracks.length });
+  }
   return mappedTracks;
 }
 
