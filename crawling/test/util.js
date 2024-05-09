@@ -47,3 +47,8 @@ export function checkForDuplicates(tracks, platform) {
 
   return uniqueCombinations.size === tracks.filter(track => track.platforms[platform]).length;
 }
+
+export function convertMultilineToJsonString(text) {
+  const lines = text.split('\n');
+  return lines.join('\\n');
+}

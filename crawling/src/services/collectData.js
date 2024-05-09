@@ -17,7 +17,10 @@ import {
   mappingTrackBeforeIntegrate,
 } from '../dataCollecting/domestic/integrate';
 import { extractYearMonthDay } from '../util/time';
+import { removeDuplicates } from '../util/array.js';
 import winLogger from '../util/winston';
+
+import verifiedTrack from './verifiedTracks.json';
 
 const modules = { melon, bugs, genie };
 
@@ -64,25 +67,21 @@ export async function integrateAllDomesticTracks(startDate, endDate, chartType) 
   const mappingTrack = mappingTrackBeforeIntegrate(tracks);
   const step1 = [];
   const step2 = [];
-  const step3 = [];
-
-  // 로직상 두사이클 돌려야함
   for await (const track of mappingTrack) {
-    const _track = await decideKeyNameOfArtists(track);
-    step1.push(_track);
+    const da1 = await decideKeyNameOfArtists(track);
+    step1.push(da1);
   }
   for await (const track of step1) {
-    const _track = await decideKeyNameOfArtists(track);
-    step2.push(_track);
+    const dt = await decideKeyNameOfTrack(track);
+    step2.push(dt);
   }
-  for await (const track of step2) {
-    const _track = await decideKeyNameOfTrack(track);
-    step3.push(_track);
-  }
-  const result = integrateTracks(step3);
+  const result = integrateTracks(step2);
+  const trackWithSubFixOverZeroNotVerified = [];
   Object.entries(result).forEach(([key, value]) => {
-    if (key.split('/')[2] > 0) {
-      winLogger.warn('SubFix of trackKey is over zero.', { trackKey: key });
+    const subFix = key.split('/')[2];
+
+    if (subFix > 0 && !verifiedTrack.includes(key)) {
+      trackWithSubFixOverZeroNotVerified.push(key);
     }
     const { artists } = value;
     artists.forEach(artist => {
@@ -93,6 +92,11 @@ export async function integrateAllDomesticTracks(startDate, endDate, chartType) 
   });
   const fileNameToWrite = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
   + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
+
+  const trackWithSubFixOverZeroNotVerifiedNoDuplicate = removeDuplicates(trackWithSubFixOverZeroNotVerified);
+  const filePath = path.join(__dirname, `${fileNameToWrite}-notVerified.json`);
+  trackWithSubFixOverZeroNotVerifiedNoDuplicate.length && fs.writeFileSync(filePath, JSON.stringify(trackWithSubFixOverZeroNotVerifiedNoDuplicate));
+
   const filePathToWrite = path.join(__dirname, '../dataCollecting/domestic', '/dataAfterIntegration', `${fileNameToWrite}.json`);
   fs.writeFileSync(filePathToWrite, JSON.stringify(result));
   return result;

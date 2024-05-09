@@ -22,7 +22,7 @@ const modules = { melon, bugs, genie };
 const { trackList, artistList } = redisKey;
 
 export function isSameLyrics(lyrics1, lyrics2) {
-  const similarity = ss.compareTwoStrings(lyrics1, lyrics2);
+  const similarity = ss.compareTwoStrings(lyrics1.toLowerCase(), lyrics2.toLowerCase());
   if (similarity > 0.75)
     return true;
   return false;
