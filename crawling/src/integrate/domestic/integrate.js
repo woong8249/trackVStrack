@@ -7,15 +7,15 @@
 
 import ss from 'string-similarity';
 
+import * as bugs from '../../platforms/domestic/bugs.js';
+import * as genie from '../../platforms/domestic/genie.js';
+import * as melon from '../../platforms/domestic/melon.js';
 import { parseJSONProperties, stringifyMembers } from '../../util/json.js';
 import redisClient from '../../redis/redisClient.js';
 import redisKey from '../../../config/redisKey.js';
 import { removeDuplicates } from '../../util/array.js';
 import winLogger from '../../util/winston.js';
 
-import * as bugs from './bugs.js';
-import * as genie from './genie.js';
-import * as melon from './melon.js';
 import exception from './exception.json';
 
 const modules = { melon, bugs, genie };

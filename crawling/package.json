@@ -9,7 +9,7 @@
     "start": "run(){ vite-node  ${1:-index.js}; };run",
     "lint": "NODE_OPTIONS=--experimental-import-meta-resolve nextlab-eslint **/*.js ",
     "test": "vitest",
-    "integrate": "vite-node integrate.js"
+    "trackIntegrate": "vite-node trackIntegrate.js"
   },
   "keywords": [],
   "author": "",

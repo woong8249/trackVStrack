@@ -4,13 +4,13 @@
 /* eslint-disable camelcase */
 import { expect, it } from 'vitest';
 
-import { getItemsWithSameKeyword } from '../src/dataCollecting/domestic/integrate';
-import jsonFile20181231_20191229 from '../src/dataCollecting/domestic/dataAfterIntegration/20181231-20191229-w.json';
-import jsonFile20191230_20210103 from '../src/dataCollecting/domestic/dataAfterIntegration/20191230-20210103-w.json';
-import jsonFile20210104_20220102 from '../src/dataCollecting/domestic/dataAfterIntegration/20210104-20220102-w.json';
-import jsonFile20220103_20230101 from '../src/dataCollecting/domestic/dataAfterIntegration/20220103-20230101-w.json';
-import jsonFile20230102_20231231 from '../src/dataCollecting/domestic/dataAfterIntegration/20230102-20231231-w.json';
-import jsonFile20240101_20240505 from '../src/dataCollecting/domestic/dataAfterIntegration/20240101-20240505-w.json';
+import { getItemsWithSameKeyword } from '../src/integrate/domestic/integrate.js';
+import jsonFile20181231_20191229 from '../src/integrate/domestic/dataAfterIntegration/20181231-20191229-w.json';
+import jsonFile20191230_20210103 from '../src/integrate/domestic/dataAfterIntegration/20191230-20210103-w.json';
+import jsonFile20210104_20220102 from '../src/integrate/domestic/dataAfterIntegration/20210104-20220102-w.json';
+import jsonFile20220103_20230101 from '../src/integrate/domestic/dataAfterIntegration/20220103-20230101-w.json';
+import jsonFile20230102_20231231 from '../src/integrate/domestic/dataAfterIntegration/20230102-20231231-w.json';
+import jsonFile20240101_20240505 from '../src/integrate/domestic/dataAfterIntegration/20240101-20240505-w.json';
 import redisKeys from '../config/redisKey';
 import winLogger from '../src/util/winston';
 

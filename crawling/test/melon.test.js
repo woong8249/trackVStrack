@@ -3,7 +3,7 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/dataCollecting/domestic/melon.js';
+import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/platforms/domestic/melon.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';

@@ -4,32 +4,23 @@
 import fs from 'fs';
 import path from 'path';
 
-import * as bugs from '../dataCollecting/domestic/bugs.js';
-import * as genie from '../dataCollecting/domestic/genie.js';
-import * as melon from '../dataCollecting/domestic/melon.js';
+import * as bugs from '../platforms/domestic/bugs.js';
+import * as genie from '../platforms/domestic/genie.js';
+import * as melon from '../platforms/domestic/melon.js';
 import {
   addAdditionalInfoToTracks,
   classifyTracks,
-  decideKeyNameOfArtists,
-  decideKeyNameOfTrack,
-  integrateTracks,
   mappingChartDataToTrack,
-  mappingTrackBeforeIntegrate,
-} from '../dataCollecting/domestic/integrate';
+} from '../integrate/domestic/integrate.js';
 import { extractYearMonthDay } from '../util/time';
-import { removeDuplicates } from '../util/array.js';
 import winLogger from '../util/winston';
-
-import verifiedTrack from './verifiedTracks.json';
 
 const modules = { melon, bugs, genie };
 
-// --------------------------------------------------------------------------------------------------------------------------------
-//  step 1: crawlingDomesticPlatformCharts
-export async function crawlingDomesticPlatformCharts(startDate, endDate, chartType) {
+export default async function crawlingDomesticPlatformCharts(startDate, endDate, chartType) {
   const fileName = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
    + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
-  const filePath = path.join(__dirname, '../dataCollecting/domestic', '/dataBeforeIntegration', `${fileName}.json`);
+  const filePath = path.join(__dirname, '../integrate/domestic/dataBeforeIntegration', `${fileName}.json`);
 
   const startTimeCrawling = new Date();
   winLogger.info('Start chart crawling and classification', { startDate, endDate, chartType });
@@ -54,50 +45,5 @@ export async function crawlingDomesticPlatformCharts(startDate, endDate, chartTy
   winLogger.info('End crawling additional track information');
   winLogger.info(`Crawling additional track information took ${(endTimeAdditionalInfo - startTimeAdditionalInfo) / 1000} seconds`);
   fs.writeFileSync(filePath, JSON.stringify(result));
-  return result;
-}
-
-// --------------------------------------------------------------------------------------------------------
-//  step 2: integrateAllDomesticTracks
-export async function integrateAllDomesticTracks(startDate, endDate, chartType) {
-  const fileNameToRead = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
-  + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
-  const filePathToRead = path.join(__dirname, '../dataCollecting/domestic', '/dataBeforeIntegration', `${fileNameToRead}.json`);
-  const tracks = JSON.parse(fs.readFileSync(filePathToRead));
-  const mappingTrack = mappingTrackBeforeIntegrate(tracks);
-  const step1 = [];
-  const step2 = [];
-  for await (const track of mappingTrack) {
-    const da1 = await decideKeyNameOfArtists(track);
-    step1.push(da1);
-  }
-  for await (const track of step1) {
-    const dt = await decideKeyNameOfTrack(track);
-    step2.push(dt);
-  }
-  const result = integrateTracks(step2);
-  const trackWithSubFixOverZeroNotVerified = [];
-  Object.entries(result).forEach(([key, value]) => {
-    const subFix = key.split('/')[2];
-
-    if (subFix > 0 && !verifiedTrack.includes(key)) {
-      trackWithSubFixOverZeroNotVerified.push(key);
-    }
-    const { artists } = value;
-    artists.forEach(artist => {
-      if (artist.artistKey.split('/')[2] > 0) {
-        winLogger.warn('SubFix of artistKey is over zero', { artistKey: artist.artistKey });
-      }
-    });
-  });
-  const fileNameToWrite = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
-  + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
-
-  const trackWithSubFixOverZeroNotVerifiedNoDuplicate = removeDuplicates(trackWithSubFixOverZeroNotVerified);
-  const filePath = path.join(__dirname, `${fileNameToWrite}-notVerified.json`);
-  trackWithSubFixOverZeroNotVerifiedNoDuplicate.length && fs.writeFileSync(filePath, JSON.stringify(trackWithSubFixOverZeroNotVerifiedNoDuplicate));
-
-  const filePathToWrite = path.join(__dirname, '../dataCollecting/domestic', '/dataAfterIntegration', `${fileNameToWrite}.json`);
-  fs.writeFileSync(filePathToWrite, JSON.stringify(result));
   return result;
 }
