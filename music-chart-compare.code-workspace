@@ -7,10 +7,10 @@
             "path": "./crawling"
         },
         {
-            "path": "./APIServer"
+            "path": "./migrator"
+        },
+        {
+            "path": "./apiServer"
         },
     ],
-    "settings": {
-        "liveServer.settings.multiRootWorkspaceName": "music-chart-compare"
-    },
 }

@@ -1,5 +1,9 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-empty */
 /* eslint-disable no-param-reassign */
+import fs from 'fs';
+import path from 'path';
+
 export function parseJSONProperties(obj) {
   Object.keys(obj).forEach(key => {
     try {
@@ -17,4 +21,17 @@ export function stringifyMembers(input) {
   }
   return Object.fromEntries(Object.entries(input)
     .map(([key, value]) => [key, typeof value !== 'string' ? JSON.stringify(value) : value]));
+}
+
+export function loadJSONFiles(directoryPath) {
+  const files = fs.readdirSync(directoryPath);
+  const result = [];
+  for (const file of files) {
+    if (path.extname(file) === '.json') {
+      const filePath = path.join(directoryPath, file);
+      const data = fs.readFileSync(filePath, 'utf-8');
+      result.push(JSON.parse(data));
+    }
+  }
+  return result;
 }

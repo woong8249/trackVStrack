@@ -1,16 +1,17 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable no-undef */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
 /* eslint-disable no-restricted-syntax */
+import path from 'path';
 
 import ss from 'string-similarity';
 
 import * as bugs from '../../platforms/domestic/bugs.js';
 import * as genie from '../../platforms/domestic/genie.js';
 import * as melon from '../../platforms/domestic/melon.js';
-import { parseJSONProperties, stringifyMembers } from '../../util/json.js';
+import { loadJSONFiles, parseJSONProperties, stringifyMembers } from '../../util/json.js';
 import redisClient from '../../redis/redisClient.js';
 import redisKey from '../../../config/redisKey.js';
 import { removeDuplicates } from '../../util/array.js';
@@ -28,6 +29,75 @@ export function isSameLyrics(lyrics1, lyrics2) {
   return false;
 }
 
+function mergeArtists(artist1, artists2) {
+  const mergedArtists = {};
+  [artist1, artists2].forEach(artists => {
+    artists.forEach(artist => {
+      const key = artist.artistKey;
+      if (mergedArtists[key]) {
+        Object.entries(artist.platforms).forEach(([platform, details]) => {
+          mergedArtists[key].platforms[platform] = details;
+        });
+      } else {
+        mergedArtists[key] = { ...artist };
+      }
+    });
+  });
+
+  return Object.values(mergedArtists);
+}
+
+function mergeTrackInfo(info1, info2) {
+  return {
+    title: info1.title,
+    trackID: info1.trackID,
+    albumID: info1.albumID || info2.albumID,
+  };
+}
+
+// 차트 정보 병합 함수
+function mergeChartInfos(charts1, charts2) {
+  const chartMap = new Map();
+
+  // 첫 번째 차트 정보 추가
+  charts1.forEach(chart => {
+    const key = chart.startDate + chart.endDate; // startDate와 endDate를 키로 사용
+    chartMap.set(key, chart);
+  });
+
+  // 두 번째 차트 정보 추가, 중복 검사
+  charts2.forEach(chart => {
+    const key = chart.startDate + chart.endDate;
+    if (!chartMap.has(key)) {
+      chartMap.set(key, chart);
+    }
+  });
+
+  return Array.from(chartMap.values());
+}
+
+// 플랫폼 정보 병합
+function mergePlatforms(platforms1, platforms2) {
+  const platforms = {};
+
+  // 모든 키 (플랫폼) 검색
+  new Set([...Object.keys(platforms1), ...Object.keys(platforms2)]).forEach(key => {
+    const plat1 = platforms1[key];
+    const plat2 = platforms2[key];
+
+    if (plat1 && plat2) {
+      platforms[key] = {
+        trackInfo: mergeTrackInfo(plat1.trackInfo, plat2.trackInfo),
+        chartInfos: mergeChartInfos(plat1.chartInfos, plat2.chartInfos),
+      };
+    } else {
+      platforms[key] = plat1 || plat2; // 둘 중 하나만 존재하는 경우 그대로 사용
+    }
+  });
+
+  return platforms;
+}
+
 export function integrateTracks(tracks, result = {}) {
   if (tracks.length === 0) {
     return result;
@@ -37,10 +107,10 @@ export function integrateTracks(tracks, result = {}) {
   if (!result[trackKey]) {
     Object.assign(result, { [trackKey]: track });
   } else {
-    const { platforms } = track;
-    const platformName = Object.keys(platforms)[0];
-    // eslint-disable-next-line no-param-reassign
-    result[trackKey].platforms[platformName] = platforms[platformName];
+    const { platforms, artists } = track;
+    const { platforms: savedPlatforms, artists: savedArtists } = result[trackKey];
+    result[trackKey].platforms = mergePlatforms(savedPlatforms, platforms);
+    result[trackKey].artists = mergeArtists(savedArtists, artists);
   }
   return integrateTracks(tracks, result);
 }
@@ -368,4 +438,13 @@ export function classifyTracks(tracks, platformName, number = 0, result = {}) {
   }
   tracks.push(track);
   return classifyTracks(tracks, platformName, number + 1, result);
+}
+
+export function integrateJSONFiles(dirPath) {
+  const jsonFilesArray = loadJSONFiles(dirPath);
+  const tracks = jsonFilesArray.reduce((pre, cur) => {
+    pre.push(...Object.values(cur));
+    return pre;
+  }, []);
+  return Object.values(integrateTracks(tracks));
 }

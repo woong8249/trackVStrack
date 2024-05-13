@@ -24,10 +24,11 @@ const config = {
   },
   mysql: {
     host: required('VITE_MYSQL_HOST', 'mysql'),
-    database: required('VITE_MYSQL_DATABASE', 'chartchart'),
-    user: required('VITE_MYSQL_USER', 'production'),
     password: required('VITE_MYSQL_PASSWORD', 123456789),
+    user: required('VITE_MYSQL_USER', 'production'),
+    database: required('VITE_MYSQL_DATABASE', 'chartchart'),
     port: required('VITE_MYSQL_PORT', 3306),
+    waitForConnections: true,
     connectionLimit: parseInt(required('VITE_MYSQL_POOL_LIMIT'), 10),
   },
 };

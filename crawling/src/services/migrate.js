@@ -1,8 +1,25 @@
-//  전제조건
-// 1. mySQL 이 떠있어야한다.
-// 2. mysql 테이블 정보를 확인해야한다.
-// 3. myslq로 데이터 넣는코드작성해야한다.
+/* eslint-disable no-restricted-syntax */
+import path from 'path';
 
-// 1. 레드스 저장정보를 밀어버린다.
-// 2. json파일들을 통합한다
-// 3. mysql에 넣는다.
+import createTable from '../mysql/createTables';
+import insertTracks from '../mysql/insertData';
+import { integrateJSONFiles } from '../integrate/domestic/integrate';
+import pool from '../mysql/pool';
+import winLogger from '../util/winston';
+
+export default async function migrate() {
+  const tableNames = ['tracks', 'trackDetails', 'artists'];
+  const conn = await pool.getConnection();
+  await conn.ping().then(() => winLogger.info('mysql ping ok'));
+  await createTable();
+  for await (const tableName of tableNames) {
+    const result = await conn.query(`select * from ${tableName}`);
+    if (result[0].length !== 0) {
+      throw new Error('Table already has data');
+    }
+  }
+  conn.release();
+  const dirPath = path.join(__dirname, '../integrate/domestic/dataAfterIntegration');
+  const tracks = integrateJSONFiles(dirPath);
+  await insertTracks(tracks);
+}
