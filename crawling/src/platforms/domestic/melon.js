@@ -56,37 +56,13 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-/**
-- The Melon weekly chart has been available since January 3, 2010.
-- The Melon monthly chart has been available since January 1, 2010.
- * @param {string} year - ex) '2023','2024'
- * @param {string} month - ex) '12','8'
- * @param {string} day
- * @param { 'w' | 'm'} chartType - default is MO
-  */
-export async function fetchChart(year, month, day, chartType) {
-  const validateChartType = standardizeChartType(chartType);
-  validateDateAvailability(year, month, day, validateChartType);
-  const age = Math.floor(year / 10) * 10;
-  const startDay = `${year}${month}${day}`;
-  const endDay = validateChartType === 'WE' ? addSixDaysToYYYYMMDD(startDay) : startDay;
-  const chartScope = {
-    chartType,
-    ...(validateChartType === 'WE' ? {
-      startDate: new Date(`${year}-${month}-${day}`),
-      endDate: new Date(new Date(`${year}-${month}-${day}`).getTime() + (6 * 24 * 60 * 60 * 1000)),
-      weekOfMonth: calculateWeekOfMonth(new Date(`${year}-${month}-${day}`), new Date(new Date(`${year}-${month}-${day}`).getTime() + (6 * 24 * 60 * 60 * 1000))),
-    } : { date: new Date(`${year}-${month}-${day}`) }),
-  };
-
-  const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
-  const melonHtml = await getHtml(url, options);
+async function makeChartDetails(url, opt) {
+  const melonHtml = await getHtml(url, opt);
   const $ = cheerio.load(melonHtml);
   const songSelectors = $('tr.lst50, tr.lst100');
   const chartDetails = songSelectors.map((_i, element) => {
     const rank = $(element).find('span.rank').text().match(/\d+/)[0];
-    const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
-
+    const title = $(element).find('div.ellipsis.rank01').text().trim();
     const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
     const artistNames = artistElements.text().trim().split(',');
     const artistIDs = artistElements.find('a').map((i, el) => {
@@ -106,6 +82,34 @@ export async function fetchChart(year, month, day, chartType) {
       rank, title, titleKeyword, artists, trackID, thumbnail,
     };
   }).get();
+  return chartDetails;
+}
+
+/**
+- The Melon weekly chart has been available since January 3, 2010.
+- The Melon monthly chart has been available since January 1, 2010.
+ * @param {string} year - ex) '2023','2024'
+ * @param {string} month - ex) '12','8'
+ * @param {string} day
+ * @param { 'w' | 'm'| 'n'} chartType - default is MO
+  */
+export async function fetchChart(year, month, day, chartType) {
+  const validateChartType = standardizeChartType(chartType);
+  validateDateAvailability(year, month, day, validateChartType);
+  const age = Math.floor(year / 10) * 10;
+  const startDay = `${year}${month}${day}`;
+  const endDay = validateChartType === 'WE' ? addSixDaysToYYYYMMDD(startDay) : startDay;
+  const chartScope = {
+    chartType,
+    ...(validateChartType === 'WE' ? {
+      startDate: new Date(`${year}-${month}-${day}`),
+      endDate: new Date(new Date(`${year}-${month}-${day}`).getTime() + (6 * 24 * 60 * 60 * 1000)),
+      weekOfMonth: calculateWeekOfMonth(new Date(`${year}-${month}-${day}`), new Date(new Date(`${year}-${month}-${day}`).getTime() + (6 * 24 * 60 * 60 * 1000))),
+    } : { date: new Date(`${year}-${month}-${day}`) }),
+  };
+
+  const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
+  const chartDetails = await makeChartDetails(url, options);
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'melon' };
 }
 
@@ -150,4 +154,10 @@ export async function fetchAdditionalInformationOfTrack(trackID) {
   const trackImage = $('div.thumb img').attr('src');
   const lyrics = $('div.lyric').text();
   return { releaseDate, trackImage, lyrics };
+}
+
+export async function fetchRealTimeChart() {
+  const url = 'https://www.melon.com/chart/index.htm';
+  const chartDetails = await makeChartDetails(url, options);
+  return chartDetails;
 }

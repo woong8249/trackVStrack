@@ -65,17 +65,7 @@ function determineChartScope(year, month, day, chartType) {
   return chartScope;
 }
 
-/**
- * @param {string} year
- * @param {string} month
- * @param {string} day
- * @param {'d' | 'w' } chartType - default is day
-  */
-export async function fetchChart(year, month, day, chartType) {
-  const validateChartType = standardizeChartType(chartType);
-  validateDateAvailability(year, month, day, validateChartType);
-  const url = `https://music.bugs.co.kr/chart/track/${validateChartType}/total?chartdate=${year}${month}${day}`;
-  const chartScope = determineChartScope(year, month, day, validateChartType);
+async function makeChartDetails(url) {
   const bugsHtml = await getHtml(url);
   const $ = cheerio.load(bugsHtml);
   const list = $('tr');
@@ -102,6 +92,20 @@ export async function fetchChart(year, month, day, chartType) {
       thumbnail,
     };
   }).get();
+  return chartDetails;
+}
+/**
+ * @param {string} year
+ * @param {string} month
+ * @param {string} day
+ * @param {'d' | 'w' } chartType - default is day
+  */
+export async function fetchChart(year, month, day, chartType) {
+  const validateChartType = standardizeChartType(chartType);
+  validateDateAvailability(year, month, day, validateChartType);
+  const chartScope = determineChartScope(year, month, day, validateChartType);
+  const url = `https://music.bugs.co.kr/chart/track/${validateChartType}/total?chartdate=${year}${month}${day}`;
+  const chartDetails = await makeChartDetails(url);
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'bugs' };
 }
 
@@ -156,4 +160,10 @@ export async function fetchAdditionalInformationOfTrack(trackID, albumID) {
   const trackImage = $('div.innerContainer img').attr('src');
   releaseDate = new Date(releaseDate.split('.').join('-'));
   return { releaseDate, trackImage, lyrics };
+}
+
+export async function fetchRealTimeChart() {
+  const url = 'https://music.bugs.co.kr/chart/track/realtime/total';
+  const chartDetails = await makeChartDetails(url);
+  return chartDetails;
 }

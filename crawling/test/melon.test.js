@@ -3,24 +3,26 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/platforms/domestic/melon.js';
+import {
+  fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel, fetchRealTimeChart,
+} from '../src/platforms/domestic/melon.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
 
-describe('The fetchChart func Test', () => {
+describe('Test func fetchChart', () => {
   it('The Melon weekly chart has been available since January 3, 2010.So fetchChart(\'2010\', \'01\', \'02\', \'w\') is going to throw Error.', () => {
     expect(() => fetchChart('2010', '01', '02', 'w')).rejects.toThrowError('The Melon weekly chart has been available since January 3, 2010.');
     expect.assertions(1);
   });
 
-  // The Melon weekly Chart dates are as follows:
-  // Sunday basis:
-  //   Start: January 3, 2010, to January 9, 2010
-  //   End: August 5, 2012, to August 11, 2012
-  // Monday basis:
-  //   Start: August 13, 2012, to August 19, 2012
-  //   Ongoing to the present
+  //   // The Melon weekly Chart dates are as follows:
+  //   // Sunday basis:
+  //   //   Start: January 3, 2010, to January 9, 2010
+  //   //   End: August 5, 2012, to August 11, 2012
+  //   // Monday basis:
+  //   //   Start: August 13, 2012, to August 19, 2012
+  //   //   Ongoing to the present
   it('The Melon weekly chart has been available since January 3, 2010. We will test using a randomly selected Monday after this date.', async () => {
     const minDate = new Date('2012-08-13');
     const today = new Date();
@@ -61,7 +63,7 @@ describe('The fetchChart func Test', () => {
   });
 });
 
-describe('fetchChartsForDateRangeInParallel', () => {
+describe('Test func fetchChartsForDateRangeInParallel', () => {
   it('It can obtain monthly charts for a specific period.', async () => {
     const result = await fetchChartsForDateRangeInParallel(new Date('2024-02-01'), new Date('2024-03-01'), 'm');
     const { chartScope: chartScope2M } = result.find(item => item.chartScope.date.getDate() === new Date('2024-02-01').getDate());
@@ -83,7 +85,7 @@ describe('fetchChartsForDateRangeInParallel', () => {
   });
 });
 
-describe('func fetchAdditionalInformationOfTrack', () => {
+describe('Test func fetchAdditionalInformationOfTrack', () => {
   it('This function can fetch the releaseDate,trackImage and lyrics.', async () => {
     const { releaseDate, trackImage, lyrics } = await fetchAdditionalInformationOfTrack(36713849);
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
@@ -92,5 +94,20 @@ describe('func fetchAdditionalInformationOfTrack', () => {
     expect(isURL).toBe(true);
     expect(lyrics.length > 100).toBe(true);
     expect.assertions(3);
+  });
+});
+
+describe('Test fetchRealTimeChart', () => {
+  it('check properties', async () => {
+    const randomIndex = Math.floor(Math.random() * 100);
+    const result = await fetchRealTimeChart();
+    const target = result[randomIndex];
+    expect(target);
+    expect(target).toHaveProperty('rank');
+    expect(target).toHaveProperty('artists');
+    expect(target).toHaveProperty('title');
+    expect(target).toHaveProperty('titleKeyword');
+    expect(target).toHaveProperty('trackID');
+    expect(target).toHaveProperty('thumbnail');
   });
 });

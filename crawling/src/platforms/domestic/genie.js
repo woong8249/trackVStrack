@@ -67,25 +67,7 @@ function standardizeChartType(chartType) {
   throw Error('chart type is able only \'d\'|\'w\'|\'m\'');
 }
 
-/**
-- The Genie Daily Chart starts from March 28, 2012.
-- The Genie Weekly Chart has been in place since March 25, 2012,
- with Mondays as the reference point.
-- The Genie Monthly Chart has been active since February 1, 2012,
- using the first of the month as the starting points
- * @param {number} year
- * @param {number} month
- * @param {number} day
-  * @param {'d' | 'w' | 'm'} chartType
-  */
-export async function fetchChart(year, month, day, chartType) {
-  const validateChartType = standardizeChartType(chartType);
-  validateDateAvailability(year, month, day, validateChartType);
-  const chartScope = determineChartScope(year, month, day, validateChartType);
-  const urls = [
-    `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=1`,
-    `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=2`,
-  ];
+async function makeChartDetails(urls, type) {
   const htmlContents = await Promise.all(urls.map(url => getHtml(url)));
   const combinedHtml = htmlContents.join(' ');
   const $ = cheerio.load(combinedHtml);
@@ -107,7 +89,7 @@ export async function fetchChart(year, month, day, chartType) {
       artists = artists.map(item => ({ artistName: item.trim(), artistKeyword: extractKeyword(item), artistID: null }));
     }
     const titleKeyword = extractKeyword(title);
-    const albumID = $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
+    const albumID = type === 'now' ? undefined : $(element).find('td a.cover span.mask').attr('onclick').match(/\d+/)[0];
     const trackID = $(element).attr('songid');
     const thumbnail = 'https:' + $(element).find('a.cover img').attr('src');
 
@@ -115,6 +97,30 @@ export async function fetchChart(year, month, day, chartType) {
       rank, title, titleKeyword, artists, albumID, trackID, thumbnail,
     };
   }).get();
+  return chartDetails;
+}
+
+/**
+- The Genie Daily Chart starts from March 28, 2012.
+- The Genie Weekly Chart has been in place since March 25, 2012,
+ with Mondays as the reference point.
+- The Genie Monthly Chart has been active since February 1, 2012,
+ using the first of the month as the starting points
+ * @param {number} year
+ * @param {number} month
+ * @param {number} day
+  * @param {'d' | 'w' | 'm'} chartType
+  */
+export async function fetchChart(year, month, day, chartType) {
+  const validateChartType = standardizeChartType(chartType);
+  validateDateAvailability(year, month, day, validateChartType);
+  const chartScope = determineChartScope(year, month, day, validateChartType);
+  const urls = [
+    `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=1`,
+    `https://www.genie.co.kr/chart/top200?ditc=${validateChartType}&ymd=${year}${month}${day}&hh=20&rtm=N&pg=2`,
+  ];
+
+  const chartDetails = await makeChartDetails(urls);
   return { chartDetails: chartDetails.filter(item => item.title), chartScope, platform: 'genie' };
 }
 
@@ -178,4 +184,13 @@ export async function fetchAdditionalInformationOfTrack(trackID, albumID) {
     trackImage = 'https:' + trackImage;
   }
   return { releaseDate, trackImage, lyrics };
+}
+
+export async function fetchRealTimeChart() {
+  const urls = [
+    'https://www.genie.co.kr/chart/top200',
+    'https://www.genie.co.kr/chart/top200?ditc=D&ymd=20240513&hh=21&rtm=Y&pg=2',
+  ];
+  const chartDetails = await makeChartDetails(urls, 'now');
+  return chartDetails;
 }

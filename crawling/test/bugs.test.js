@@ -3,7 +3,9 @@ import {
   expect, it,
 } from 'vitest';
 
-import { fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel } from '../src/platforms/domestic/bugs.js';
+import {
+  fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel, fetchRealTimeChart,
+} from '../src/platforms/domestic/bugs.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
@@ -84,5 +86,20 @@ describe('func fetchAdditionalInformationOfTrack', () => {
     expect(lyrics.length > 100).toBe(true);
     expect(isURL).toBe(true);
     expect.assertions(3);
+  });
+});
+
+describe('Test fetchRealTimeChart', () => {
+  it('check properties', async () => {
+    const randomIndex = Math.floor(Math.random() * 100);
+    const result = await fetchRealTimeChart();
+    const target = result[randomIndex];
+    expect(target);
+    expect(target).toHaveProperty('rank');
+    expect(target).toHaveProperty('artists');
+    expect(target).toHaveProperty('title');
+    expect(target).toHaveProperty('titleKeyword');
+    expect(target).toHaveProperty('trackID');
+    expect(target).toHaveProperty('thumbnail');
   });
 });

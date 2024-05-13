@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import winLogger from '../util/winston.js';
 
-import pool from './pool.js';
+import pool, { ping } from './pool.js';
 
+const tableNames = ['tracks', 'trackDetails', 'artists'];
 const queries = [
   `CREATE TABLE IF NOT EXISTS \`artists\` (
   \`id\` INT PRIMARY KEY AUTO_INCREMENT,
@@ -30,6 +31,7 @@ const queries = [
 ];
 
 export default async function createTable() {
+  await ping();
   for await (const query of queries) {
     const connection = await pool.getConnection();
     await connection.query(query).then(result => {
@@ -37,4 +39,20 @@ export default async function createTable() {
     });
     connection.release();
   }
+}
+
+export async function doesTableHaveData() {
+  await ping();
+  let result = false;
+  const tasks = tableNames.map(async tableName => {
+    const conn = await pool.getConnection();
+    const queryResult = (await conn.query(`select * from ${tableName}`))[0];
+    if (queryResult.length !== 0) {
+      result = true;
+      winLogger.info('Table have Data', { tableName });
+    }
+    conn.release();
+  });
+  await Promise.all(tasks);
+  return result;
 }
