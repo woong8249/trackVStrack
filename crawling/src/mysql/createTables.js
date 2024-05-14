@@ -28,6 +28,7 @@ const queries = [
 );`,
   'ALTER TABLE `trackDetails` ADD FOREIGN KEY (`artistId`) REFERENCES `artists` (`id`);',
   'ALTER TABLE `trackDetails` ADD FOREIGN KEY (`trackId`) REFERENCES `tracks` (`id`);',
+  'ALTER TABLE `trackDetails` ADD UNIQUE INDEX `idx_artist_track` (`artistId`, `trackId`);', // 추가된 쿼리
 ];
 
 export default async function createTable() {
@@ -49,7 +50,7 @@ export async function doesTableHaveData() {
     const queryResult = (await conn.query(`select * from ${tableName}`))[0];
     if (queryResult.length !== 0) {
       result = true;
-      winLogger.info('Table have Data', { tableName });
+      winLogger.debug('Table have Data', { tableName });
     }
     conn.release();
   });

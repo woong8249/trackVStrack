@@ -21,7 +21,7 @@ async function insertTrack(track) {
           'INSERT INTO artists (artistKey, artistKeyword, platforms) VALUES (?, ?, ?)',
           [artist.artistKey, artist.artistKeyword, JSON.stringify(artist.platforms)],
         );
-        artistIds.push(artistResult.insertIndex);
+        artistIds.push(artistResult.insertId);
       }
     }
     const [trackExists] = await connection.query(

@@ -12,11 +12,7 @@ export default async function upsertTracksAndArtists(tracks) {
     for await (const track of tracks) {
       // 아티스트 삽입 또는 업데이트
       for await (const artist of track.artists) {
-        const sql = `
-                    INSERT INTO artists (artistKey, artistKeyword, platforms)
-                    VALUES (?, ?, ?)
-                    ON DUPLICATE KEY UPDATE platforms = JSON_MERGE_PRESERVE(platforms, VALUES(platforms));
-                `;
+        const sql = 'INSERT IGNORE INTO artists (artistKey, artistKeyword, platforms) VALUES (?, ?, ?)';
         await connection.query(sql, [artist.artistKey, artist.artistKeyword, JSON.stringify(artist.platforms)]);
       }
 
@@ -44,8 +40,7 @@ export default async function upsertTracksAndArtists(tracks) {
         INSERT IGNORE INTO trackDetails (artistId, trackId)
         SELECT a.id, t.id
         FROM artists a, tracks t
-        WHERE a.artistKey = ? AND t.trackKey = ?
-                `;
+        WHERE a.artistKey = ? AND t.trackKey = ?`;
         await connection.query(sql, [artist.artistKey, track.trackKey]);
       }
     }

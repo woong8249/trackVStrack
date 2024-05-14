@@ -17,7 +17,8 @@ import redisKey from '../../../config/redisKey.js';
 import { removeDuplicates } from '../../util/array.js';
 import winLogger from '../../util/winston.js';
 
-import exception from './exception.json';
+import artistException from './artistException.json';
+import titleException from './titleException.json';
 
 const modules = { melon, bugs, genie };
 const { trackList, artistList } = redisKey;
@@ -279,10 +280,19 @@ export async function decideKeyNameOfTrack(track) {
   await redisClient.hSet(newKey, stringifyMembers(trackToSave));
   return decidedTrack;
 }
+function checkTitleException(titleKeyword) {
+  const isException = titleException[titleKeyword];
+  if (isException) {
+    // eslint-disable-next-line no-param-reassign
+    titleKeyword = titleException[titleKeyword];
+  }
 
-function checkException(artists) {
+  return titleKeyword;
+}
+
+function checkArtistException(artists) {
   artists.forEach(artist => {
-    const isException = exception[artist.artistKeyword];
+    const isException = artistException[artist.artistKeyword];
     if (isException) {
       // eslint-disable-next-line no-param-reassign
       artist.artistKeyword = isException;
@@ -331,8 +341,8 @@ export function mappingTrackBeforeIntegrate(tracksOrTracksArray) {
         },
       }));
       const mappingResult = {
-        titleKeyword: value.titleKeyword,
-        artists: checkException(artists),
+        titleKeyword: checkTitleException(value.titleKeyword),
+        artists: checkArtistException(artists),
         releaseDate,
         lyrics,
         platforms: {

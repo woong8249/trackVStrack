@@ -11,6 +11,7 @@
     "test": "vitest",
     "integrate": "vite-node integrate.js",
     "upsert": "vite-node upsert.js",
+    "migrate": "vite-node migrate.js",
     "collectData": "vite-node collectData.js"
   },
   "keywords": [],
