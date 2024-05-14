@@ -1,14 +1,11 @@
 /* eslint-disable no-restricted-syntax */
+import { toMysqlFormat } from '../util/time.js';
 import winLogger from '../util/winston.js';
 
 import pool from './pool.js';
 
-function toMysqlFormat(dateString) {
-  const date = new Date(dateString);
-  return date.toISOString().slice(0, 19).replace('T', ' ');
-}
-
-async function insertTrack(track, connection) {
+async function insertTrack(track) {
+  const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
     const artistIds = [];
@@ -60,19 +57,18 @@ async function insertTrack(track, connection) {
   } catch (error) {
     await connection.rollback();
     throw error; // Re-throw the error to be handled in the batch processing
+  } finally {
+    connection.release();
   }
 }
 
 export default async function insertTracks(tracks) {
   winLogger.info('Start inserting tracks');
   for await (const track of tracks) {
-    const connection = await pool.getConnection();
     try {
-      await insertTrack(track, connection);
+      await insertTrack(track);
     } catch (error) {
       winLogger.error(error);
-    } finally {
-      connection.release();
     }
   }
   winLogger.info('Finished inserting tracks');

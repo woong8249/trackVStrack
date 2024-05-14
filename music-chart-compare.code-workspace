@@ -7,9 +7,6 @@
             "path": "./crawling"
         },
         {
-            "path": "./migrator"
-        },
-        {
             "path": "./apiServer"
         },
     ],

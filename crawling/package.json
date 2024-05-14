@@ -9,8 +9,9 @@
     "start": "run(){ vite-node  ${1:-index.js}; };run",
     "lint": "NODE_OPTIONS=--experimental-import-meta-resolve nextlab-eslint **/*.js ",
     "test": "vitest",
-    "integrate": "vite-node trackIntegrate.js",
-    "migrate": "vite-node migrateToMysql.js"
+    "integrate": "vite-node integrate.js",
+    "upsert": "vite-node upsert.js",
+    "collectData": "vite-node collectData.js"
   },
   "keywords": [],
   "author": "",

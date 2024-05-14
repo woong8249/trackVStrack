@@ -10,9 +10,8 @@ import {
 } from '../integrate/domestic/integrate.js';
 import { extractYearMonthDay } from '../util/time';
 import { removeDuplicates } from '../util/array.js';
+import verifiedTrack from '../integrate/domestic/verifiedTracks.json';
 import winLogger from '../util/winston';
-
-import verifiedTrack from './verifiedTracks.json';
 
 export default async function integrateAllDomesticTracks(startDate, endDate, chartType) {
   const fileNameToRead = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
@@ -49,10 +48,11 @@ export default async function integrateAllDomesticTracks(startDate, endDate, cha
     + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
 
   const trackWithSubFixOverZeroNotVerifiedNoDuplicate = removeDuplicates(trackWithSubFixOverZeroNotVerified);
-  const filePath = path.join(__dirname, `${fileNameToWrite}-notVerified.json`);
+  const filePath = path.join(__dirname, '../integrate/domestic', `${fileNameToWrite}-notVerified.json`);
   trackWithSubFixOverZeroNotVerifiedNoDuplicate.length && fs.writeFileSync(filePath, JSON.stringify(trackWithSubFixOverZeroNotVerifiedNoDuplicate));
 
   const filePathToWrite = path.join(__dirname, '../integrate/domestic/dataAfterIntegration', `${fileNameToWrite}.json`);
   fs.writeFileSync(filePathToWrite, JSON.stringify(result));
+  winLogger.info('integrate done check notVerified tracks.', { filePath });
   return result;
 }

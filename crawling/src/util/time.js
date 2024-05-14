@@ -99,3 +99,20 @@ export function calculateWeekOfMonth(startDate, endDate) {
 
   return { year, month, week };
 }
+
+export function validateDate(dateString) {
+  const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD 포맷 검사
+  if (!regex.test(dateString)) {
+    throw new Error('Date format must be YYYY-MM-DD');
+  }
+  const date = new Date(dateString);
+  if (date.toString() === 'Invalid Date') {
+    throw new Error('Invalid date provided');
+  }
+  return date;
+}
+
+export function toMysqlFormat(dateString) {
+  const date = new Date(dateString);
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}

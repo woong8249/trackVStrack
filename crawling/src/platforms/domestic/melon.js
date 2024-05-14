@@ -56,13 +56,13 @@ function generateDatesForChartType(startDate, endDate, chartType) {
   throw new Error('Invalid chart type.');
 }
 
-async function makeChartDetails(url, opt) {
+async function makeChartDetails(url, opt, type) {
   const melonHtml = await getHtml(url, opt);
   const $ = cheerio.load(melonHtml);
   const songSelectors = $('tr.lst50, tr.lst100');
   const chartDetails = songSelectors.map((_i, element) => {
     const rank = $(element).find('span.rank').text().match(/\d+/)[0];
-    const title = $(element).find('div.ellipsis.rank01').text().trim();
+    const title = type === 'now' ? $(element).find('div.ellipsis.rank01').text().trim() : $(element).find('div.ellipsis.rank01 strong').text().trim();
     const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
     const artistNames = artistElements.text().trim().split(',');
     const artistIDs = artistElements.find('a').map((i, el) => {
@@ -158,6 +158,6 @@ export async function fetchAdditionalInformationOfTrack(trackID) {
 
 export async function fetchRealTimeChart() {
   const url = 'https://www.melon.com/chart/index.htm';
-  const chartDetails = await makeChartDetails(url, options);
+  const chartDetails = await makeChartDetails(url, options, 'now');
   return chartDetails;
 }
