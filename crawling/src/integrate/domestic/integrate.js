@@ -195,6 +195,17 @@ export async function decideKeyNameOfArtists(track) {
   return Object.assign(track, { artists: allResult });
 }
 
+function compareArrays(a, b) {
+  const longer = a.length >= b.length ? a : b;
+  const shorter = a.length >= b.length ? b : a;
+  if (a.length === b.length) {
+    const sortedA = [...a].sort();
+    const sortedB = [...b].sort();
+    return sortedA.length === sortedB.length && sortedA.every((element, index) => element === sortedB[index]);
+  }
+  return shorter.every(element => longer.includes(element));
+}
+
 export async function decideKeyNameOfTrack(track) {
   // 병렬로 실행되면 안됨
   const {
@@ -203,7 +214,7 @@ export async function decideKeyNameOfTrack(track) {
     platforms,
     artists,
   } = track;
-  const { artistKey } = artists[0];
+  const artistKeys = artists.map(artist => artist.artistKey);
   const platformName = Object.keys(platforms)[0];
   const deepCopiedPlatform = JSON.parse(JSON.stringify(platforms));
   delete deepCopiedPlatform[platformName].chartInfos;
@@ -222,7 +233,7 @@ export async function decideKeyNameOfTrack(track) {
       titleKeyword,
       lyrics,
       platforms: deepCopiedPlatform,
-      artistKey,
+      artistKeys,
     });
     await redisClient.sAdd(trackList, trackDefaultKeyName);
     await redisClient.hSet(trackDefaultKeyName, trackToSave);
@@ -236,7 +247,7 @@ export async function decideKeyNameOfTrack(track) {
       trackKey: savedTrackKey,
       lyrics: savedLyrics,
       platforms: savedPlatforms,
-      artistKey: savedArtistKey,
+      artistKeys: savedArtistKeys,
     } = savedTrack;
     const savedPlatformKeyList = Object.keys(savedPlatforms);
     const isSamePlatform = savedPlatformKeyList.some(savedPlatformName => savedPlatformName === platformName);
@@ -250,9 +261,9 @@ export async function decideKeyNameOfTrack(track) {
         return decidedTrack;
       }
     }
-
     const isSimilarLyrics = isSameLyrics(savedLyrics, lyrics);
-    const isSameArtistKey = savedArtistKey === artistKey;
+    const isSameArtistKey = compareArrays(savedArtistKeys, artistKeys);
+
     if (isSimilarLyrics && isSameArtistKey) {
       result.trackKey = savedTrackKey;
       savedPlatforms[platformName] = deepCopiedPlatform[platformName];
@@ -275,7 +286,7 @@ export async function decideKeyNameOfTrack(track) {
     titleKeyword,
     lyrics,
     platforms: deepCopiedPlatform,
-    artistKey,
+    artistKeys,
   });
   await redisClient.hSet(newKey, stringifyMembers(trackToSave));
   return decidedTrack;

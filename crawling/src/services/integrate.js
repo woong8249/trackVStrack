@@ -21,13 +21,20 @@ export default async function integrateAllDomesticTracks(startDate, endDate, cha
   const mappingTrack = mappingTrackBeforeIntegrate(tracks);
   const step1 = [];
   const step2 = [];
+  const step3 = [];
   for await (const track of mappingTrack) {
     const da1 = await decideKeyNameOfArtists(track);
     step1.push(da1);
   }
+  // 로직상 두번
   for await (const track of step1) {
-    const dt = await decideKeyNameOfTrack(track);
+    const dt = await decideKeyNameOfArtists(track);
     step2.push(dt);
+  }
+
+  for await (const track of step2) {
+    const dt = await decideKeyNameOfTrack(track);
+    step3.push(dt);
   }
   const result = integrateTracks(step2);
   const trackWithSubFixOverZeroNotVerified = [];
@@ -50,9 +57,9 @@ export default async function integrateAllDomesticTracks(startDate, endDate, cha
   const trackWithSubFixOverZeroNotVerifiedNoDuplicate = removeDuplicates(trackWithSubFixOverZeroNotVerified);
   const filePath = path.join(__dirname, '../integrate/domestic', `${fileNameToWrite}-notVerified.json`);
   trackWithSubFixOverZeroNotVerifiedNoDuplicate.length && fs.writeFileSync(filePath, JSON.stringify(trackWithSubFixOverZeroNotVerifiedNoDuplicate));
+  trackWithSubFixOverZeroNotVerifiedNoDuplicate.length && winLogger.info('check notVerified tracks.', { filePath });
 
   const filePathToWrite = path.join(__dirname, '../integrate/domestic/dataAfterIntegration', `${fileNameToWrite}.json`);
   fs.writeFileSync(filePathToWrite, JSON.stringify(result));
-  winLogger.info('integrate done check notVerified tracks.', { filePath });
   return result;
 }

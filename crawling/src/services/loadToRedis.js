@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-import flushAllRedisData from '../redis/flushAllRedisData.js';
 import pool from '../mysql/pool.js';
 import redisClient from '../redis/redisClient.js';
 import redisKey from '../../config/redisKey.js';
@@ -27,7 +26,6 @@ JOIN artists ON trackDetails.artistId = artists.id
 JOIN tracks ON trackDetails.trackId = tracks.id;`;
 
 export default async function loadToRedis() {
-  await flushAllRedisData();
   const conn = await pool.getConnection();
   const queryResult = (await conn.query(query))[0];
   winLogger.info('mysql data import success');
@@ -59,6 +57,7 @@ export default async function loadToRedis() {
   for await (const track of tracks) {
     const { trackKey, artists } = track;
     await redisClient.sAdd(trackList, trackKey);
+    track.artistKeys = track.artists.map(artist => artist.artistKey);
     await redisClient.hSet(trackKey, stringifyMembers(track));
     for await (const artist of artists) {
       const { artistKey } = artist;

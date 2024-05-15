@@ -116,3 +116,11 @@ export function toMysqlFormat(dateString) {
   const date = new Date(dateString);
   return date.toISOString().slice(0, 19).replace('T', ' ');
 }
+
+export function formatDates(filename) {
+  const dates = filename.split('-w.json')[0];
+  const [startDate, endDate] = dates.split('-');
+  const formattedStartDate = `${startDate.slice(0, 4)}-${startDate.slice(4, 6)}-${startDate.slice(6, 8)}`;
+  const formattedEndDate = `${endDate.slice(0, 4)}-${endDate.slice(4, 6)}-${endDate.slice(6, 8)}`;
+  return [formattedStartDate, formattedEndDate];
+}

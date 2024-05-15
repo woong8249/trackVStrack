@@ -5,13 +5,16 @@ import pool, { ping } from './pool.js';
 
 const tableNames = ['tracks', 'trackDetails', 'artists'];
 const queries = [
-  `CREATE TABLE IF NOT EXISTS \`artists\` (
+  'DROP TABLE IF EXISTS `trackDetails`;',
+  'DROP TABLE IF EXISTS `artists`;',
+  'DROP TABLE IF EXISTS `tracks`;',
+  `CREATE TABLE  \`artists\` (
   \`id\` INT PRIMARY KEY AUTO_INCREMENT,
   \`artistKey\` VARCHAR(50) UNIQUE,
   \`artistKeyword\` VARCHAR(50),
   \`platforms\` JSON
 );`,
-  `CREATE TABLE IF NOT EXISTS \`tracks\` (
+  `CREATE TABLE  \`tracks\` (
   \`id\` INT PRIMARY KEY AUTO_INCREMENT,
   \`trackKey\` VARCHAR(100) UNIQUE,
   \`titleKeyword\` VARCHAR(100),
@@ -21,14 +24,14 @@ const queries = [
   \`thumbnails\` VARCHAR(512),
   \`lyrics\` VARCHAR(5000)
 );`,
-  `CREATE TABLE IF NOT EXISTS \`trackDetails\` (
+  `CREATE TABLE  \`trackDetails\` (
   \`id\` INT PRIMARY KEY AUTO_INCREMENT,
   \`artistId\` INT,
   \`trackId\` INT
 );`,
   'ALTER TABLE `trackDetails` ADD FOREIGN KEY (`artistId`) REFERENCES `artists` (`id`);',
   'ALTER TABLE `trackDetails` ADD FOREIGN KEY (`trackId`) REFERENCES `tracks` (`id`);',
-  'ALTER TABLE `trackDetails` ADD UNIQUE INDEX `idx_artist_track` (`artistId`, `trackId`);', // 추가된 쿼리
+  'ALTER TABLE `trackDetails` ADD UNIQUE INDEX `idx_artist_track` (`artistId`, `trackId`);',
 ];
 
 export default async function createTable() {

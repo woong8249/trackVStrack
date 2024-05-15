@@ -10,7 +10,6 @@ export default async function migrate() {
   const result = await doesTableHaveData();
   if (result) {
     winLogger.warn('Please empty all table information.');
-    return;
   }
   const dirPath = path.join(__dirname, '../integrate/domestic/dataAfterIntegration');
   const tracks = integrateJSONFiles(dirPath);
