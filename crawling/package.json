@@ -25,11 +25,11 @@
     "redis": "^4.6.13",
     "string-similarity": "^4.0.4",
     "winston": "^3.13.0",
-    "winston-console-format": "^1.0.8"
+    "winston-console-format": "^1.0.8",
+    "vite": "^5.2.9",
+    "vite-node": "^1.4.0"
   },
   "devDependencies": {
-    "vite": "^5.2.9",
-    "vite-node": "^1.4.0",
     "vitest": "^1.4.0"
   }
 }

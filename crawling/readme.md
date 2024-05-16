@@ -23,7 +23,7 @@ pnpm run migrate
 
     ```bash
     # example
-    pnpm run collectData YYYY-MM-DD YYYY-MM-DD
+    pnpm run fetch YYYY-MM-DD YYYY-MM-DD
     ```
 
     - 플랫폼별 차트데이터 크롤링
@@ -37,7 +37,7 @@ pnpm run migrate
 
     ```bash
     # example
-    pnpm run collectData YYYY-MM-DD YYYY-MM-DD
+    pnpm run integrate YYYY-MM-DD YYYY-MM-DD
     ```
 
     - 각기 다른 플랫폼의 `track`, `artist` 통합
