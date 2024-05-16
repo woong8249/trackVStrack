@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-shadow */
 import fs from 'fs';
 import path from 'path';
@@ -53,4 +54,67 @@ export default async function collectWeeklyCharts(startDate, endDate, chartType)
   fs.writeFileSync(filePath, JSON.stringify(result));
   winLogger.info('check file', { filePath });
   return result;
+}
+
+function fetchArtistInfo(platform, artistID) {
+  switch (platform) {
+    case 'bugs':
+      return bugs.fetchArtistInfo(artistID);
+    case 'genie':
+      return genie.fetchArtistInfo(artistID);
+    case 'melon':
+      return melon.fetchArtistInfo(artistID);
+    default:
+      throw new Error(`Unknown platform: ${platform}`);
+  }
+}
+
+async function processBatch(batch) {
+  const platformRequestCounts = { bugs: 0, genie: 0, melon: 0 };
+  const artistData = [];
+
+  for await (const artist of batch) {
+    const platformKeys = Object.keys(artist.platforms);
+    let selectedPlatform = null;
+
+    // 가능한 플랫폼 중 가장 적은 요청을 받은 플랫폼 선택
+    platformKeys.forEach(platform => {
+      if (selectedPlatform === null || platformRequestCounts[platform] < platformRequestCounts[selectedPlatform]) {
+        selectedPlatform = platform;
+      }
+    });
+
+    if (selectedPlatform) {
+      const { artistID } = artist.platforms[selectedPlatform];
+      try {
+        const info = await fetchArtistInfo(selectedPlatform, artistID);
+        artistData.push({
+          ...artist,
+          artistImage: info.artistImage,
+          debut: info.debut,
+        });
+
+        // 요청 카운트 증가
+        platformRequestCounts[selectedPlatform] += 1;
+      } catch (error) {
+        console.error(`Failed to fetch artist info for ${artist.artistKey} from ${selectedPlatform}:`, error);
+      }
+    }
+  }
+
+  return artistData;
+}
+
+export async function fetchArtistsInfo(artists) {
+  winLogger.info('start fetchArtistsInfo');
+  const BATCH_SIZE = 10;
+  const results = [];
+  for (let i = 0; i < artists.length; i += BATCH_SIZE) {
+    const batch = artists.slice(i, i + BATCH_SIZE);
+    // eslint-disable-next-line no-await-in-loop
+    const batchResults = await processBatch(batch);
+    results.push(...batchResults);
+  }
+  winLogger.info('done fetchArtistsInfo');
+  return results;
 }

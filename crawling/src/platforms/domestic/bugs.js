@@ -172,10 +172,10 @@ export async function fetchArtistInfo(artistID) {
   const url = `https://music.bugs.co.kr/artist/${artistID}?wl_ref=list_ar_01_search`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
-  const artistImage = $('li.big img').attr('src');
+  const artistImage = $('li.big img').attr('src') || null;
   const debut = $('tr').filter(function () {
     return $(this).find('th').text() === '데뷔';
-  }).find('td').text();
+  }).find('td').text() || null;
 
   return { artistImage, debut };
 }

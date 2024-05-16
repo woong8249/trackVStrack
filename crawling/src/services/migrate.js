@@ -2,7 +2,7 @@
 import path from 'path';
 
 import createTable, { doesTableHaveData } from '../mysql/createTables';
-import getAllTrackDataJoinedWithArtist from '../mysql/getAllTrackDataJoinedWithArtist.js';
+import { getAllTrackDataJoinedWithArtist } from '../mysql/getAllData.js';
 import insertTracks from '../mysql/insertData';
 import { integrateJSONFiles } from '../integrate/domestic/integrate';
 import redisClient from '../redis/redisClient.js';

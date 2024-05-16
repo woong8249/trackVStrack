@@ -13,6 +13,7 @@ const queries = [
   \`artistKey\` VARCHAR(50) UNIQUE,
   \`artistKeyword\` VARCHAR(50),
   \`artistImage\` VARCHAR(512) NULL,
+  \`debut\` VARCHAR(50) NULL,
   \`platforms\` JSON
 );`,
   `CREATE TABLE  \`tracks\` (

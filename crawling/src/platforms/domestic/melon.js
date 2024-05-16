@@ -166,7 +166,7 @@ export async function fetchArtistInfo(artistID) {
   const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
-  const artistImage = $('span#artistImgArea img').attr('src');
-  const debut = $('span.gubun').text();
+  const artistImage = $('span#artistImgArea img').attr('src') || null;
+  const debut = $('span.gubun').text() || $('dd.debut_song').text().trim() || null;
   return { artistImage, debut };
 }

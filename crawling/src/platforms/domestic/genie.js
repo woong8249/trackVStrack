@@ -199,26 +199,12 @@ export async function fetchArtistInfo(artistID) {
   const url = `https://www.genie.co.kr/detail/artistInfo?xxnm=${artistID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
-  const artistImage = 'https:' + $('div.photo-zone a').attr('href');
+  const artistImage = $('div.photo-zone a').attr('href') ? 'https:' + $('div.photo-zone a').attr('href') : null;
   // eslint-disable-next-line func-names
   const debutInfo = $('li').filter(function () {
     return $(this).find('img').attr('alt') === '데뷔';
   }).find('span.value').text()
     .trim();
-  const debut = debutInfo.match(/\d{4}/)[0];
+  const debut = debutInfo.match(/\d{4}/) ? debutInfo.match(/\d{4}/)[0] : null;
   return { artistImage, debut };
 }
-// export async function fetchArtistInfo(artistID) {
-//   const url = `https://www.genie.co.kr/detail/artistInfo?xxnm=${artistID}`;
-//   const html = await getHtml(url);
-//   const $ = cheerio.load(html);
-//   const artistImage = $('span.cover-img img').attr('src');
-//   const debutInfo = $('li').filter(() => $(this).find('span[attr] img')
-//     .attr('alt') === '데뷔')
-//     .find('span.value')
-//     .text()
-//     .trim();
-
-//   const debut = debutInfo.match(/\d{4}/)[0];
-//   return { artistImage, debut };
-// }

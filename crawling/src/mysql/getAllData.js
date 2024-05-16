@@ -2,7 +2,7 @@ import winLogger from '../util/winston.js';
 
 import pool from './pool.js';
 
-const query = `SELECT 
+const queryGetAllTrackDataJoinedWithArtist = `SELECT 
 artists.id AS artist_id,
 artists.artistKey AS artist_key,
 artists.artistKeyword AS artist_keyword,
@@ -20,9 +20,24 @@ FROM trackDetails
 JOIN artists ON trackDetails.artistId = artists.id
 JOIN tracks ON trackDetails.trackId = tracks.id;`;
 
-export default async function getAllTrackDataJoinedWithArtist() {
+const queryGetArtistsNoHasImage = `SELECT id, artistKey, platforms 
+FROM artists 
+WHERE artistImage = 'null'
+OR artistImage IS NULL
+OR debut IS NULL
+OR debut = 'null';`;
+
+export async function getAllTrackDataJoinedWithArtist() {
   const conn = await pool.getConnection();
-  const queryResult = (await conn.query(query))[0];
+  const queryResult = (await conn.query(queryGetAllTrackDataJoinedWithArtist))[0];
+  winLogger.info('mysql data import success');
+  conn.release();
+  return queryResult;
+}
+
+export async function getArtistsNoHasAddInfo() {
+  const conn = await pool.getConnection();
+  const queryResult = (await conn.query(queryGetArtistsNoHasImage))[0];
   winLogger.info('mysql data import success');
   conn.release();
   return queryResult;
