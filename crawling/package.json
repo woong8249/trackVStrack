@@ -9,10 +9,10 @@
     "start": "run(){ vite-node  ${1:-index.js}; };run",
     "lint": "NODE_OPTIONS=--experimental-import-meta-resolve nextlab-eslint **/*.js ",
     "test": "vitest",
-    "integrate": "vite-node integrate.js",
-    "upsert": "vite-node upsert.js",
     "migrate": "vite-node migrate.js",
-    "collectData": "vite-node collectData.js"
+    "fetch": "vite-node fetch.js",
+    "integrate": "vite-node integrate.js",
+    "upsert": "vite-node upsert.js"
   },
   "keywords": [],
   "author": "",

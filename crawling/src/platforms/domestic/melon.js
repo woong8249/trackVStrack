@@ -161,3 +161,12 @@ export async function fetchRealTimeChart() {
   const chartDetails = await makeChartDetails(url, options, 'now');
   return chartDetails;
 }
+
+export async function fetchArtistInfo(artistID) {
+  const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  const artistImage = $('span#artistImgArea img').attr('src');
+  const debut = $('span.gubun').text();
+  return { artistImage, debut };
+}

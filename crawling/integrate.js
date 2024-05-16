@@ -1,6 +1,6 @@
 import flushAllRedisData from './src/redis/flushAllRedisData.js';
-import integrateAllDomesticTracks from './src/services/integrate.js';
-import loadToRedis from './src/services/loadToRedis.js';
+import integrateFiles from './src/services/integrate.js';
+import { loadToRedis } from './src/services/migrate.js';
 import { validateDate } from './src/util/time.js';
 import winLogger from './src/util/winston.js';
 
@@ -12,6 +12,6 @@ const endDate = validateDate(process.argv[3]);
 
 await flushAllRedisData();
 await loadToRedis();
-await integrateAllDomesticTracks(new Date(startDate), new Date(endDate), 'w');
+await integrateFiles(new Date(startDate), new Date(endDate), 'w');
 winLogger.info('integrate done.');
 process.exit();

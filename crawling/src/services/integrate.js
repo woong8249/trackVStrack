@@ -8,12 +8,13 @@ import {
   integrateTracks,
   mappingTrackBeforeIntegrate,
 } from '../integrate/domestic/integrate.js';
-import { extractYearMonthDay } from '../util/time';
+import { extractYearMonthDay, formatDates } from '../util/time';
+import flushAllRedisData from '../redis/flushAllRedisData.js';
 import { removeDuplicates } from '../util/array.js';
 import verifiedTrack from '../integrate/domestic/verifiedTracks.json';
 import winLogger from '../util/winston';
 
-export default async function integrateAllDomesticTracks(startDate, endDate, chartType) {
+export default async function integrateFiles(startDate, endDate, chartType) {
   const fileNameToRead = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
     + '-' + Object.values(extractYearMonthDay(endDate)).reduce((pre, cur) => pre + cur, '') + '-' + chartType;
   const filePathToRead = path.join(__dirname, '../integrate/domestic/dataBeforeIntegration', `${fileNameToRead}.json`);
@@ -62,4 +63,19 @@ export default async function integrateAllDomesticTracks(startDate, endDate, cha
   const filePathToWrite = path.join(__dirname, '../integrate/domestic/dataAfterIntegration', `${fileNameToWrite}.json`);
   fs.writeFileSync(filePathToWrite, JSON.stringify(result));
   return result;
+}
+
+export async function integrateAllFile() {
+  await flushAllRedisData();
+  const dirPath = path.join(__dirname, '../integrate/domestic/dataBeforeIntegration');
+  const days = fs.readdirSync(dirPath).map(item => formatDates(item));
+
+  for await (const day of days) {
+    const startDate = new Date(day[0]);
+    const endDate = new Date(day[1]);
+    await integrateFiles(startDate, endDate, 'w');
+    winLogger.info('integrate done.', { startDate, endDate });
+  }
+  winLogger.info('integrate all done.');
+  await flushAllRedisData();
 }
