@@ -3,9 +3,10 @@
 import * as cheerio from 'cheerio';
 
 import {
-  addSixDaysToYYYYMMDD, arrayToChunk, calculateWeekOfMonth,
+  addSixDaysToYYYYMMDD, calculateWeekOfMonth,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
 } from '../../util/time.js';
+import { arrayToChunk } from '../../util/array.js';
 import extractKeyword from '../../util/regex.js';
 import { getHtml } from '../../util/fetch.js';
 import winLogger from '../../util/winston.js';
@@ -162,11 +163,36 @@ export async function fetchRealTimeChart() {
   return chartDetails;
 }
 
+function isValidDate(dateString) {
+  // YYYY.MM.DD, YYYY.MM, YYYY 형식 검증
+  const fullDatePattern = /^\d{4}\.\d{2}\.\d{2}$/;
+  const partialDatePattern = /^\d{4}\.\d{2}$/;
+  const yearPattern = /^\d{4}$/;
+
+  return fullDatePattern.test(dateString) || partialDatePattern.test(dateString) || yearPattern.test(dateString);
+}
+
 export async function fetchArtistInfo(artistID) {
   const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   const artistImage = $('span#artistImgArea img').attr('src') || null;
-  const debut = $('span.gubun').text() || $('dd.debut_song').text().trim() || null;
+  const candi1 = $('span.gubun').text().trim();
+  const candi2 = $('dd.debut_song').text().trim();
+  const candi3 = $('dd.debut_song span.ellipsis').contents().first().text()
+    .trim();
+
+  let debut = null;
+
+  if (isValidDate(candi1)) {
+    debut = candi1;
+  } else if (isValidDate(candi3)) {
+    debut = candi3;
+  } else {
+    const possibleDate = candi2.split('\n')[0].trim();
+    if (isValidDate(possibleDate)) {
+      debut = possibleDate;
+    }
+  }
   return { artistImage, debut };
 }

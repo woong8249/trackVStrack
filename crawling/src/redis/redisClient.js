@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 
-import config from '../../config/config';
-import winLogger from '../util/winston';
+import config from '../../config/config.js';
+import winLogger from '../util/winston.js';
 
 const { socket } = config.redis;
 

@@ -3,9 +3,10 @@
 import * as cheerio from 'cheerio';
 
 import {
-  arrayToChunk, calculateWeekOfMonth, createAllDatesBetween,
+  calculateWeekOfMonth, createAllDatesBetween,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
 } from '../../util/time.js';
+import { arrayToChunk } from '../../util/array.js';
 import extractKeyword from '../../util/regex.js';
 import { getHtml } from '../../util/fetch.js';
 import winLogger from '../../util/winston.js';

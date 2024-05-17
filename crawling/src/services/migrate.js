@@ -1,14 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 import path from 'path';
 
-import createTable, { doesTableHaveData } from '../mysql/createTables';
+import createTable, { doesTableHaveData } from '../mysql/createTables.js';
 import { getAllTrackDataJoinedWithArtist } from '../mysql/getAllData.js';
-import insertTracks from '../mysql/insertData';
-import { integrateJSONFiles } from '../integrate/domestic/integrate';
+import insertTracks from '../mysql/insertData.js';
+import { integrateJSONFiles } from '../integrate/domestic/integrate.js';
 import redisClient from '../redis/redisClient.js';
 import redisKey from '../../config/redisKey.js';
 import { stringifyMembers } from '../util/json.js';
-import winLogger from '../util/winston';
+import winLogger from '../util/winston.js';
 
 const { trackList, artistList } = redisKey;
 

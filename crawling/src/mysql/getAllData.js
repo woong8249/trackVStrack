@@ -20,12 +20,11 @@ FROM trackDetails
 JOIN artists ON trackDetails.artistId = artists.id
 JOIN tracks ON trackDetails.trackId = tracks.id;`;
 
-const queryGetArtistsNoHasImage = `SELECT id, artistKey, platforms 
+const queryGetArtistsNoHasImage = `SELECT
+id, artistKey, platforms 
 FROM artists 
-WHERE artistImage = 'null'
-OR artistImage IS NULL
-OR debut IS NULL
-OR debut = 'null';`;
+WHERE artistImage IS NULL
+OR debut IS NULL;`;
 
 export async function getAllTrackDataJoinedWithArtist() {
   const conn = await pool.getConnection();

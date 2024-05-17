@@ -63,10 +63,6 @@ export function addSixDaysToYYYYMMDD(inputYYYYMMDD) {
   return `${resultYear}${resultMonth}${resultDay}`;
 }
 
-export function arrayToChunk(array, size) {
-  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size));
-}
-
 export function extractYearMonthDay(date) {
   const year = date.getFullYear();
   const month = (`0${date.getMonth() + 1}`).slice(-2);

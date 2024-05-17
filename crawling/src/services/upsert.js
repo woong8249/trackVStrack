@@ -26,6 +26,9 @@ export default async function upsert(startDate, endDay, chartType) {
 //  가끔 호출 해주면 갱신되지않을까..
 export async function updateArtistAddInfo() {
   const artists = await getArtistsNoHasAddInfo();
+  winLogger.info('Number of artists without additional information', { numberOfArtists: artists.length });
   const result = await fetchArtistsInfo(artists);
   await updateArtistsAddInfoBulk(result);
 }
+
+await updateArtistAddInfo();

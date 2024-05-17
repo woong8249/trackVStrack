@@ -8,11 +8,11 @@ import {
   integrateTracks,
   mappingTrackBeforeIntegrate,
 } from '../integrate/domestic/integrate.js';
-import { extractYearMonthDay, formatDates } from '../util/time';
+import { extractYearMonthDay, formatDates } from '../util/time.js';
 import flushAllRedisData from '../redis/flushAllRedisData.js';
 import { removeDuplicates } from '../util/array.js';
 import verifiedTrack from '../integrate/domestic/verifiedTracks.json';
-import winLogger from '../util/winston';
+import winLogger from '../util/winston.js';
 
 export default async function integrateFiles(startDate, endDate, chartType) {
   const fileNameToRead = Object.values(extractYearMonthDay(startDate)).reduce((pre, cur) => pre + cur, '')
@@ -37,7 +37,7 @@ export default async function integrateFiles(startDate, endDate, chartType) {
     const dt = await decideKeyNameOfTrack(track);
     step3.push(dt);
   }
-  const result = integrateTracks(step2);
+  const result = integrateTracks(step2, 'track', {});
   const trackWithSubFixOverZeroNotVerified = [];
   Object.entries(result).forEach(([key, value]) => {
     const subFix = key.split('/')[2];

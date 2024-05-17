@@ -4,17 +4,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
 /* eslint-disable no-restricted-syntax */
-import path from 'path';
-
 import ss from 'string-similarity';
 
 import * as bugs from '../../platforms/domestic/bugs.js';
 import * as genie from '../../platforms/domestic/genie.js';
 import * as melon from '../../platforms/domestic/melon.js';
+import { arrayToChunk, removeDuplicates } from '../../util/array.js';
 import { loadJSONFiles, parseJSONProperties, stringifyMembers } from '../../util/json.js';
 import redisClient from '../../redis/redisClient.js';
 import redisKey from '../../../config/redisKey.js';
-import { removeDuplicates } from '../../util/array.js';
 import winLogger from '../../util/winston.js';
 
 import artistException from './artistException.json';
@@ -98,13 +96,14 @@ function mergePlatforms(platforms1, platforms2) {
 
   return platforms;
 }
-
-export function integrateTracks(tracks, result = {}) {
+// 1. integrate tracks
+// 2. integrate files
+export function integrateTracks(tracks, opt, result = {}) {
   if (tracks.length === 0) {
     return result;
   }
   const track = tracks.pop();
-  const { trackKey } = track;
+  const { trackKey, thumbnails, trackImages } = track;
   if (!result[trackKey]) {
     Object.assign(result, { [trackKey]: track });
   } else {
@@ -112,8 +111,18 @@ export function integrateTracks(tracks, result = {}) {
     const { platforms: savedPlatforms, artists: savedArtists } = result[trackKey];
     result[trackKey].platforms = mergePlatforms(savedPlatforms, platforms);
     result[trackKey].artists = mergeArtists(savedArtists, artists);
+    if (opt === 'track') {
+      result[trackKey].thumbnails.push(thumbnails[0]);
+      result[trackKey].trackImages.push(trackImages[0]);
+    }
+    if (opt === 'file') {
+      result[trackKey].thumbnails.push(...thumbnails);
+      result[trackKey].trackImages.push(...trackImages);
+      result[trackKey].thumbnails = removeDuplicates(result[trackKey].thumbnails);
+      result[trackKey].trackImages = removeDuplicates(result[trackKey].trackImages);
+    }
   }
-  return integrateTracks(tracks, result);
+  return integrateTracks(tracks, opt, result);
 }
 
 export async function getItemsWithSameKeyword(listKey, keyword) {
@@ -467,5 +476,12 @@ export function integrateJSONFiles(dirPath) {
     pre.push(...Object.values(cur));
     return pre;
   }, []);
-  return Object.values(integrateTracks(tracks));
+  const trackChunks = arrayToChunk(tracks, 1000);
+
+  let integratedResult = {};
+  for (const chunk of trackChunks) {
+    integratedResult = integrateTracks(chunk, 'file', integratedResult);
+  }
+  const result = Object.values(integratedResult);
+  return result;
 }

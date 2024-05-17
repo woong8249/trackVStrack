@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-import winLogger from '../util/winston';
+import winLogger from '../util/winston.js';
 
-import redisClient from './redisClient';
+import redisClient from './redisClient.js';
 
 export default async function flushAllRedisData() {
   try {
