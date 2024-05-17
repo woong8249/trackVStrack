@@ -22,8 +22,8 @@ const queries = [
   \`titleKeyword\` VARCHAR(100),
   \`releaseDate\` DATETIME,
   \`platforms\` JSON,
-  \`trackImages\` VARCHAR(800),
-  \`thumbnails\` VARCHAR(800),
+  \`trackImages\` JSON,
+  \`thumbnails\` JSON,
   \`lyrics\` VARCHAR(5000)
 );`,
   `CREATE TABLE  \`trackDetails\` (
