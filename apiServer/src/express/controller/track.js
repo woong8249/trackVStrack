@@ -68,8 +68,5 @@ export async function getTrackWithArtist(req, res) {
 
     return pre;
   }, {}) : null;
-  if (track.platforms) {
-    console.dir(track.platforms, { depth: 10 });
-  }
   res.status(200).json({ track });
 }

@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  
+  version: 1.0.0
+  title: ChartChart
+
+servers:
+  - url: "http://localhost:3000"
+tags:
+  - name: Track
+    description: Track APIs 
+  - name: Artist
+    description: Artist APIs 
+  
+
+paths:
+  /track/{id}:
+    get:
+      tags:
+        - Track
+      summary: Get track by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Track ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+  /track:
+    get:
+      tags:
+        - Track
+      summary: Search tracks
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TrackListMobile'
+                  - $ref: '#/components/schemas/TrackListDesktop'
+  /artist/{id}:
+    get:
+      tags:
+        - Artist
+      summary: Get artist by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Artist ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistDetail'
+  /artist:
+    get:
+      tags:
+        - Artist
+      summary: Search artists
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ArtistListMobile'
+                  - $ref: '#/components/schemas/ArtistListDesktop'
+components:
+  schemas:
+    TrackInfo:
+      type: object
+      properties:
+        title:
+          type: string
+        trackID:
+          type: string
+        albumID:
+          type: string
+          nullable: true
+    ChartInfo:
+      type: object
+      properties:
+        rank:
+          type: string
+        chartType:
+          type: string
+          enum: [w]
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        weekOfMonth:
+          type: object
+          properties:
+            year:
+              type: integer
+            month:
+              type: integer
+            week:
+              type: integer
+    Platform:
+      type: object
+      properties:
+        chartInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartInfo'
+        trackInfo:
+          $ref: '#/components/schemas/TrackInfo'
+    Artist:
+      type: object
+      properties:
+        id:
+          type: integer
+        artistKeyword:
+          type: string
+        artistImage:
+          type: string
+          nullable: true
+        debut:
+          type: string
+          nullable: true
+    Track:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+        titleKeyword:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        trackImage:
+          type: string
+        platforms:
+          type: object
+          properties:
+            melon:
+              $ref: '#/components/schemas/Platform'
+              nullable: true
+            genie:
+              $ref: '#/components/schemas/Platform'
+              nullable: true
+            bugs:
+              $ref: '#/components/schemas/Platform'
+              nullable: true
+        lyrics:
+          type: string
+        artists:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artist'
+    TrackListMobile:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          titleKeyword:
+            type: string
+    TrackListDesktop:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          titleKeyword:
+            type: string
+          thumbnail:
+            type: string
+    ArtistDetail:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+        artistKeyword:
+          type: string
+        debut:
+          type: string
+          format: date
+          nullable: true
+        artistImage:
+          type: string
+          nullable: true
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Track'
+    ArtistListMobile:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          artistKeyword:
+            type: string
+    ArtistListDesktop:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          artistKeyword:
+            type: string
+          artistImage:
+            type: string
