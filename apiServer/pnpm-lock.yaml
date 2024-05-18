@@ -14,6 +14,9 @@ dependencies:
   express-async-errors:
     specifier: ^3.1.1
     version: 3.1.1(express@4.19.2)
+  express-rate-limit:
+    specifier: ^7.2.0
+    version: 7.2.0(express@4.19.2)
   express-useragent:
     specifier: ^1.0.15
     version: 1.0.15
@@ -790,6 +793,15 @@ packages:
     resolution: {integrity: sha512-h6aK1da4tpqWSbyCa3FxB/V6Ehd4EEB15zyQq9qe75OZBp0krinNKuH4rAY+S/U/2I36vdLAUFSjQJ+TFmODng==}
     peerDependencies:
       express: ^4.16.2
+    dependencies:
+      express: 4.19.2
+    dev: false
+
+  /express-rate-limit@7.2.0(express@4.19.2):
+    resolution: {integrity: sha512-T7nul1t4TNyfZMJ7pKRKkdeVJWa2CqB8NA1P8BwYaoDI5QSBZARv5oMS43J7b7I5P+4asjVXjb7ONuwDKucahg==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express: 4 || 5 || ^5.0.0-beta.1
     dependencies:
       express: 4.19.2
     dev: false
