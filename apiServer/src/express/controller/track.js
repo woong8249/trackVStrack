@@ -1,5 +1,30 @@
 import * as trackData from '../../mysql/track.js';
 
+function sortChartInfos(platforms) {
+  const sortFunction = (a, b) => {
+    if (a.weekOfMonth.year !== b.weekOfMonth.year) {
+      return a.weekOfMonth.year - b.weekOfMonth.year;
+    }
+    if (a.weekOfMonth.month !== b.weekOfMonth.month) {
+      return a.weekOfMonth.month - b.weekOfMonth.month;
+    }
+    return a.weekOfMonth.week - b.weekOfMonth.week;
+  };
+  const platformsToSort = Object.keys(platforms);
+  const sortedPlatforms = {};
+  platformsToSort.forEach(platform => {
+    if (platforms[platform] && platforms[platform].chartInfos) {
+      sortedPlatforms[platform] = {
+        ...platforms[platform],
+        chartInfos: [...platforms[platform].chartInfos].sort(sortFunction),
+      };
+    } else {
+      sortedPlatforms[platform] = platforms[platform];
+    }
+  });
+  return sortedPlatforms;
+}
+
 // ok
 export async function getRelatedTracks(req, res) {
   const { q } = req.query;
@@ -29,7 +54,7 @@ export async function getTrackWithArtist(req, res) {
         titleKeyword,
         releaseDate,
         trackImage: trackImages[0],
-        platforms,
+        platforms: sortChartInfos(platforms),
         lyrics,
         artists: [],
       });
@@ -43,5 +68,8 @@ export async function getTrackWithArtist(req, res) {
 
     return pre;
   }, {}) : null;
+  if (track.platforms) {
+    console.dir(track.platforms, { depth: 10 });
+  }
   res.status(200).json({ track });
 }
