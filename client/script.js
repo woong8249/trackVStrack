@@ -19,9 +19,7 @@ function handleSelect(type, id) {
 
 function displaySearchResults(searchResultsPopup, results) {
   Object.assign(searchResultsPopup, { innerHTML: '' });
-
   const { tracks, artists } = results;
-
   if (artists.length > 0) {
     const artistSection = document.createElement('div');
     artistSection.classList.add('result-section');
@@ -63,16 +61,22 @@ function displaySearchResults(searchResultsPopup, results) {
       img.src = track.thumbnail;
       img.alt = 'Track Thumbnail';
 
-      const span = document.createElement('span');
-      span.textContent = track.titleKeyword;
+      const titleSpan = document.createElement('span');
+      titleSpan.classList.add('track-title');
+      titleSpan.textContent = track.titleKeyword;
 
-      div.append(img, span);
+      const artistsSpan = document.createElement('span');
+      artistsSpan.classList.add('track-artists');
+      artistsSpan.textContent = ` - ${track.artists.map(artist => artist.artistKeyword).join(', ')}`;
+
+      div.append(img, titleSpan, artistsSpan);
       div.addEventListener('click', () => handleSelect('track', track.id));
       trackSection.append(div);
     });
 
     searchResultsPopup.append(trackSection);
   }
+
   Object.assign(searchResultsPopup.style, { display: (tracks.length > 0 || artists.length > 0) ? 'block' : 'none' });
 }
 
