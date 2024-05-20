@@ -5,11 +5,13 @@ name: chart
 services:
   redis:
     image: redis:7-alpine
+    container_name: redis
     ports:
       - 6379:6379
 
   mysql:
     image: mysql:latest
+    container_name: mysql
     platform: linux/arm64  #
     environment:
      MYSQL_ROOT_PASSWORD: 123456789  
