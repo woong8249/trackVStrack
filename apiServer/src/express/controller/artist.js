@@ -27,7 +27,6 @@ export async function getArtistWithTrack(req, res) {
         tracks: [],
       });
     }
-    console.log(pre);
     pre.tracks.push({
       id: trackId,
       titleKeyword,

@@ -5,7 +5,6 @@ export default function validator(req, res, next) {
   if (!errors.isEmpty()) {
     const { msg } = errors.array()[0];
     const status = 400;
-    console.log(msg);
     return res.status(status).json({ message: msg });
   }
   return next();
