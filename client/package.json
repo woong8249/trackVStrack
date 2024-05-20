@@ -1,6 +1,10 @@
 {
+	"type": "module",
 	"dependencies": {
 		"chart.js": "3.9.1",
 		"chartjs-adapter-date-fns": "2.0.0"
+	},
+	"devDependencies": {
+		"nextlab-eslint": "github:nextlab-ai/public-releases#eslint"
 	}
 }
