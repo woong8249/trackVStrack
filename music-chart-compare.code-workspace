@@ -9,5 +9,8 @@
         {
             "path": "./apiServer"
         },
+        {
+            "path": "./client"
+        },
     ],
 }

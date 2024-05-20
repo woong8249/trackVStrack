@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="main-content">
+        <div id="track-details" class="track-details"></div>
+        <div class="date-selector">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" name="start-date">
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" name="end-date">
+            <button id="update-chart">Update Chart</button>
+        </div>
+    </div>
+    <!-- 올바른 경로로 스크립트를 로드합니다. -->
+    <script src="node_modules/chart.js/dist/chart.js"></script>
+    <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+    <script src="track.js"></script>
+</body>
+
+</html>
