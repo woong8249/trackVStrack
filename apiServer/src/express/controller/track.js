@@ -1,4 +1,5 @@
 import * as trackData from '../../mysql/track.js';
+import winLogger from '../../util/winston.js';
 
 function sortChartInfos(platforms) {
   const sortFunction = (a, b) => {
@@ -29,14 +30,38 @@ function sortChartInfos(platforms) {
 export async function getRelatedTracks(req, res) {
   const { q } = req.query;
   const { isMobile } = req.useragent;
-  const fields = isMobile ? ['id', 'titleKeyword'] : ['id', 'titleKeyword', 'thumbnails'];
+  const fields = isMobile ? ['id', 'titleKeyword'] : ['id', 'titleKeyword', 'thumbnails', 'artistId', 'artistKeyword'];
   const tracks = await trackData.getRelatedTracks(q, fields);
-  const mappedTracks = tracks.length > 0 ? tracks.map(track => {
-    const { id, titleKeyword, thumbnails } = track;
-    const mapped = { id, titleKeyword, thumbnail: thumbnails[0] };
-    return mapped;
-  }) : tracks;
-  res.status(200).json({ tracks: mappedTracks });
+  if (tracks.length === 0) {
+    return res.status(200).json({ tracks });
+  }
+  const reducedTracks = isMobile ? tracks.map(track => ({
+    id: track.id,
+    titleKeyword: track.titleKeyword,
+  })) : tracks.reduce((acc, track) => {
+    const {
+      id, titleKeyword, thumbnails, artistKeyword, artistId,
+    } = track;
+    const existingTrack = acc.find(t => t.id === id);
+    if (existingTrack) {
+      existingTrack.artists.push({
+        id: artistId,
+        artistKeyword,
+      });
+    } else {
+      acc.push({
+        id,
+        titleKeyword,
+        thumbnail: thumbnails[0],
+        artists: [{
+          id: artistId,
+          artistKeyword,
+        }],
+      });
+    }
+    return acc;
+  }, []);
+  return res.status(200).json({ tracks: reducedTracks });
 }
 
 // ok

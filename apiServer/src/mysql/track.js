@@ -2,19 +2,41 @@ import pool from './pool.js';
 
 export async function getRelatedTracks(search, fields) {
   const conn = await pool.getConnection();
-  const selectFields = fields.join(',');
+
+  // CTE에 필요한 필드 (id와 titleKeyword는 항상 포함)
+  const cteFields = ['tracks.id', 'tracks.titleKeyword'];
+  if (fields.includes('thumbnails')) {
+    cteFields.push('tracks.thumbnails');
+  }
+
+  // 최종 SELECT 구문에 필요한 필드
+  const selectFields = fields
+    .filter(field => field !== 'artistKeyword' && field !== 'artistId')
+    .map(field => `unique_tracks.${field}`)
+    .join(',');
+  const artistFields = fields.includes('artistKeyword') || fields.includes('artistId')
+    ? ', artists.id AS artistId, artists.artistKeyword'
+    : '';
+
   const query = `
-      SELECT ${selectFields}
-      FROM tracks
-      WHERE 
-        titleKeyword LIKE ?
-        OR JSON_UNQUOTE(JSON_EXTRACT(platforms, '$.melon.trackInfo.title')) LIKE ?
-        OR JSON_UNQUOTE(JSON_EXTRACT(platforms, '$.genie.trackInfo.title')) LIKE ?
-        OR JSON_UNQUOTE(JSON_EXTRACT(platforms, '$.bugs.trackInfo.title')) LIKE ?
-      LIMIT 5;
+    WITH unique_tracks AS (
+        SELECT DISTINCT ${cteFields.join(', ')}
+        FROM tracks
+        WHERE 
+          tracks.titleKeyword LIKE ?
+          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.melon.trackInfo.title')) LIKE ?
+          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.genie.trackInfo.title')) LIKE ?
+          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.bugs.trackInfo.title')) LIKE ?
+        LIMIT 5
+    )
+    SELECT ${selectFields} ${artistFields}
+    FROM unique_tracks
+    JOIN trackDetails ON unique_tracks.id = trackDetails.trackId
+    ${fields.includes('artistKeyword') || fields.includes('artistId') ? 'JOIN artists ON trackDetails.artistId = artists.id' : ''}
     `;
+
   const searchParam = `%${search}%`;
-  const tracks = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam]))[0];
+  const tracks = (await conn.query(query, [searchParam, searchParam, searchParam, searchParam]))[0];
   conn.release();
   return tracks;
 }
