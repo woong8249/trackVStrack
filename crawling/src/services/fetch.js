@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-shadow */
 import fs from 'fs';
@@ -70,19 +71,19 @@ function fetchArtistInfo(platform, artistID) {
 }
 
 async function processBatch(batch) {
-  const platformRequestCounts = { bugs: 0, genie: 0, melon: 0 };
   const artistData = [];
 
   for await (const artist of batch) {
     const platformKeys = Object.keys(artist.platforms);
     let selectedPlatform = null;
 
-    // 가능한 플랫폼 중 가장 적은 요청을 받은 플랫폼 선택
-    platformKeys.forEach(platform => {
-      if (selectedPlatform === null || platformRequestCounts[platform] < platformRequestCounts[selectedPlatform]) {
-        selectedPlatform = platform;
-      }
-    });
+    if (platformKeys.includes('bugs')) {
+      selectedPlatform = 'bugs';
+    } else if (platformKeys.includes('genie')) {
+      selectedPlatform = 'genie';
+    } else if (platformKeys.includes('melon')) {
+      selectedPlatform = 'melon';
+    }
 
     if (selectedPlatform) {
       const { artistID } = artist.platforms[selectedPlatform];
@@ -93,9 +94,6 @@ async function processBatch(batch) {
           artistImage: info.artistImage,
           debut: info.debut,
         });
-
-        // 요청 카운트 증가
-        platformRequestCounts[selectedPlatform] += 1;
       } catch (error) {
         console.error(`Failed to fetch artist info for ${artist.artistKey} from ${selectedPlatform}:`, error);
       }

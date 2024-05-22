@@ -11,6 +11,7 @@ import * as genie from '../../platforms/domestic/genie.js';
 import * as melon from '../../platforms/domestic/melon.js';
 import { arrayToChunk, removeDuplicates } from '../../util/array.js';
 import { loadJSONFiles, parseJSONProperties, stringifyMembers } from '../../util/json.js';
+import flushAllRedisData from '../../redis/flushAllRedisData.js';
 import redisClient from '../../redis/redisClient.js';
 import redisKey from '../../../config/redisKey.js';
 import winLogger from '../../util/winston.js';
@@ -28,17 +29,25 @@ export function isSameLyrics(lyrics1, lyrics2) {
   return false;
 }
 
-function mergeArtists(artist1, artists2) {
+function mergeArtists(artist1, artist2) {
   const mergedArtists = {};
-  [artist1, artists2].forEach(artists => {
+
+  [artist1, artist2].forEach(artists => {
     artists.forEach(artist => {
       const key = artist.artistKey;
-      if (mergedArtists[key]) {
-        Object.entries(artist.platforms).forEach(([platform, details]) => {
-          mergedArtists[key].platforms[platform] = details;
-        });
-      } else {
+      if (!mergedArtists[key]) {
         mergedArtists[key] = { ...artist };
+      } else {
+        Object.entries(artist.platforms).forEach(([platform, details]) => {
+          if (!mergedArtists[key].platforms[platform]) {
+            mergedArtists[key].platforms[platform] = details;
+          } else {
+            mergedArtists[key].platforms[platform] = {
+              ...mergedArtists[key].platforms[platform],
+              ...details,
+            };
+          }
+        });
       }
     });
   });
@@ -470,7 +479,7 @@ export function classifyTracks(tracks, platformName, number = 0, result = {}) {
   return classifyTracks(tracks, platformName, number + 1, result);
 }
 
-export function integrateJSONFiles(dirPath) {
+export async function integrateJSONFiles(dirPath) {
   const jsonFilesArray = loadJSONFiles(dirPath);
   const tracks = jsonFilesArray.reduce((pre, cur) => {
     pre.push(...Object.values(cur));
@@ -483,5 +492,26 @@ export function integrateJSONFiles(dirPath) {
     integratedResult = integrateTracks(chunk, 'file', integratedResult);
   }
   const result = Object.values(integratedResult);
+
+  for await (const track of result) {
+    const { artists } = track;
+    for await (const artist of artists) {
+      const { artistKey } = artist;
+      const savedArtistInfo = parseJSONProperties(await redisClient.hGetAll(artistKey));
+      if (!Object.keys(savedArtistInfo).length) {
+        await redisClient.hSet(artistKey, stringifyMembers(artist));
+      } else {
+        await redisClient.hSet(artistKey, stringifyMembers(mergeArtists([savedArtistInfo], [artist])[0]));
+      }
+    }
+  }
+  for (const [i, track] of result.entries()) {
+    const { artists } = track;
+    for await (const [z, artist] of artists.entries()) {
+      const { artistKey } = artist;
+      result[i].artists[z] = parseJSONProperties(await redisClient.hGetAll(artistKey));
+    }
+  }
+  await flushAllRedisData();
   return result;
 }

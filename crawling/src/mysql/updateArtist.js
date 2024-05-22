@@ -2,32 +2,26 @@ import winLogger from '../util/winston.js';
 
 import pool from './pool.js';
 
-export default async function updateArtistsAddInfoBulk(artists, batchSize = 10) {
+// 수정 필요
+export default async function updateArtistsAddInfoBulk(artists) {
   winLogger.info('start updateArtistsBulk');
   const connection = await pool.getConnection();
   try {
-    for (let i = 0; i < artists.length; i += batchSize) {
-      const batch = artists.slice(i, i + batchSize);
-      let query = 'UPDATE artists SET ';
-      const debutCases = [];
-      const imageCases = [];
-      const ids = [];
-      const params = [];
-
-      batch.forEach(artist => {
-        debutCases.push('WHEN id = ? THEN ?');
-        imageCases.push('WHEN id = ? THEN ?');
-        ids.push(artist.id);
-        params.push(artist.id, artist.debut === null ? null : artist.debut);
-        params.push(artist.id, artist.artistImage === null ? null : artist.artistImage);
-      });
-
-      query += 'debut = CASE ' + debutCases.join(' ') + ' END, ';
-      query += 'artistImage = CASE ' + imageCases.join(' ') + ' END ';
-      query += 'WHERE id IN (' + ids.map(() => '?').join(',') + ')';
+    // eslint-disable-next-line no-restricted-syntax
+    for (const artist of artists) {
+      const query = `
+        UPDATE artists
+        SET debut = ?, artistImage = ?
+        WHERE id = ?
+      `;
+      const params = [
+        artist.debut,
+        artist.artistImage,
+        artist.id,
+      ];
 
       // eslint-disable-next-line no-await-in-loop
-      await connection.query(query, [...params, ...ids]);
+      await connection.query(query, params);
     }
     winLogger.info('All artists updated successfully');
   } catch (error) {

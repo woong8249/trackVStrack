@@ -19,7 +19,7 @@ export default async function migrate() {
     winLogger.warn('Please empty all table information.');
   }
   const dirPath = path.join(__dirname, '../integrate/domestic/dataAfterIntegration');
-  const tracks = integrateJSONFiles(dirPath);
+  const tracks = await integrateJSONFiles(dirPath);
   await insertTracks(tracks);
 }
 
