@@ -1,6 +1,5 @@
 openapi: 3.0.0
 info:
-  
   version: 1.0.0
   title: ChartChart
 
@@ -8,12 +7,50 @@ servers:
   - url: "http://localhost:3000"
 tags:
   - name: Track
-    description: Track APIs 
+    description: Track APIs
   - name: Artist
-    description: Artist APIs 
-  
+    description: Artist APIs
 
 paths:
+  /track:
+    get:
+      tags:
+        - Track
+      summary: Search tracks
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Limit the maximum number of tracks
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Number of tracks to skip before starting to collect the result set
+        - name: event
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Only "search" is allowed, used only when the search button is pressed
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TrackListMobile"
+                  - $ref: "#/components/schemas/TrackListDesktop"
   /track/{id}:
     get:
       tags:
@@ -27,17 +64,17 @@ paths:
             type: integer
           description: Track ID
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Track'
-  /track:
+                $ref: "#/components/schemas/Track"
+  /artist:
     get:
       tags:
-        - Track
-      summary: Search tracks
+        - Artist
+      summary: Search artists
       parameters:
         - name: q
           in: query
@@ -45,15 +82,33 @@ paths:
           schema:
             type: string
           description: Search query
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Limit the maximum number of artists
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Number of artists to skip before starting to collect the result set
+        - name: event
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Only "search" is allowed, used only when the search button is pressed
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/TrackListMobile'
-                  - $ref: '#/components/schemas/TrackListDesktop'
+                  - $ref: "#/components/schemas/ArtistListMobile"
+                  - $ref: "#/components/schemas/ArtistListDesktop"
   /artist/{id}:
     get:
       tags:
@@ -67,33 +122,13 @@ paths:
             type: integer
           description: Artist ID
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArtistDetail'
-  /artist:
-    get:
-      tags:
-        - Artist
-      summary: Search artists
-      parameters:
-        - name: q
-          in: query
-          required: true
-          schema:
-            type: string
-          description: Search query
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ArtistListMobile'
-                  - $ref: '#/components/schemas/ArtistListDesktop'
+                $ref: "#/components/schemas/ArtistDetail"
+
 components:
   schemas:
     TrackInfo:
@@ -135,15 +170,15 @@ components:
         chartInfo:
           type: array
           items:
-            $ref: '#/components/schemas/ChartInfo'
+            $ref: "#/components/schemas/ChartInfo"
         trackInfo:
-          $ref: '#/components/schemas/TrackInfo'
+          $ref: "#/components/schemas/TrackInfo"
     Artist:
       type: object
       properties:
         id:
           type: integer
-        artistKeyword:
+        artistName:
           type: string
         artistImage:
           type: string
@@ -151,13 +186,28 @@ components:
         debut:
           type: string
           nullable: true
+
+    TrackNoPlatforms:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+        titleName:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        trackImage:
+          type: string
+
     Track:
       type: object
       nullable: true
       properties:
         id:
           type: integer
-        titleKeyword:
+        titleName:
           type: string
         releaseDate:
           type: string
@@ -168,20 +218,20 @@ components:
           type: object
           properties:
             melon:
-              $ref: '#/components/schemas/Platform'
+              $ref: "#/components/schemas/Platform"
               nullable: true
             genie:
-              $ref: '#/components/schemas/Platform'
+              $ref: "#/components/schemas/Platform"
               nullable: true
             bugs:
-              $ref: '#/components/schemas/Platform'
+              $ref: "#/components/schemas/Platform"
               nullable: true
         lyrics:
           type: string
         artists:
           type: array
           items:
-            $ref: '#/components/schemas/Artist'
+            $ref: "#/components/schemas/Artist"
     TrackListMobile:
       type: array
       items:
@@ -189,7 +239,7 @@ components:
         properties:
           id:
             type: integer
-          titleKeyword:
+          titleName:
             type: string
     TrackListDesktop:
       type: array
@@ -198,18 +248,18 @@ components:
         properties:
           id:
             type: integer
-          titleKeyword:
+          titleName:
             type: string
           thumbnail:
             type: string
-          artists :
-            type : array
-            items:  
+          artists:
+            type: array
+            items:
               type: object
               properties:
                 id:
                   type: integer
-                artistKeyword:  
+                artistName:
                   type: string
     ArtistDetail:
       type: object
@@ -217,7 +267,7 @@ components:
       properties:
         id:
           type: integer
-        artistKeyword:
+        artistName:
           type: string
         debut:
           type: string
@@ -229,7 +279,7 @@ components:
         tracks:
           type: array
           items:
-            $ref: '#/components/schemas/Track'
+            $ref: "#/components/schemas/TrackNoPlatforms"
     ArtistListMobile:
       type: array
       items:
@@ -237,7 +287,7 @@ components:
         properties:
           id:
             type: integer
-          artistKeyword:
+          artistName:
             type: string
     ArtistListDesktop:
       type: array
@@ -246,7 +296,10 @@ components:
         properties:
           id:
             type: integer
-          artistKeyword:
+          artistName:
             type: string
           artistImage:
             type: string
+          debut:
+            type: string
+            nullable: true

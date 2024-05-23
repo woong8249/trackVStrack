@@ -98,7 +98,7 @@ export async function getTrackWithArtist(req, res) {
   const tracks = await trackData.getTrackWithArtist(id);
 
   if (tracks.length === 0) {
-    res.status(404).json({ error: 'Track not found' });
+    res.status(200).json({ track: tracks });
     return;
   }
   const track = tracks.reduce((pre, cur) => {
