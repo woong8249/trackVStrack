@@ -1,71 +1,106 @@
 import pool from './pool.js';
 
-export async function getRelatedTracks(search, fields) {
-  const conn = await pool.getConnection();
-
-  // CTE에 필요한 필드 (id와 titleKeyword는 항상 포함)
-  const cteFields = ['tracks.id', 'tracks.titleKeyword'];
-  if (fields.includes('thumbnails')) {
-    cteFields.push('tracks.thumbnails');
-  }
-
-  // 최종 SELECT 구문에 필요한 필드
-  const selectFields = fields
-    .filter(field => field !== 'artistKeyword' && field !== 'artistId')
-    .map(field => `unique_tracks.${field}`)
-    .join(',');
-  const artistFields = fields.includes('artistKeyword') || fields.includes('artistId')
-    ? ', artists.id AS artistId, artists.artistKeyword'
-    : '';
-
-  const query = `
-    WITH unique_tracks AS (
-        SELECT DISTINCT ${cteFields.join(', ')}
-        FROM tracks
-        WHERE 
-          tracks.titleKeyword LIKE ?
-          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.melon.trackInfo.title')) LIKE ?
-          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.genie.trackInfo.title')) LIKE ?
-          OR JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.bugs.trackInfo.title')) LIKE ?
-        LIMIT 5
-    )
-    SELECT ${selectFields} ${artistFields}
-    FROM unique_tracks
-    JOIN trackDetails ON unique_tracks.id = trackDetails.trackId
-    ${fields.includes('artistKeyword') || fields.includes('artistId') ? 'JOIN artists ON trackDetails.artistId = artists.id' : ''}
-    `;
-
-  const searchParam = `%${search}%`;
-  const tracks = (await conn.query(query, [searchParam, searchParam, searchParam, searchParam]))[0];
-  conn.release();
-  return tracks;
-}
-
 export async function getTrackWithArtist(id) {
   const conn = await pool.getConnection();
-  const query = `
-    SELECT 
-    ttd.id,
-    ttd.titleKeyword,
-    ttd.releaseDate,
-    ttd.trackImages,
-    ttd.platforms,
-    ttd.lyrics,
-    a.id as artistId,
-    a.artistKeyword, 
-    a.debut as artistDebut,
-    a.artistImage
-    FROM (
-      SELECT t.id, t.titleKeyword, t.releaseDate, t.lyrics, t.trackImages, t.platforms, td.artistId
-      FROM tracks as t
-      LEFT JOIN trackDetails as td
-      ON t.id = td.trackId
-      WHERE t.id = ${id}
-    ) as ttd
-    LEFT JOIN artists as a
-    ON ttd.artistId = a.id;
+  try {
+    const query = `
+      SELECT 
+        ttd.id,
+        JSON_UNQUOTE(JSON_EXTRACT(ttd.platforms, '$.melon.trackInfo.title')) AS trackTitleMelon,
+        JSON_UNQUOTE(JSON_EXTRACT(ttd.platforms, '$.genie.trackInfo.title')) AS trackTitleGenie,
+        JSON_UNQUOTE(JSON_EXTRACT(ttd.platforms, '$.bugs.trackInfo.title')) AS trackTitleBugs,
+        ttd.releaseDate,
+        ttd.trackImages,
+        ttd.platforms,
+        ttd.lyrics,
+        a.id as artistId,
+        JSON_UNQUOTE(JSON_EXTRACT(a.platforms, '$.melon.artistName')) AS artistNameMelon,
+        JSON_UNQUOTE(JSON_EXTRACT(a.platforms, '$.genie.artistName')) AS artistNameGenie,
+        JSON_UNQUOTE(JSON_EXTRACT(a.platforms, '$.bugs.artistName')) AS artistNameBugs,
+        a.debut as artistDebut,
+        a.artistImage
+      FROM (
+        SELECT 
+          t.id,
+          t.titleKeyword,
+          t.releaseDate,
+          t.lyrics,
+          t.trackImages,
+          t.platforms,
+          td.artistId
+        FROM tracks AS t
+        LEFT JOIN trackDetails AS td
+        ON t.id = td.trackId
+        WHERE t.id = ?
+      ) AS ttd
+      LEFT JOIN artists AS a
+      ON ttd.artistId = a.id;
     `;
-  const trackWithArtistInfo = (await conn.query(query))[0];
-  conn.release();
-  return trackWithArtistInfo;
+    const trackWithArtistInfo = (await conn.query(query, [id]))[0];
+    return trackWithArtistInfo;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function getRelatedTracks(search, options) {
+  const conn = await pool.getConnection();
+
+  !(options.limit) && Object.assign(options, { limit: 5 });
+  !(options.offset) && Object.assign(options, { offset: 0 });
+
+  try {
+    const cteFields = [
+      'tracks.id AS trackId',
+      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.melon.trackInfo.title\')) AS trackTitleMelon',
+      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.genie.trackInfo.title\')) AS trackTitleGenie',
+      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.bugs.trackInfo.title\')) AS trackTitleBugs',
+    ];
+
+    const selectFields = [
+      'UT.trackId AS trackId',
+      'trackTitleMelon',
+      'trackTitleGenie',
+      'trackTitleBugs',
+    ];
+
+    if (options.includeThumbnails) {
+      cteFields.push('tracks.thumbnails AS trackThumbnails');
+      selectFields.push('trackThumbnails');
+    }
+
+    if (options.includeArtistInfo) {
+      selectFields.push(
+        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.melon.artistName\')) AS artistNameMelon',
+        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.genie.artistName\')) AS artistNameGenie',
+        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.bugs.artistName\')) AS artistNameBugs',
+      );
+    }
+
+    const query = `
+    WITH UT AS (
+      SELECT DISTINCT
+        ${cteFields.join(', ')}
+      FROM
+        tracks
+      WHERE
+        tracks.titleKeyword LIKE ?
+        OR LOWER(JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.melon.trackInfo.title'))) LIKE LOWER(?)
+        OR LOWER(JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.genie.trackInfo.title'))) LIKE LOWER(?)
+        OR LOWER(JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, '$.bugs.trackInfo.title'))) LIKE LOWER(?)
+      LIMIT ? OFFSET ?
+    )  
+    SELECT 
+      ${selectFields.join(', ')}
+    FROM UT
+    JOIN trackDetails AS TD ON UT.trackId = TD.trackId
+    JOIN artists AS A ON TD.artistId = A.id;
+    `;
+
+    const searchParam = `%${search}%`;
+    const tracks = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam, options.limit, options.offset]))[0];
+    return tracks;
+  } finally {
+    conn.release();
+  }
 }

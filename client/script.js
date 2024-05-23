@@ -20,11 +20,41 @@ function handleSelect(type, id) {
 function displaySearchResults(searchResultsPopup, results) {
   Object.assign(searchResultsPopup, { innerHTML: '' });
   const { tracks, artists } = results;
+  if (tracks.length > 0) {
+    const trackSection = document.createElement('div');
+    trackSection.classList.add('result-section');
+    const trackTitle = document.createElement('h3');
+    trackTitle.textContent = 'tracks';
+    trackSection.append(trackTitle);
+
+    tracks.forEach(track => {
+      const div = document.createElement('div');
+      div.classList.add('result-item');
+
+      const img = document.createElement('img');
+      img.src = track.thumbnail;
+      img.alt = 'Track Thumbnail';
+
+      const titleSpan = document.createElement('span');
+      titleSpan.classList.add('track-title');
+      titleSpan.textContent = track.titleName;
+
+      const artistsSpan = document.createElement('span');
+      artistsSpan.classList.add('track-artists');
+      artistsSpan.textContent = ` - ${track.artists.map(artist => artist.artistName).join(', ')}`;
+
+      div.append(img, titleSpan, artistsSpan);
+      div.addEventListener('click', () => handleSelect('track', track.id));
+      trackSection.append(div);
+    });
+
+    searchResultsPopup.append(trackSection);
+  }
   if (artists.length > 0) {
     const artistSection = document.createElement('div');
     artistSection.classList.add('result-section');
     const artistTitle = document.createElement('h3');
-    artistTitle.textContent = '아티스트';
+    artistTitle.textContent = 'Artists';
     artistSection.append(artistTitle);
 
     artists.forEach(artist => {
@@ -44,37 +74,6 @@ function displaySearchResults(searchResultsPopup, results) {
     });
 
     searchResultsPopup.append(artistSection);
-  }
-
-  if (tracks.length > 0) {
-    const trackSection = document.createElement('div');
-    trackSection.classList.add('result-section');
-    const trackTitle = document.createElement('h3');
-    trackTitle.textContent = '트랙';
-    trackSection.append(trackTitle);
-
-    tracks.forEach(track => {
-      const div = document.createElement('div');
-      div.classList.add('result-item');
-
-      const img = document.createElement('img');
-      img.src = track.thumbnail;
-      img.alt = 'Track Thumbnail';
-
-      const titleSpan = document.createElement('span');
-      titleSpan.classList.add('track-title');
-      titleSpan.textContent = track.titleKeyword;
-
-      const artistsSpan = document.createElement('span');
-      artistsSpan.classList.add('track-artists');
-      artistsSpan.textContent = ` - ${track.artists.map(artist => artist.artistKeyword).join(', ')}`;
-
-      div.append(img, titleSpan, artistsSpan);
-      div.addEventListener('click', () => handleSelect('track', track.id));
-      trackSection.append(div);
-    });
-
-    searchResultsPopup.append(trackSection);
   }
 
   Object.assign(searchResultsPopup.style, { display: (tracks.length > 0 || artists.length > 0) ? 'block' : 'none' });

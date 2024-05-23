@@ -1,8 +1,4 @@
-/* eslint-disable no-alert */
-/* eslint-disable no-shadow */
 /* eslint-disable no-undef */
-/* eslint-disable no-param-reassign */
-
 const API_BASE_URL = 'http://localhost:3000';
 
 function formatDate(date) {
@@ -16,7 +12,7 @@ function filterChartData(chartData, startDate, endDate) {
   const filteredLabels = [];
   const filteredDatasets = chartData.datasets.map(dataset => {
     const filteredData = dataset.data.filter(point => {
-      const date = new Date(point.x);
+      const date = new Date(point.x.replace('w', ''));
       return date >= startDate && date <= endDate;
     });
     filteredData.forEach(point => {
@@ -59,26 +55,23 @@ function prepareChartData(platforms) {
   addChartData(platforms.genie, 'Genie', '#3498DB');
   addChartData(platforms.bugs, 'Bugs', '#E44C29');
 
-  // 날짜 라벨 정렬
   labels.sort((a, b) => new Date(a.split('-').join('/').replace('w', '')) - new Date(b.split('-').join('/').replace('w', '')));
 
   return { labels, datasets };
 }
 
-function displayTrackDetails(trackDetails, track, chartInstance, initializeDateInputs) {
+function displayTrackDetails(trackDetails, track, chartInstanceRef, func) {
   if (track) {
     const { platforms } = track;
     const chartData = prepareChartData(platforms);
-
-    // 트랙 세부 사항 렌더링
-    trackDetails.textContent = '';
+    Object.assign(trackDetails, { textContent: '' });
 
     const title = document.createElement('h2');
-    title.textContent = track.titleKeyword;
+    title.textContent = track.titleName;
 
     const img = document.createElement('img');
     img.src = track.trackImage;
-    img.alt = track.titleKeyword;
+    img.alt = track.titleName;
     img.style.width = '200px';
     img.style.height = '200px';
 
@@ -90,42 +83,42 @@ function displayTrackDetails(trackDetails, track, chartInstance, initializeDateI
 
     trackDetails.append(title, img, releaseDate, canvas);
 
-    // Chart.js 초기화
     const ctx = canvas.getContext('2d');
-
-    chartInstance = new Chart(ctx, {
-      type: 'line',
-      data: chartData,
-      options: {
-        scales: {
-          x: {
-            type: 'category',
-            labels: chartData.labels,
-            title: {
-              display: true,
-              text: 'Date (Year-Month-Week)',
+    Object.assign(chartInstanceRef, {
+      instance: new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          scales: {
+            x: {
+              type: 'category',
+              labels: chartData.labels,
+              title: {
+                display: true,
+                text: 'Date (Year-Month-Week)',
+              },
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45,
+                autoSkip: true,
+                maxTicksLimit: 20, // 적절한 최대 틱 수 설정
+              },
             },
-            ticks: {
-              maxRotation: 45,
-              minRotation: 45,
-              autoSkip: true,
-              maxTicksLimit: 20, // 적절한 최대 틱 수 설정
-            },
-          },
-          y: {
-            reverse: true,
-            min: 1,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Rank',
+            y: {
+              reverse: true,
+              min: 1,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Rank',
+              },
             },
           },
         },
-      },
+      }),
     });
 
-    initializeDateInputs(platforms);
+    func(platforms);
   }
 }
 
@@ -156,13 +149,8 @@ function initializeDateInputs(platforms, startDateInput, endDateInput) {
   const minDate = new Date(Math.min(...dates));
   const maxDate = new Date(Math.max(...dates));
 
-  startDateInput.min = formatDate(minDate);
-  startDateInput.max = formatDate(maxDate);
-  endDateInput.min = formatDate(minDate);
-  endDateInput.max = formatDate(maxDate);
-
-  startDateInput.value = formatDate(minDate);
-  endDateInput.value = formatDate(maxDate);
+  Object.assign(startDateInput, { min: formatDate(minDate), max: formatDate(maxDate), value: formatDate(minDate) });
+  Object.assign(endDateInput, { min: formatDate(minDate), max: formatDate(maxDate), value: formatDate(maxDate) });
 }
 
 // DOMContentLoaded 이벤트 리스너
@@ -171,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startDateInput = document.getElementById('start-date');
   const endDateInput = document.getElementById('end-date');
   const updateChartButton = document.getElementById('update-chart');
-  let chartInstance;
+  const chartInstance = { instance: null };
   const urlParams = new URLSearchParams(window.location.search);
   const trackId = urlParams.get('id');
 
@@ -181,15 +169,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   updateChartButton.addEventListener('click', () => {
-    const startDate = new Date(startDateInput.value);
-    const endDate = new Date(endDateInput.value);
+    if (chartInstance.instance) {
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
 
-    if (startDate <= endDate) {
-      const filteredChartData = filterChartData(chartInstance.data, startDate, endDate);
-      Object.assign(chartInstance.data, filteredChartData);
-      chartInstance.update();
+      if (startDate <= endDate) {
+        const filteredChartData = filterChartData(chartInstance.instance.data, startDate, endDate);
+        Object.assign(chartInstance.instance.data, filteredChartData);
+        chartInstance.instance.update();
+      } else {
+        alert('End date must be after start date');
+      }
     } else {
-      alert('End date must be after start date');
+      alert('Chart is not initialized');
     }
   });
 });

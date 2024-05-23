@@ -26,41 +26,69 @@ function sortChartInfos(platforms) {
   return sortedPlatforms;
 }
 
+function formatTrack(track, includeArtistInfo) {
+  const {
+    trackId, trackThumbnails, artistId,
+    artistNameMelon, artistNameGenie, artistNameBugs,
+    trackTitleMelon, trackTitleGenie, trackTitleBugs,
+  } = track;
+
+  const titleName = trackTitleMelon || trackTitleGenie || trackTitleBugs;
+  const artistName = artistNameMelon || artistNameGenie || artistNameBugs;
+
+  const formattedTrack = {
+    id: trackId,
+    titleName,
+    thumbnail: trackThumbnails ? trackThumbnails[0] : null,
+  };
+
+  if (includeArtistInfo) {
+    formattedTrack.artists = [{
+      id: artistId,
+      artistName,
+    }];
+  }
+
+  return formattedTrack;
+}
+
 // ok
 export async function getRelatedTracks(req, res) {
-  const { q } = req.query;
+  const {
+    q, limit, offset, event,
+  } = req.query;
   const { isMobile } = req.useragent;
-  const fields = isMobile ? ['id', 'titleKeyword'] : ['id', 'titleKeyword', 'thumbnails', 'artistId', 'artistKeyword'];
-  const tracks = await trackData.getRelatedTracks(q, fields);
+  const options = {
+    limit,
+    offset,
+    includeThumbnails: !isMobile,
+    includeArtistInfo: !isMobile || event === 'search',
+  };
+  const tracks = await trackData.getRelatedTracks(q, options);
   if (tracks.length === 0) {
     return res.status(200).json({ tracks });
   }
-  const reducedTracks = isMobile ? tracks.map(track => ({
-    id: track.id,
-    titleKeyword: track.titleKeyword,
-  })) : tracks.reduce((acc, track) => {
-    const {
-      id, titleKeyword, thumbnails, artistKeyword, artistId,
-    } = track;
-    const existingTrack = acc.find(t => t.id === id);
+  const reducedTracks = tracks.reduce((acc, track) => {
+    const existingTrack = acc.find(t => t.id === track.trackId);
     if (existingTrack) {
       existingTrack.artists.push({
-        id: artistId,
-        artistKeyword,
+        id: track.artistId,
+        artistName: track.artistNameMelon || track.artistNameGenie || track.artistNameBugs,
       });
     } else {
-      acc.push({
-        id,
-        titleKeyword,
-        thumbnail: thumbnails[0],
-        artists: [{
-          id: artistId,
-          artistKeyword,
-        }],
-      });
+      acc.push(formatTrack(track, options.includeArtistInfo));
     }
     return acc;
   }, []);
+
+  if (event !== 'search' && isMobile) {
+    const minimalTracks = reducedTracks.map(track => ({
+      id: track.id,
+      titleKeyword: track.titleKeyword,
+    }));
+    return res.status(200).json({ tracks: minimalTracks });
+  }
+
   return res.status(200).json({ tracks: reducedTracks });
 }
 
@@ -68,15 +96,22 @@ export async function getRelatedTracks(req, res) {
 export async function getTrackWithArtist(req, res) {
   const { id } = req.params;
   const tracks = await trackData.getTrackWithArtist(id);
-  const track = tracks.length > 0 ? tracks.reduce((pre, cur) => {
+
+  if (tracks.length === 0) {
+    res.status(404).json({ error: 'Track not found' });
+    return;
+  }
+  const track = tracks.reduce((pre, cur) => {
     const {
-      id: trackID, titleKeyword, releaseDate, trackImages, platforms, lyrics, // about track
-      artistId, artistKeyword, artistDebut, artistImage, // about artist
+      id: trackID, trackTitleMelon, trackTitleGenie, trackTitleBugs,
+      releaseDate, trackImages, platforms, lyrics,
+      artistId, artistNameMelon, artistNameGenie, artistNameBugs,
+      artistDebut, artistImage,
     } = cur;
     if (!pre.id) {
       Object.assign(pre, {
         id: trackID,
-        titleKeyword,
+        titleName: trackTitleMelon || trackTitleGenie || trackTitleBugs,
         releaseDate,
         trackImage: trackImages[0],
         platforms: sortChartInfos(platforms),
@@ -86,12 +121,13 @@ export async function getTrackWithArtist(req, res) {
     }
     pre.artists.push({
       id: artistId,
-      artistKeyword,
+      artistName: artistNameMelon || artistNameGenie || artistNameBugs,
       artistImage,
       debut: artistDebut,
     });
 
     return pre;
-  }, {}) : null;
+  }, {});
+
   res.status(200).json({ track });
 }

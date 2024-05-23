@@ -10,17 +10,6 @@ export default function validator(req, res, next) {
   return next();
 }
 
-export function isNumeric(item) {
-  if (typeof item === 'number') {
-    return true;
-  }
-  if (typeof item === 'string') {
-    // eslint-disable-next-line no-restricted-globals
-    return !isNaN(Number(item));
-  }
-  return false;
-}
-
 export function isPositiveInteger(item) {
   const number = Number(item);
   if (!Number.isInteger(number)) {
@@ -33,13 +22,11 @@ export function isPositiveInteger(item) {
 }
 
 export const validateParmId = [
-  param('id').custom(isNumeric).withMessage('Please, provide number type.'),
   param('id').custom(isPositiveInteger).withMessage('Please, provide positiveInteger.'),
   validator,
 ];
 
 export const validateQueryQ = [
-  query('q').isString().withMessage('Please, provide string type.'),
   query('q').notEmpty().withMessage('Please, provide query.'),
   validator,
 ];
