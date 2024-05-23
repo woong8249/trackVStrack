@@ -23,19 +23,19 @@ function displayArtistDetails(artist, artistDetails) {
 
   const artistImage = document.createElement('img');
   artistImage.src = artist.artistImage;
-  artistImage.alt = artist.artistKeyword;
+  artistImage.alt = artist.artistName;
   artistImage.classList.add('artist-image');
 
   const artistMeta = document.createElement('div');
   artistMeta.classList.add('artist-meta');
 
-  const artistKeyword = document.createElement('h2');
-  artistKeyword.textContent = artist.artistKeyword;
+  const artistName = document.createElement('h2');
+  artistName.textContent = artist.artistName;
 
   const debut = document.createElement('p');
   debut.textContent = `Debut: ${artist.debut}`;
 
-  artistMeta.appendChild(artistKeyword);
+  artistMeta.appendChild(artistName);
   artistMeta.appendChild(debut);
   artistInfo.appendChild(artistImage);
   artistInfo.appendChild(artistMeta);

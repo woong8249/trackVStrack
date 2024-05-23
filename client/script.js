@@ -65,10 +65,17 @@ function displaySearchResults(searchResultsPopup, results) {
       img.src = artist.artistImage;
       img.alt = 'Artist Image';
 
-      const span = document.createElement('span');
-      span.textContent = artist.artistKeyword;
+      const artistNameSpan = document.createElement('span');
+      artistNameSpan.textContent = artist.artistName;
 
-      div.append(img, span);
+      if (artist.debut) {
+        const debutSpan = document.createElement('span');
+        debutSpan.textContent = artist.debut;
+        div.append(img, artistNameSpan, debutSpan);
+      } else {
+        div.append(img, artistNameSpan);
+      }
+
       div.addEventListener('click', () => handleSelect('artist', artist.id));
       artistSection.append(div);
     });

@@ -2,11 +2,22 @@ import * as artistData from '../../mysql/artist.js';
 
 // ok
 export async function getRelatedArtists(req, res) {
-  const { q } = req.query;
+  const {
+    q, limit, offset, event,
+  } = req.query;
   const { isMobile } = req.useragent;
-  const fields = isMobile ? ['id', 'artistKeyword'] : ['id', 'artistKeyword', 'artistImage'];
-  const artists = await artistData.getRelatedArtists(q, fields);
-  res.status(200).json({ artists });
+  const options = {
+    limit,
+    offset,
+    includeArtistInfo: !isMobile || event === 'search',
+  };
+  const artists = await artistData.getRelatedArtists(q, options);
+  const mapped = artists.map(({
+    id, debut, artistImage, artistNameMelon, artistNameGenie, artistNameBugs,
+  }) => ({
+    id, debut, artistImage, artistName: artistNameMelon || artistNameGenie || artistNameBugs,
+  }));
+  res.status(200).json({ artists: mapped });
 }
 
 // ok
@@ -15,13 +26,13 @@ export async function getArtistWithTrack(req, res) {
   const artists = await artistData.getTrackWithArtist(id);
   const artist = artists.length > 0 ? artists.reduce((pre, cur) => {
     const {
-      id: artistId, artistKeyword, debut, artistImage, // about artist
+      id: artistId, debut, artistImage, artistNameMelon, artistNameGenie, artistNameBugs, // about artist
       trackId, titleKeyword, releaseDate, thumbnails, // about track
     } = cur;
     if (!pre.id) {
       Object.assign(pre, {
         id: artistId,
-        artistKeyword,
+        artistName: artistNameMelon || artistNameGenie || artistNameBugs,
         debut,
         artistImage,
         tracks: [],

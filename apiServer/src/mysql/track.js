@@ -44,40 +44,39 @@ export async function getTrackWithArtist(id) {
 }
 
 export async function getRelatedTracks(search, options) {
-  const conn = await pool.getConnection();
+  const {
+    limit, offset, includeThumbnails, includeArtistInfo,
+  } = options;
+  !(limit) && Object.assign(options, { limit: 5 });
+  !(offset) && Object.assign(options, { offset: 0 });
+  const cteFields = [
+    'tracks.id AS trackId',
+    'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.melon.trackInfo.title\')) AS trackTitleMelon',
+    'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.genie.trackInfo.title\')) AS trackTitleGenie',
+    'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.bugs.trackInfo.title\')) AS trackTitleBugs',
+  ];
 
-  !(options.limit) && Object.assign(options, { limit: 5 });
-  !(options.offset) && Object.assign(options, { offset: 0 });
+  const selectFields = [
+    'UT.trackId AS trackId',
+    'trackTitleMelon',
+    'trackTitleGenie',
+    'trackTitleBugs',
+  ];
 
-  try {
-    const cteFields = [
-      'tracks.id AS trackId',
-      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.melon.trackInfo.title\')) AS trackTitleMelon',
-      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.genie.trackInfo.title\')) AS trackTitleGenie',
-      'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.bugs.trackInfo.title\')) AS trackTitleBugs',
-    ];
+  if (includeThumbnails) {
+    cteFields.push('tracks.thumbnails AS trackThumbnails');
+    selectFields.push('trackThumbnails');
+  }
 
-    const selectFields = [
-      'UT.trackId AS trackId',
-      'trackTitleMelon',
-      'trackTitleGenie',
-      'trackTitleBugs',
-    ];
+  if (includeArtistInfo) {
+    selectFields.push(
+      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.melon.artistName\')) AS artistNameMelon',
+      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.genie.artistName\')) AS artistNameGenie',
+      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.bugs.artistName\')) AS artistNameBugs',
+    );
+  }
 
-    if (options.includeThumbnails) {
-      cteFields.push('tracks.thumbnails AS trackThumbnails');
-      selectFields.push('trackThumbnails');
-    }
-
-    if (options.includeArtistInfo) {
-      selectFields.push(
-        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.melon.artistName\')) AS artistNameMelon',
-        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.genie.artistName\')) AS artistNameGenie',
-        'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.bugs.artistName\')) AS artistNameBugs',
-      );
-    }
-
-    const query = `
+  const query = `
     WITH UT AS (
       SELECT DISTINCT
         ${cteFields.join(', ')}
@@ -97,7 +96,9 @@ export async function getRelatedTracks(search, options) {
     JOIN artists AS A ON TD.artistId = A.id;
     `;
 
-    const searchParam = `%${search}%`;
+  const searchParam = `%${search}%`;
+  const conn = await pool.getConnection();
+  try {
     const tracks = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam, options.limit, options.offset]))[0];
     return tracks;
   } finally {

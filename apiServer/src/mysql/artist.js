@@ -1,10 +1,23 @@
 import pool from './pool.js';
 
-export async function getRelatedArtists(search, fields) {
-  const conn = await pool.getConnection();
-  const selectFields = fields.join(',');
+export async function getRelatedArtists(search, options) {
+  const {
+    limit, offset, includeArtistInfo,
+  } = options;
+
+  !(limit) && Object.assign(options, { limit: 5 });
+  !(offset) && Object.assign(options, { offset: 0 });
+
+  const fields = [
+    'id',
+    'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.melon.artistName\')) AS artistNameMelon',
+    'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.genie.artistName\')) AS artistNameGenie',
+    'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.bugs.artistName\')) AS artistNameBugs',
+  ];
+  includeArtistInfo && fields.push('artistImage', 'debut');
+
   const query = `
-    SELECT ${selectFields}
+    SELECT DISTINCT ${fields.join(', ')}
     FROM artists
     WHERE 
       artistKeyword LIKE ?
@@ -14,9 +27,13 @@ export async function getRelatedArtists(search, fields) {
     LIMIT 5;
   `;
   const searchParam = `%${search}%`;
-  const artists = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam]))[0];
-  conn.release();
-  return artists;
+  const conn = await pool.getConnection();
+  try {
+    const artists = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam]))[0];
+    return artists;
+  } finally {
+    conn.release();
+  }
 }
 
 export async function getTrackWithArtist(id) {
