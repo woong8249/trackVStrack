@@ -2,7 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 
 import * as trackController from '../controller/track.js';
-import * as trackValidator from '../validator/track.js';
+import * as validator from '../validator/index.js';
 
 const router = express.Router();
 
@@ -19,9 +19,13 @@ const getRelatedTracksLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-router.get('/:id', trackValidator.validateParmId, getTrackLimiter, trackController.getTrackWithArtist);
+router.get('/:id',
+  validator.validateParmId,
+  getTrackLimiter,
+  trackController.getTrackWithArtist);
+
 router.get('/',
-  trackValidator.validateGetRelatedTracksQueryOption,
+  validator.validateGetRelatedQueryOption,
   getRelatedTracksLimiter,
   trackController.getRelatedTracks);
 

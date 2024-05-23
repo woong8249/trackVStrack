@@ -19,7 +19,14 @@ const getRelatedArtistsLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-router.get('/:id', validator.validateParmId, getArtistLimiter, artist.getArtistWithTrack);
-router.get('/', validator.validateQueryQ, getRelatedArtistsLimiter, artist.getRelatedArtists);
+router.get('/:id',
+  validator.validateParmId,
+  getArtistLimiter,
+  artist.getArtistWithTrack);
+
+router.get('/',
+  validator.validateGetRelatedQueryOption,
+  getRelatedArtistsLimiter,
+  artist.getRelatedArtists);
 
 export default router;

@@ -26,7 +26,10 @@ export const validateParmId = [
   validator,
 ];
 
-export const validateQueryQ = [
+export const validateGetRelatedQueryOption = [
   query('q').notEmpty().withMessage('Please, provide query.'),
+  query('limit').optional().custom(isPositiveInteger).withMessage('Please, provide a positive integer.'),
+  query('offset').optional().custom(isPositiveInteger).withMessage('Please, provide a positive integer.'),
+  query('event').optional().isIn(['search']).withMessage('Invalid value for event. Only "search" is allowed.'),
   validator,
 ];
