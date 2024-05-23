@@ -70,7 +70,8 @@ function displaySearchResults(searchResultsPopup, results) {
 
       if (artist.debut) {
         const debutSpan = document.createElement('span');
-        debutSpan.textContent = artist.debut;
+        debutSpan.classList.add('artist-debut');
+        debutSpan.textContent = ` -  ${artist.debut}`;
         div.append(img, artistNameSpan, debutSpan);
       } else {
         div.append(img, artistNameSpan);
