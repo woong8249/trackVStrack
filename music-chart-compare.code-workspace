@@ -12,5 +12,8 @@
         {
             "path": "./client"
         },
+        {
+            "path": "./react-client"
+        },
     ],
 }
