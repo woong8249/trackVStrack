@@ -1,31 +1,49 @@
+import logo from './assets/logo.png';
+import textLogo from './assets/text-logo.png';
+
+const tracks = [
+  { id: 1 },
+  { id: 2 },
+  { id: 3 },
+  { id: 4 },
+  { id: 5 },
+  { id: 6 },
+];
+
 function App() {
   return (
-    <>
-      <div className="flex bg-neutral-700 items-center justify-between h-[13rem] group" >
-        <div className="flex gap-4 group-hover:bg-yellow-400">
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-        </div>
+    <div className="bg-black min-h-screen min-w-[35rem] ">
 
-        <div className="flex justify-center items-center gap-2 ">
-          <div className="bg-red-500 w-32 h-32 rounded-full hover:bg-red-100 transition border-black  border-[2px]"></div>
-          <div className="bg-yellow-500 w-32 h-32 rounded-full hover:bg-red-100 transition border-black  border-[2px] "></div>
-          <div className="bg-green-500 w-32 h-32 rounded-full hover:bg-red-100 transition border-black  border-[2px] "></div>
-        </div>
-
-        <div className="flex gap-4 group-hover:bg-yellow-400">
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-          <div className="bg-white w-[1rem] h-[11rem]"></div>
-        </div>
+      <div className="flex justify-center items-center pt-[2rem] mb-[1rem]">
+        <img alt="logo" src={logo} className='w-[8rem]' />
+        <img alt="logo"src={textLogo} className='w-[16rem] h-[3rem]' />
       </div>
 
-    </>
+      <h1 className="text-red-500 text-center text-[1.5rem] md:text-[2rem] lg:text-[3rem] font-bold mb-[3rem]" >
+        "Easily View and Compare Track Charts."
+      </h1>
+
+      <span className="text-white flex justify-center items-center text-center text-[0.8rem] md:text-[1.2rem] mb-[3rem]">
+        "당신의 최애곡의 차트 퍼포먼스를 간편히 확인하세요.
+        {' '}
+        <br></br>
+        {' '}
+        또 서로 다른 차트와도 비교해 보세요."
+      </span>
+
+      <div className="flex justify-center items-center mb-[5rem]">
+        <button className="bg-red-500 text-white   py-[0.5rem] px-[1rem] rounded hover:bg-red-800">
+          Get Started
+        </button>
+      </div>
+
+      <div className=' flex justify-center items-center gap-[1rem] flex-wrap pb-[3rem]'>
+        {tracks.map((track) => (
+          <div key={track.id} className='bg-white w-[30rem] h-[25rem] sm:w-[40rem] sm:h-[30rem] rounded-md' ></div>
+        ))}
+      </div>
+
+    </div>
   );
 }
 export default App;
