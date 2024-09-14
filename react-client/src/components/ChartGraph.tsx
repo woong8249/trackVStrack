@@ -65,7 +65,7 @@ export default function ChartGraph({ track }: Props) {
       },
       title: {
         display: true,
-        text: `${track.titleName} Chart Performance`,
+        text: `${track.titleName} Weekly Chart Performance`,
       },
     },
     scales: {
@@ -86,6 +86,6 @@ export default function ChartGraph({ track }: Props) {
   };
 
   return (
-    <Line data={chartData} options={options} className='bg-gray-300 ' />
+    <Line data={chartData} options={options} className=' ' />
   );
 }

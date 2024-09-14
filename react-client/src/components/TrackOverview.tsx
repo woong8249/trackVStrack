@@ -22,7 +22,7 @@ export default function TrackOverview({ track }: Props) {
   }, []);
 
   return (
-    <div className='border-[0.25rem] border-white rounded-md hover:bg-gray-600 transition cursor-pointer' >
+    <div className='border-[1px] border-[#9A9A9A] rounded-md hover:bg-gray-200 transition cursor-pointer shadow-2xl' >
       <TrackInfoCard track={track} />
       {isLargeViewport && <ChartGraph track={track} />}
     </div>
