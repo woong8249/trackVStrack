@@ -86,6 +86,6 @@ export default function ChartGraph({ track }: Props) {
   };
 
   return (
-    <Line data={chartData} options={options} className=' ' />
+    <Line data={chartData} options={options} />
   );
 }
