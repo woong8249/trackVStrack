@@ -10,6 +10,9 @@ export default {
         // 커스텀 텍스트 그림자 정의
         default: '2px 2px 4px rgba(0, 0, 0, 0.3)',
       },
+      screens: {
+        mobile: '400px', // 400px 이상일 때 적용되는 브레이크포인트 추가
+      },
     },
   },
   plugins: [
