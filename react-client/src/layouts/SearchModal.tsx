@@ -17,7 +17,22 @@ export default function SearchModal() {
       </SearchBar>
 
       {isModalOpen && (
-        <div className="bg-black bg-opacity-50 min-w-[20rem] fixed inset-0 z-50 flex items-center justify-center" >
+        <div
+        role='button'
+        tabIndex={0}
+        className="bg-black bg-opacity-50 min-w-[20rem] fixed inset-0 z-50 flex items-center justify-center"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) { // 모달 외부 클릭 시
+            e.stopPropagation();
+            setIsModalOpen(false);
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            setIsModalOpen(false); // ESC 키를 누르면 모달 닫기
+          }
+        }}
+        >
           <div className='bg-white rounded-3xl h-[90vh]'>
             <div className='w-[60vw] px-[2rem] py-[1.5rem]'>
               <SearchBar ></SearchBar>
