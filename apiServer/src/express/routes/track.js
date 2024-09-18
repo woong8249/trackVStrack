@@ -19,14 +19,18 @@ const getRelatedTracksLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-router.get('/:id',
+router.get(
+  '/:id',
   validator.validateParmId,
   getTrackLimiter,
-  trackController.getTrackWithArtist);
+  trackController.getTrackWithDetail,
+);
 
-router.get('/',
+router.get(
+  '/',
   validator.validateGetRelatedQueryOption,
   getRelatedTracksLimiter,
-  trackController.getRelatedTracks);
+  trackController.getTracksWithoutDetail,
+);
 
 export default router;

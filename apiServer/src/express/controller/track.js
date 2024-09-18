@@ -1,5 +1,4 @@
 import * as trackData from '../../mysql/track.js';
-import winLogger from '../../util/winston.js';
 
 function sortChartInfos(platforms) {
   const sortFunction = (a, b) => {
@@ -26,76 +25,59 @@ function sortChartInfos(platforms) {
   return sortedPlatforms;
 }
 
-function formatTrack(track, includeArtistInfo) {
+function formatTrack(track) {
   const {
-    trackId, trackThumbnails, artistId,
+    id, artistId, releaseDate, trackImages,
     artistNameMelon, artistNameGenie, artistNameBugs,
     trackTitleMelon, trackTitleGenie, trackTitleBugs,
   } = track;
 
   const titleName = trackTitleMelon || trackTitleGenie || trackTitleBugs;
+  const trackImage = trackImages[0] || trackImages[1] || trackImages[2];
   const artistName = artistNameMelon || artistNameGenie || artistNameBugs;
 
   const formattedTrack = {
-    id: trackId,
+    id,
     titleName,
-    thumbnail: trackThumbnails ? trackThumbnails[0] : null,
+    trackImage,
+    releaseDate: releaseDate || null,
+    artists: [{ artistId, artistName }]
+    ,
   };
-
-  if (includeArtistInfo) {
-    formattedTrack.artists = [{
-      id: artistId,
-      artistName,
-    }];
-  }
 
   return formattedTrack;
 }
 
 // ok
-export async function getRelatedTracks(req, res) {
+export async function getTracksWithoutDetail(req, res) {
   const {
-    q, limit, offset, event,
+    q, limit, offset,
   } = req.query;
-  const { isMobile } = req.useragent;
-  const options = {
-    limit,
-    offset,
-    includeThumbnails: !isMobile,
-    includeArtistInfo: !isMobile || event === 'search',
-  };
-  const tracks = await trackData.getRelatedTracks(q, options);
+  const options = { limit, offset };
+  const tracks = await trackData.getTracksWithoutDetail(q, options);
   if (tracks.length === 0) {
     return res.status(200).json({ tracks });
   }
   const reducedTracks = tracks.reduce((acc, track) => {
-    const existingTrack = acc.find(t => t.id === track.trackId);
+    const existingTrack = acc.find(t => t.id === track.id);
     if (existingTrack) {
       existingTrack.artists.push({
         id: track.artistId,
         artistName: track.artistNameMelon || track.artistNameGenie || track.artistNameBugs,
       });
     } else {
-      acc.push(formatTrack(track, options.includeArtistInfo));
+      acc.push(formatTrack(track));
     }
     return acc;
   }, []);
-
-  if (event !== 'search' && isMobile) {
-    const minimalTracks = reducedTracks.map(track => ({
-      id: track.id,
-      titleKeyword: track.titleKeyword,
-    }));
-    return res.status(200).json({ tracks: minimalTracks });
-  }
 
   return res.status(200).json({ tracks: reducedTracks });
 }
 
 // ok
-export async function getTrackWithArtist(req, res) {
+export async function getTrackWithDetail(req, res) {
   const { id } = req.params;
-  const tracks = await trackData.getTrackWithArtist(id);
+  const tracks = await trackData.getTrackWithDetail(id);
 
   if (tracks.length === 0) {
     res.status(200).json({ track: tracks });

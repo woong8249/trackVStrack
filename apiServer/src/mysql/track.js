@@ -1,6 +1,6 @@
 import pool from './pool.js';
 
-export async function getTrackWithArtist(id) {
+export async function getTrackWithDetail(id) {
   const conn = await pool.getConnection();
   try {
     const query = `
@@ -43,9 +43,9 @@ export async function getTrackWithArtist(id) {
   }
 }
 
-export async function getRelatedTracks(search, options) {
+export async function getTracksWithoutDetail(search, options) {
   const {
-    limit, offset, includeThumbnails, includeArtistInfo,
+    limit, offset,
   } = options;
   !(limit) && Object.assign(options, { limit: 5 });
   !(offset) && Object.assign(options, { offset: 0 });
@@ -54,27 +54,21 @@ export async function getRelatedTracks(search, options) {
     'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.melon.trackInfo.title\')) AS trackTitleMelon',
     'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.genie.trackInfo.title\')) AS trackTitleGenie',
     'JSON_UNQUOTE(JSON_EXTRACT(tracks.platforms, \'$.bugs.trackInfo.title\')) AS trackTitleBugs',
+    'releaseDate',
+    'trackImages',
   ];
 
   const selectFields = [
-    'UT.trackId AS trackId',
+    'UT.trackId AS id',
     'trackTitleMelon',
     'trackTitleGenie',
     'trackTitleBugs',
+    'releaseDate',
+    'trackImages',
+    'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.melon.artistName\')) AS artistNameMelon',
+    'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.genie.artistName\')) AS artistNameGenie',
+    'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.bugs.artistName\')) AS artistNameBugs',
   ];
-
-  if (includeThumbnails) {
-    cteFields.push('tracks.thumbnails AS trackThumbnails');
-    selectFields.push('trackThumbnails');
-  }
-
-  if (includeArtistInfo) {
-    selectFields.push(
-      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.melon.artistName\')) AS artistNameMelon',
-      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.genie.artistName\')) AS artistNameGenie',
-      'JSON_UNQUOTE(JSON_EXTRACT(A.platforms, \'$.bugs.artistName\')) AS artistNameBugs',
-    );
-  }
 
   const query = `
     WITH UT AS (
