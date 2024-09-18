@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function Main() {
   return (
-    <div className="bg-[#fff] text-[#3D3D3D]  min-h-screen min-w-[375px] ">
+    <div className="bg-[#fff] text-[#3D3D3D]  min-h-screen min-w-[375px]">
       <div className='mb-[2rem] '>
         <Logo></Logo>
       </div>
@@ -23,9 +23,11 @@ function Main() {
       </span>
 
       <div className="flex justify-center items-center mb-[5rem]">
-        <button className="bg-[#b4ec51] text-[black] py-[0.5rem] px-[1rem] font-bold rounded hover:bg-[#9ab867]">
-          <Link to={'dashboard'}>Get Started</Link>
-        </button>
+        <Link to={'dashboard'}>
+          <button className="bg-[#b4ec51] text-[black] py-[0.5rem] px-[1rem] font-bold rounded hover:bg-[#9ab867]">
+            Get Started
+          </button>
+        </Link>
       </div>
 
       <div className=' flex justify-center items-center gap-[2rem] flex-wrap pb-[3rem]'>

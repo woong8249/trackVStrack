@@ -17,7 +17,6 @@ export default function SearchModal() {
       </SearchBar>
 
       {isModalOpen && (
-
         <div className="bg-black bg-opacity-50 min-w-[20rem] fixed inset-0 z-50 flex items-center justify-center" >
           <div className='bg-white rounded-3xl h-[90vh]'>
             <div className='w-[60vw] px-[2rem] py-[1.5rem]'>
