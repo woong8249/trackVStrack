@@ -40,3 +40,11 @@ export interface Track {
   lyrics: string;
   artists: Artist[];
 }
+
+export interface TrackShortInfo {
+  id: number;
+  titleName: string;
+  releaseDate: string | null;
+  trackImage: string;
+  artists: Omit<Artist, 'debut,artistImage'>[];
+}

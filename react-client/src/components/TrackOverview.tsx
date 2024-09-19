@@ -1,26 +1,15 @@
-import {
-  useState, useEffect,
-} from 'react';
+import { useState } from 'react';
 import ChartGraph from './ChartGraph';
 import TrackInfoCard from './TrackInfoCard';
 import { Track } from 'src/types/track';
 
 interface Props {
   track: Track;
+  isLargeViewport:boolean
 }
 
-export default function TrackOverview({ track }: Props) {
-  const [isLargeViewport, setIsLargeViewport] = useState(false);
+export default function TrackOverview({ track, isLargeViewport }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  useEffect(() => {
-    const handleResize = () => {
-      setIsLargeViewport(window.innerWidth >= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div

@@ -2,8 +2,20 @@ import Logo from '@components/Logo';
 import tracks from '../assets/track.json';
 import TrackOverview from '@components/TrackOverview';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function Main() {
+  const [isLargeViewport, setIsLargeViewport] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeViewport(window.innerWidth >= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="bg-[#fff] text-[#3D3D3D]  min-h-screen min-w-[375px]">
       <div className='mb-[2rem] '>
@@ -31,7 +43,15 @@ function Main() {
       </div>
 
       <div className=' flex justify-center items-center gap-[2rem] flex-wrap pb-[3rem]'>
-        {tracks.map((track) => <TrackOverview key= {track.id} track={track} />)}
+        {tracks.map(
+          (track) => (
+            <TrackOverview
+              key= {track.id}
+              track={track}
+              isLargeViewport={isLargeViewport}
+            />
+          ),
+        )}
       </div>
     </div>
   );

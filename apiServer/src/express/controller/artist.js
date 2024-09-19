@@ -1,17 +1,15 @@
 import * as artistData from '../../mysql/artist.js';
 
 // ok
-export async function getRelatedArtists(req, res) {
+export async function getArtistsWithoutDetail(req, res) {
   const {
-    q, limit, offset, event,
+    q, limit, offset,
   } = req.query;
-  const { isMobile } = req.useragent;
   const options = {
     limit,
     offset,
-    includeArtistInfo: !isMobile || event === 'search',
   };
-  const artists = await artistData.getRelatedArtists(q, options);
+  const artists = await artistData.getArtistsWithoutDetail(q, options);
   const mapped = artists.map(({
     id, debut, artistImage, artistNameMelon, artistNameGenie, artistNameBugs,
   }) => ({
@@ -21,9 +19,9 @@ export async function getRelatedArtists(req, res) {
 }
 
 // ok
-export async function getArtistWithTrack(req, res) {
+export async function getArtistWithDetail(req, res) {
   const { id } = req.params;
-  const artists = await artistData.getTrackWithArtist(id);
+  const artists = await artistData.getArtistWithDetail(id);
   const artist = artists.length > 0 ? artists.reduce((pre, cur) => {
     const {
       id: artistId, debut, artistImage, artistNameMelon, artistNameGenie, artistNameBugs, // about artist

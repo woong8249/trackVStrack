@@ -4,7 +4,7 @@ import {
 } from 'vitest';
 
 import {
-  fetchAdditionalInformationOfTrack, fetchChart, fetchChartsForDateRangeInParallel, fetchRealTimeChart,
+  fetchAdditionalInformationOfTrack, fetchArtistInfo, fetchChart, fetchChartsForDateRangeInParallel, fetchRealTimeChart,
 } from '../src/platforms/domestic/genie.js';
 import { extractYearMonthDay } from '../src/util/time.js';
 
@@ -133,3 +133,14 @@ describe('Test fetchRealTimeChart', () => {
     expect(target).toHaveProperty('thumbnail');
   });
 });
+
+describe('Test ArtistInfo function', () => {
+  it('ArtistInfo function', async () => {
+    const result = await fetchArtistInfo(82007551);
+    console.log(result);
+    expect(typeof (result.artistImage)).toBe('string');
+    expect(typeof (result.debut)).toBe('string');
+  });
+});
+
+// "genie": {"artistID": "82007551"

@@ -1,8 +1,8 @@
 import pool from './pool.js';
 
-export async function getRelatedArtists(search, options) {
+export async function getArtistsWithoutDetail(search, options) {
   const {
-    limit, offset, includeArtistInfo,
+    limit, offset,
   } = options;
 
   !(limit) && Object.assign(options, { limit: 5 });
@@ -13,8 +13,9 @@ export async function getRelatedArtists(search, options) {
     'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.melon.artistName\')) AS artistNameMelon',
     'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.genie.artistName\')) AS artistNameGenie',
     'JSON_UNQUOTE(JSON_EXTRACT(platforms, \'$.bugs.artistName\')) AS artistNameBugs',
+    'artistImage',
+    'debut',
   ];
-  includeArtistInfo && fields.push('artistImage', 'debut');
 
   const query = `
     SELECT DISTINCT ${fields.join(', ')}
@@ -30,13 +31,14 @@ export async function getRelatedArtists(search, options) {
   const conn = await pool.getConnection();
   try {
     const artists = (await conn.query(query, [searchParam.toLocaleLowerCase(), searchParam, searchParam, searchParam]))[0];
+    console.log(artists);
     return artists;
   } finally {
     conn.release();
   }
 }
 
-export async function getTrackWithArtist(id) {
+export async function getArtistWithDetail(id) {
   const conn = await pool.getConnection();
   const query = `SELECT
   atd.id,

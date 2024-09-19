@@ -1,8 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SearchBar from '@components/SearchBar';
+import { Track } from 'src/types/track';
+import { searchTracks } from '@utils/axios';
+import TrackInfoCard from '@components/TrackInfoCard';
 
 export default function SearchModal() {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
+  const [query, setQuery] = useState('');
+  const [tracks, setTracks] = useState<Track[]>([]);
+
+  useEffect(() => {
+    if (query !== '') {
+      searchTracks(query).then((tracks) => {
+        setTracks(tracks);
+      });
+    }
+  }, [query]);
 
   return (
     <div className='w-full' >
@@ -33,9 +46,9 @@ export default function SearchModal() {
           }
         }}
         >
-          <div className='bg-white rounded-3xl h-[90vh]'>
-            <div className='w-[60vw] px-[2rem] py-[1.5rem]'>
-              <SearchBar ></SearchBar>
+          <div className='bg-white rounded-3xl h-[80vh] w-[80vw] overflow-auto'>
+            <div className='px-[2rem] py-[1.5rem]'>
+              <SearchBar query={query} setQuery={setQuery} ></SearchBar>
             </div>
 
             <button
@@ -46,12 +59,31 @@ export default function SearchModal() {
             }}>
               ×
             </button>
+
+            <div className='flex justify-center items-center'>
+
+              {(query && (tracks.length > 0)) && (
+              <div>
+                <span>tracks</span>
+                {tracks.map((track) => <TrackInfoCard track={track} key={track.id} />)}
+              </div>
+              )}
+
+              {(query && (tracks.length > 0)) && (
+              <div>
+                <span>Artists</span>
+                {tracks.map((track) => <TrackInfoCard track={track} key={track.id} />)}
+              </div>
+              )}
+
+            </div>
           </div>
-
         </div>
-
       ) }
 
     </div>
   );
 }
+
+// 1. 스로틀링
+// 3.  배치
