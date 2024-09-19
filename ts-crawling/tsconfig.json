@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": [
+      "node",
+    ],
+    "baseUrl": "./",
+  },
+  "extends": [
+    "@tsconfig/strictest/tsconfig",
+    "@tsconfig/node22/tsconfig",
+    "@tsconfig/esm/tsconfig"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "*.ts",
+  ]
+}

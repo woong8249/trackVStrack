@@ -2,5 +2,6 @@ node_modules
 .DS_Store
 dataCollectedBeforeIntegration
 .env.*
-*.json
+crawling/src/**/*.json
 !package.json
+!.vscode/settings.json  
