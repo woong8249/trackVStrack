@@ -15,5 +15,8 @@
         {
             "path": "./react-client"
         },
+        {
+            "path": "./ts-crawling"
+        },
     ],
 }

@@ -8,6 +8,7 @@
       "node",
     ],
     "baseUrl": "./",
+    "resolvePackageJsonExports": false, //false로 설정: TypeScript는 package.json의 exports 필드를 무시하고, 패키지 내부 파일에 대한 직접적인 접근을 허용합니다.
   },
   "extends": [
     "@tsconfig/strictest/tsconfig",
