@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable max-len */
 import * as cheerio from 'cheerio';
 import _ from 'lodash';
@@ -12,19 +13,12 @@ import winLogger from '../logger/winston';
 import { validateChartDetails } from '../util/typeChecker';
 import type {
   ChartDetail, WeeklyChartScope, ChartType, MonthlyChartScope,
+  FetchWeeklyChartResult,
+  FetchMonthlyChartResult,
+  PlatformModule,
 } from 'src/types';
 
-export type MelonFetchWeeklyChartResult ={
-    platform: 'melon'
-    chartScope:WeeklyChartScope
-    chartDetails:ChartDetail[]
-}
-
-export type MelonFetchMonthlyChartResult ={
-  platform: 'melon'
-  chartScope:MonthlyChartScope
-  chartDetails:ChartDetail[]
-}
+type MelonChartType ='WE' | 'MO' |'NO'
 
 const ERRORS = {
   CHART_WE: 'The Melon weekly chart has been available since January 3, 2010.',
@@ -44,7 +38,6 @@ const options = {
 const minDateWE = new Date('2010-01-03').getTime();
 const minDateMO = new Date('2010-01-01').getTime();
 
-type MelonChartType ='WE' | 'MO' |'NO'
 function standardizeChartType(chartType : ChartType) {
   if (chartType === 'm') return 'MO';
   if (chartType === 'w') return 'WE';
@@ -67,40 +60,6 @@ function generateDatesForChartType(startDate:Date, endDate:Date, chartType:Chart
   throw new Error('Invalid chart type.');
 }
 
-function makeChartDetails(melonHtml:string) :ChartDetail[] {
-  const $ = cheerio.load(melonHtml);
-  const songSelectors = $('tr.lst50, tr.lst100');
-  const chartDetails = songSelectors.map((_i, element) => {
-    const rank = $(element).find('span.rank').text().match(/\d+/)?.[0];
-    const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
-    const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
-    const artistNames = artistElements.text().trim().split(',');
-    const artistIDs = artistElements.find('a').map((_i, el) => {
-      const href = $(el).attr('href');
-      if (href === undefined) {
-        throw new Error('melon href for artistID is undefined.');
-      }
-      const match = href.match(/goArtistDetail\('(\d+)'\)/)?.[1];
-      if (match === undefined) {
-        throw new Error('melon href.match for artistID is undefined.');
-      }
-      return match;
-    }).get();
-    const artists = artistNames.map((artistName, index) => ({
-      artistName: artistName.trim(),
-      artistKeyword: extractKeyword(artistName),
-      artistID: artistIDs[index],
-    }));
-    const trackID = $(element).find('input.input_check').val();
-    const titleKeyword = extractKeyword(title);
-    return {
-      rank, title, titleKeyword, artists, trackID,
-    };
-  }).get();
-  validateChartDetails(chartDetails);
-  return chartDetails;
-}
-
 function isValidDate(dateString:string) {
   // YYYY.MM.DD, YYYY.MM, YYYY 형식 검증
   const fullDatePattern = /^\d{4}\.\d{2}\.\d{2}$/;
@@ -110,136 +69,173 @@ function isValidDate(dateString:string) {
   return fullDatePattern.test(dateString) || partialDatePattern.test(dateString) || yearPattern.test(dateString);
 }
 
-export async function fetchChart(
-  year: string,
-  month: string,
-  day: string,
-  chartType: ChartType,
-): Promise<MelonFetchWeeklyChartResult | MelonFetchMonthlyChartResult> {
-  const validateChartType = standardizeChartType(chartType);
-  validateDateAvailability(year, month, day, validateChartType);
-  const age = Math.floor(Number(year) / 10) * 10;
-  const startDay = `${year}${month}${day}`;
-  const endDay = validateChartType === 'WE' ? addSixDaysToYYYYMMDD(startDay) : startDay;
+export class Melon implements PlatformModule {
+  public readonly platformName = 'melon';
 
-  // chartScope를 조건에 따라 정확한 타입으로 설정
-  const chartScope = validateChartType === 'WE'
-    ? {
-      startDate: new Date(`${year}-${month}-${day}`),
-      endDate: new Date(new Date(`${year}-${month}-${day}`).getTime() + 6 * 24 * 60 * 60 * 1000),
-      weekOfMonth: calculateWeekOfMonth(
-        new Date(`${year}-${month}-${day}`),
-        new Date(new Date(`${year}-${month}-${day}`).getTime() + 6 * 24 * 60 * 60 * 1000),
-      ),
-      chartType,
+  private makeChartDetails(melonHtml:string) :ChartDetail[] {
+    const $ = cheerio.load(melonHtml);
+    const songSelectors = $('tr.lst50, tr.lst100');
+    const chartDetails = songSelectors.map((_i, element) => {
+      const rank = $(element).find('span.rank').text().match(/\d+/)?.[0];
+      const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
+      const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
+      const artistNames = artistElements.text().trim().split(',');
+      const artistIDs = artistElements.find('a').map((_i, el) => {
+        const href = $(el).attr('href');
+        if (href === undefined) {
+          throw new Error('melon href for artistID is undefined.');
+        }
+        const match = href.match(/goArtistDetail\('(\d+)'\)/)?.[1];
+        if (match === undefined) {
+          throw new Error('melon href.match for artistID is undefined.');
+        }
+        return match;
+      }).get();
+      const artists = artistNames.map((artistName, index) => ({
+        artistName: artistName.trim(),
+        artistKeyword: extractKeyword(artistName),
+        artistID: artistIDs[index],
+      }));
+      const trackID = $(element).find('input.input_check').val();
+      const titleKeyword = extractKeyword(title);
+      return {
+        rank, title, titleKeyword, artists, trackID,
+      };
+    }).get();
+    validateChartDetails(chartDetails);
+    return chartDetails;
+  }
+
+  /**
+  - The Melon weekly chart has been available since January 3, 2010.
+  - The Melon monthly chart has been available since January 1, 2010.
+ */
+  public async fetchChart(
+    year: string,
+    month: string,
+    day: string,
+    chartType: ChartType,
+  ): Promise<FetchMonthlyChartResult | FetchWeeklyChartResult> {
+    const validateChartType = standardizeChartType(chartType);
+    validateDateAvailability(year, month, day, validateChartType);
+    const age = Math.floor(Number(year) / 10) * 10;
+    const startDay = `${year}${month}${day}`;
+    const endDay = validateChartType === 'WE' ? addSixDaysToYYYYMMDD(startDay) : startDay;
+
+    // chartScope를 조건에 따라 정확한 타입으로 설정
+    const chartScope = validateChartType === 'WE'
+      ? {
+        startDate: new Date(`${year}-${month}-${day}`),
+        endDate: new Date(new Date(`${year}-${month}-${day}`).getTime() + 6 * 24 * 60 * 60 * 1000),
+        weekOfMonth: calculateWeekOfMonth(
+          new Date(`${year}-${month}-${day}`),
+          new Date(new Date(`${year}-${month}-${day}`).getTime() + 6 * 24 * 60 * 60 * 1000),
+        ),
+        chartType,
+      }
+      : {
+        date: new Date(`${year}-${month}-${day}`),
+        chartType,
+      };
+
+    const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age.toString()}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
+    const melonHtml = await getHtml(url, options);
+    const chartDetails = this.makeChartDetails(melonHtml);
+
+    // chartScope 타입에 따라 반환값을 명확하게 구분
+    if (validateChartType === 'WE') {
+      return {
+        chartDetails: chartDetails.filter((item) => item.title),
+        chartScope: chartScope as WeeklyChartScope, // 타입 단언
+        platform: 'melon',
+      };
     }
-    : {
-      date: new Date(`${year}-${month}-${day}`),
-      chartType,
-    };
-
-  const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age.toString()}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
-  const melonHtml = await getHtml(url, options);
-  const chartDetails = makeChartDetails(melonHtml);
-
-  // chartScope 타입에 따라 반환값을 명확하게 구분
-  if (validateChartType === 'WE') {
     return {
       chartDetails: chartDetails.filter((item) => item.title),
-      chartScope: chartScope as WeeklyChartScope, // 타입 단언
+      chartScope: chartScope as MonthlyChartScope, // 타입 단언
       platform: 'melon',
     };
   }
-  return {
-    chartDetails: chartDetails.filter((item) => item.title),
-    chartScope: chartScope as MonthlyChartScope, // 타입 단언
-    platform: 'melon',
-  };
-}
 
-/**
-- The Melon weekly chart has been available since January 3, 2010.
-- The Melon monthly chart has been available since January 1, 2010.
- */
-export async function fetchChartsForDateRangeInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize = 10) {
-  const copiedStartDate = new Date(startDate);
-  const copiedEndDate = new Date(endDate);
-  if (chunkSize > 31) {
-    throw Error('max 30');
-  }
-
-  const dates = generateDatesForChartType(copiedStartDate, copiedEndDate, chartType);
-  const dateChunks = _.chunk(dates, chunkSize);
-  const result = await Promise.all(dateChunks.map(async (chunk) => {
-    const chunkResults = await Promise.all(chunk.map((date) => {
-      const { year, month, day } = extractYearMonthDay(date);
-      return fetchChart(year, month, day, chartType).catch((err: unknown) => {
-        winLogger.error({
-          err, year, month, day, chartType,
-        });
-        return [];
-      });
-    }));
-    return chunkResults.flat();
-  }));
-
-  return result.flat();
-}
-
-export async function fetchAdditionalInformationOfTrack(trackID:string) {
-  const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
-  const html = await getHtml(url);
-  const $ = cheerio.load(html);
-  // eslint-disable-next-line func-names
-  const releaseDateText = $('dt').filter(function () {
-    return $(this).text().trim() === '발매일';
-  }).next('dd').text()
-    .trim();
-  const releaseDate = new Date(releaseDateText.split('.').join('-'));
-  const trackImage = $('div.thumb img').attr('src');
-  const lyrics = $('div.lyric').text();
-  if (!(trackImage && lyrics)) {
-    winLogger.warn('Fail extract trackImage or lyrics', {
-      trackID, lyrics, trackImage, releaseDate,
-    });
-    throw new Error(`Fail extract trackImage or lyrics  from trackID: ${trackID}`);
-  }
-
-  return { releaseDate, trackImage, lyrics };
-}
-
-export async function fetchArtistInfo(artistID:string) {
-  const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
-  const html = await getHtml(url);
-  const $ = cheerio.load(html);
-  const artistImage = $('span#artistImgArea img').attr('src') || null;
-  const candi1 = $('span.gubun').text().trim();
-  const candi2 = $('dd.debut_song').text().trim();
-  const candi3 = $('dd.debut_song span.ellipsis').contents().first().text()
-    .trim();
-
-  let debut = null;
-  if (isValidDate(candi1)) {
-    debut = candi1;
-  } else if (isValidDate(candi3)) {
-    debut = candi3;
-  } else {
-    const possibleDate = (candi2.split('\n')[0] as string).trim();
-    if (isValidDate(possibleDate)) {
-      debut = possibleDate;
+  public async fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize = 10) {
+    const copiedStartDate = new Date(startDate);
+    const copiedEndDate = new Date(endDate);
+    if (chunkSize > 31) {
+      throw Error('max 30');
     }
-  }
-  if (!artistImage) {
-    winLogger.warn('artistImage', { artistImage });
-    throw new Error(`Fail extract artistImage from artistID ${artistID}`);
+    const dates = generateDatesForChartType(copiedStartDate, copiedEndDate, chartType);
+    const dateChunks = _.chunk(dates, chunkSize);
+    const result = await Promise.all(dateChunks.map(async (chunk) => {
+      const chunkResults = await Promise.all(chunk.map((date) => {
+        const { year, month, day } = extractYearMonthDay(date);
+        return this.fetchChart(year, month, day, chartType).catch((err: unknown) => {
+          winLogger.error({
+            err, year, month, day, chartType,
+          });
+          return [];
+        });
+      }));
+      return chunkResults.flat();
+    }));
+
+    return result.flat();
   }
 
-  if (!debut) {
-    winLogger.warn('debug', { debut });
-    throw new Error(`Fail extract debut from artistID ${artistID}`);
+  public async fetchAddInfoOfTrack(trackID:string) {
+    const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
+    const html = await getHtml(url);
+    const $ = cheerio.load(html);
+    // eslint-disable-next-line func-names
+    const releaseDateText = $('dt').filter(function () {
+      return $(this).text().trim() === '발매일';
+    }).next('dd').text()
+      .trim();
+    const releaseDate = new Date(releaseDateText.split('.').join('-'));
+    const trackImage = $('div.thumb img').attr('src');
+    const lyrics = $('div.lyric').text();
+    if (!(trackImage && lyrics)) {
+      winLogger.warn('Fail extract trackImage or lyrics', {
+        trackID, lyrics, trackImage, releaseDate,
+      });
+      throw new Error(`Fail extract trackImage or lyrics  from trackID: ${trackID}`);
+    }
+
+    return { releaseDate, trackImage, lyrics };
   }
 
-  return { artistImage, debut };
+  public async fetchAddInfoOArtist(artistID:string) {
+    const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
+    const html = await getHtml(url);
+    const $ = cheerio.load(html);
+    const artistImage = $('span#artistImgArea img').attr('src') || null;
+    const candi1 = $('span.gubun').text().trim();
+    const candi2 = $('dd.debut_song').text().trim();
+    const candi3 = $('dd.debut_song span.ellipsis').contents().first().text()
+      .trim();
+
+    let debut = null;
+    if (isValidDate(candi1)) {
+      debut = candi1;
+    } else if (isValidDate(candi3)) {
+      debut = candi3;
+    } else {
+      const possibleDate = (candi2.split('\n')[0] as string).trim();
+      if (isValidDate(possibleDate)) {
+        debut = possibleDate;
+      }
+    }
+    if (!artistImage) {
+      winLogger.warn('artistImage', { artistImage });
+      throw new Error(`Fail extract artistImage from artistID ${artistID}`);
+    }
+
+    if (!debut) {
+      winLogger.warn('debug', { debut });
+      throw new Error(`Fail extract debut from artistID ${artistID}`);
+    }
+
+    return { artistImage, debut };
+  }
 }
 
 // export async function fetchRealTimeChart() {
@@ -247,3 +243,5 @@ export async function fetchArtistInfo(artistID:string) {
 //   const chartDetails = await makeChartDetails(url, options, 'now');
 //   return chartDetails;
 // }
+
+export default new Melon();
