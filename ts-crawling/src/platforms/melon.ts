@@ -1,5 +1,9 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-len */
+
+// import type{
+//   Element,
+// } from 'node_modules/.pnpm/domhandler@5.0.3/node_modules/domhandler/lib/esm/index.d.ts';
 import * as cheerio from 'cheerio';
 import _ from 'lodash';
 import {
@@ -16,9 +20,10 @@ import type {
   FetchWeeklyChartResult,
   FetchMonthlyChartResult,
   PlatformModule,
+  Artist,
 } from 'src/types';
 
-type MelonChartType ='WE' | 'MO' |'NO'
+type MelonChartType ='WE' | 'MO'
 
 const ERRORS = {
   CHART_WE: 'The Melon weekly chart has been available since January 3, 2010.',
@@ -72,12 +77,44 @@ function isValidDate(dateString:string) {
 export class Melon implements PlatformModule {
   public readonly platformName = 'melon';
 
-  private makeChartDetails(melonHtml:string) :ChartDetail[] {
-    const $ = cheerio.load(melonHtml);
+  private async fetchIndividualArtistIDs(groupedArtistID: string): Promise<Artist[]> {
+    const url = `https://www.melon.com/artist/timeline.htm?artistId=${groupedArtistID}`;
+    const html = await getHtml(url);
+    const $ = cheerio.load(html);
+
+    const artists: Artist[] = [];
+
+    // '.wrap_atistname' 클래스 내부의 아티스트 정보를 순회하며 추출
+    $('.wrap_atistname a.atistname').each((_i, element) => {
+      const artistName = $(element).find('span').first().text()
+        .trim();
+      const artistIDMatch = $(element).attr('href')?.match(/goArtistDetail\((\d+)\)/);
+      const artistID = artistIDMatch ? artistIDMatch[1] : '';
+      const artistKeyword = extractKeyword(artistName) as string;
+
+      if (artistID && artistName) {
+        artists.push({ artistName, artistID, artistKeyword });
+      }
+    });
+
+    if (artists.length === 0) {
+      winLogger.warn('No individual artists found for groupedArtistID:', groupedArtistID);
+      // throw new Error(`No individual artists found for groupedArtistID: ${groupedArtistID}`);
+    }
+    return artists;
+  }
+
+  private async makeChartDetails(htmlContents: string): Promise<ChartDetail[]> {
+    const $ = cheerio.load(htmlContents);
     const songSelectors = $('tr.lst50, tr.lst100');
-    const chartDetails = songSelectors.map((_i, element) => {
+
+    // 각 트랙의 상세 정보를 비동기적으로 처리하는 부분
+    const chartDetailsPromises = songSelectors.map(async (_i, element) => {
       const rank = $(element).find('span.rank').text().match(/\d+/)?.[0];
       const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
+      const trackID = $(element).find('input.input_check').val();
+      const titleKeyword = extractKeyword(title);
+
       const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
       const artistNames = artistElements.text().trim().split(',');
       const artistIDs = artistElements.find('a').map((_i, el) => {
@@ -91,18 +128,30 @@ export class Melon implements PlatformModule {
         }
         return match;
       }).get();
-      const artists = artistNames.map((artistName, index) => ({
+
+      // 각 아티스트의 이름과 ID를 매핑
+      let artists = artistNames.map((artistName, index) => ({
         artistName: artistName.trim(),
         artistKeyword: extractKeyword(artistName),
         artistID: artistIDs[index],
       }));
-      const trackID = $(element).find('input.input_check').val();
-      const titleKeyword = extractKeyword(title);
+
+      // (,로 구분되어 여러명이 참여하지만 하나의 그룹으로 분류된 경우)
+      if (artists.some((artist) => artist.artistID === undefined && artistNames.length > 1)) {
+        artists = await this.fetchIndividualArtistIDs(artists[0]?.artistID as string);
+      }
+
       return {
         rank, title, titleKeyword, artists, trackID,
       };
-    }).get();
+    }).get(); // .get()은 cheerio에서 비동기 맵핑한 결과를 배열로 반환
+
+    // 모든 비동기 작업을 완료할 때까지 기다림
+    const chartDetails = await Promise.all(chartDetailsPromises);
+
+    // 유효성 검사
     validateChartDetails(chartDetails);
+
     return chartDetails;
   }
 
@@ -139,10 +188,12 @@ export class Melon implements PlatformModule {
       };
 
     const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age.toString()}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
-    const melonHtml = await getHtml(url, options);
-    const chartDetails = this.makeChartDetails(melonHtml);
 
-    // chartScope 타입에 따라 반환값을 명확하게 구분
+    const melonHtml = await getHtml(url, options);
+    // const $ = cheerio.load(melonHtml);
+    // const songSelectors = $('tr.lst50, tr.lst100');
+    const chartDetails = await this.makeChartDetails(melonHtml);
+
     if (validateChartType === 'WE') {
       return {
         chartDetails: chartDetails.filter((item) => item.title),
@@ -183,7 +234,7 @@ export class Melon implements PlatformModule {
 
   public async fetchAddInfoOfTrack(trackID:string) {
     const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
-    const html = await getHtml(url);
+    const html = await getHtml(url, options);
     const $ = cheerio.load(html);
     // eslint-disable-next-line func-names
     const releaseDateText = $('dt').filter(function () {
@@ -224,24 +275,22 @@ export class Melon implements PlatformModule {
         debut = possibleDate;
       }
     }
-    if (!artistImage) {
-      winLogger.warn('artistImage', { artistImage });
-      throw new Error(`Fail extract artistImage from artistID ${artistID}`);
-    }
+    if (!artistImage || !debut) {
+      const missingFields = {
+        artistImage: artistImage || 'missing',
+        debut: debut || 'missing',
+      };
 
-    if (!debut) {
-      winLogger.warn('debug', { debut });
-      throw new Error(`Fail extract debut from artistID ${artistID}`);
+      winLogger.warn('Missing required artist information', {
+        artistID,
+        ...missingFields,
+      });
+
+      throw new Error(`Fail extract artist information from artistID ${artistID}`);
     }
 
     return { artistImage, debut };
   }
 }
-
-// export async function fetchRealTimeChart() {
-//   const url = 'https://www.melon.com/chart/index.htm';
-//   const chartDetails = await makeChartDetails(url, options, 'now');
-//   return chartDetails;
-// }
 
 export default new Melon();

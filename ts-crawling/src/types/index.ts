@@ -1,4 +1,4 @@
-export type ChartType ='m' |'w'|'n'
+export type ChartType ='m' |'w'|'d'|'n'
 export type PlatformName ='melon' | 'genie' | 'bugs'
 
 export type WeekOfMonth ={
@@ -12,6 +12,7 @@ export type Track ={
     title:string
     titleKeyword:string
     trackID:string
+    albumID?:string
 }
 export type TrackAddInfo ={
     releaseDate:Date
@@ -35,12 +36,12 @@ export type WeeklyChartScope ={
     startDate:Date
     endDate :Date
     weekOfMonth:WeekOfMonth
-    chartType:ChartType
+    chartType:'w'
 }
 
 export type MonthlyChartScope ={
     date :Date
-    chartType:ChartType
+    chartType:'m'
 }
 
 export type FetchWeeklyChartResult ={
@@ -59,6 +60,6 @@ export interface PlatformModule {
     readonly platformName:PlatformName
     fetchChart(year:string, month:string, day:string, chartType:ChartType):Promise<FetchMonthlyChartResult|FetchWeeklyChartResult>
     fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize :number):Promise<(FetchMonthlyChartResult|FetchWeeklyChartResult)[]>
-    fetchAddInfoOfTrack(trackID:string):Promise<TrackAddInfo>
+    fetchAddInfoOfTrack(trackID: string, albumID?: string): Promise<TrackAddInfo>; // 첫 번째 오버로드 시그니처
     fetchAddInfoOArtist(artistID:string): Promise<ArtistAddInfo>
 }
