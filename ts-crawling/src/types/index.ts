@@ -32,6 +32,11 @@ export type ArtistAddInfo ={
 
 export type ChartDetail = Track &{artists:Artist[]}
 
+export type DailyChartScope ={
+    date :Date
+    chartType:'d'
+}
+
 export type WeeklyChartScope ={
     startDate:Date
     endDate :Date
@@ -42,6 +47,12 @@ export type WeeklyChartScope ={
 export type MonthlyChartScope ={
     date :Date
     chartType:'m'
+}
+
+export type FetchDailyChartResult ={
+    platform: PlatformName
+    chartScope:DailyChartScope
+    chartDetails:ChartDetail[]
 }
 
 export type FetchWeeklyChartResult ={
@@ -58,8 +69,8 @@ export type FetchMonthlyChartResult ={
 
 export interface PlatformModule {
     readonly platformName:PlatformName
-    fetchChart(year:string, month:string, day:string, chartType:ChartType):Promise<FetchMonthlyChartResult|FetchWeeklyChartResult>
-    fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize :number):Promise<(FetchMonthlyChartResult|FetchWeeklyChartResult)[]>
+    fetchChart(year:string, month:string, day:string, chartType:ChartType):Promise<FetchMonthlyChartResult|FetchWeeklyChartResult |FetchDailyChartResult>
+    fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize :number):Promise<FetchMonthlyChartResult[]|FetchWeeklyChartResult[]|FetchDailyChartResult[]>
     fetchAddInfoOfTrack(trackID: string, albumID?: string): Promise<TrackAddInfo>; // 첫 번째 오버로드 시그니처
     fetchAddInfoOArtist(artistID:string): Promise<ArtistAddInfo>
 }

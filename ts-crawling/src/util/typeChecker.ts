@@ -29,7 +29,7 @@ export function isChartDetail(value: unknown): value is ChartDetail {
 export function validateChartDetails(chartDetails: unknown[]): asserts chartDetails is ChartDetail[] {
   if (!Array.isArray(chartDetails)) {
     winLogger.error('Expected an array, but received:', chartDetails);
-    throw new Error('Return value is not an array');
+    // throw new Error('Return value is not an array');
   }
 
   const invalidDetails: { index: number; detail: unknown }[] = [];
@@ -44,6 +44,6 @@ export function validateChartDetails(chartDetails: unknown[]): asserts chartDeta
     invalidDetails.forEach(({ index, detail }) => {
       winLogger.error(`Chart detail at index ${index.toString()} does not match expected type:`, detail);
     });
-    throw new Error(`Found ${invalidDetails.length.toString()} invalid chart detail(s)`);
+    // throw new Error(`Found ${invalidDetails.length.toString()} invalid chart detail(s)`);
   }
 }

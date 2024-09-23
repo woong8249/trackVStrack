@@ -8,7 +8,7 @@ import * as cheerio from 'cheerio';
 import _ from 'lodash';
 import {
   calculateWeekOfMonth,
-  createAllDatesBetween,
+  // createAllDatesBetween,
   createMonthlyFirstDatesBetween, createWeeklyDatesBetween, extractYearMonthDay,
 } from '../util/time';
 import extractKeyword from '../util/regex';
@@ -242,9 +242,7 @@ export class Genie implements PlatformModule {
       throw Error('max 30');
     }
     let dates;
-    if (chartType === 'd') {
-      dates = createAllDatesBetween(copiedStartDate, copiedEndDate);
-    } else if (chartType === 'w') {
+    if (chartType === 'w') {
       dates = createWeeklyDatesBetween(copiedStartDate, copiedEndDate, 1);
     } else if (chartType === 'm') {
       dates = createMonthlyFirstDatesBetween(copiedStartDate, copiedEndDate);
@@ -253,29 +251,28 @@ export class Genie implements PlatformModule {
     }
 
     const dateChunks = _.chunk(dates, chunkSize);
-    const result: (FetchWeeklyChartResult | FetchMonthlyChartResult)[] = [];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const chunk of dateChunks) {
-      // eslint-disable-next-line no-await-in-loop
-      const chunkResults = await Promise.all(
-        chunk.map(async (date) => {
-          try {
+    const result = await Promise.all(
+      dateChunks.map(async (chunk) => {
+        const chunkResults = await Promise.all(
+          chunk.map((date) => {
             const { year, month, day } = extractYearMonthDay(date);
-            return await this.fetchChart(year, month, day, chartType);
-          } catch (err: unknown) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            winLogger.error(`Error fetching chart for date: ${date}`, err);
-            return null; // null 반환 후 필터링 처리
-          }
-        }),
-      );
-
-      // null 값을 제거하고 배열에 추가
-      result.push(...chunkResults.filter((r): r is FetchWeeklyChartResult | FetchMonthlyChartResult => r !== null));
+            return this.fetchChart(year, month, day, chartType).catch(
+              (err: unknown) => {
+                winLogger.error({
+                  err, year, month, day, chartType,
+                });
+                return []; // 에러 발생 시 빈 배열 반환
+              },
+            );
+          }),
+        );
+        return chunkResults.flat();
+      }),
+    );
+    if (chartType === 'w') {
+      return result.flat() as FetchWeeklyChartResult[];
     }
-
-    return result;
+    return result.flat() as FetchMonthlyChartResult[];
   }
 
   async fetchAddInfoOfTrack(trackID: string, albumID: string) {
@@ -329,8 +326,8 @@ export class Genie implements PlatformModule {
     const url = `https://www.genie.co.kr/detail/artistInfo?xxnm=${artistID}`;
     const html = await getHtml(url);
     const $ = cheerio.load(html);
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const artistImage = $('div.photo-zone a').attr('href') ? `https:${$('div.photo-zone a').attr('href')}` : null;
+
+    const artistImage = $('div.photo-zone a').attr('href') as string;
     // eslint-disable-next-line func-names
     const debutInfo = $('li').filter(function () {
       return $(this).find('img').attr('alt') === '데뷔';
@@ -338,20 +335,18 @@ export class Genie implements PlatformModule {
       .trim();
 
     const debutMatch = debutInfo.match(/\d{4}/);
-    const debut = debutMatch ? debutMatch[0] : null;
+    const debut = debutMatch ? debutMatch[0] : 'missing';
 
     if (!artistImage || !debut) {
       const missingFields = {
-        artistImage: artistImage || 'missing',
-        debut: debut || 'missing',
+        artistImage,
+        debut,
       };
 
       winLogger.warn('Missing required artist information', {
         artistID,
         ...missingFields,
       });
-
-      throw new Error(`Fail extract artist information from artistID ${artistID}`);
     }
     return { artistImage, debut };
   }

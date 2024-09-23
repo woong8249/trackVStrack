@@ -140,16 +140,11 @@ export class Melon implements PlatformModule {
       if (artists.some((artist) => artist.artistID === undefined && artistNames.length > 1)) {
         artists = await this.fetchIndividualArtistIDs(artists[0]?.artistID as string);
       }
-
       return {
         rank, title, titleKeyword, artists, trackID,
       };
-    }).get(); // .get()은 cheerio에서 비동기 맵핑한 결과를 배열로 반환
-
-    // 모든 비동기 작업을 완료할 때까지 기다림
+    }).get();
     const chartDetails = await Promise.all(chartDetailsPromises);
-
-    // 유효성 검사
     validateChartDetails(chartDetails);
 
     return chartDetails;
@@ -159,12 +154,7 @@ export class Melon implements PlatformModule {
   - The Melon weekly chart has been available since January 3, 2010.
   - The Melon monthly chart has been available since January 1, 2010.
  */
-  public async fetchChart(
-    year: string,
-    month: string,
-    day: string,
-    chartType: ChartType,
-  ): Promise<FetchMonthlyChartResult | FetchWeeklyChartResult> {
+  public async fetchChart(year: string, month: string, day: string, chartType: ChartType): Promise<FetchMonthlyChartResult | FetchWeeklyChartResult> {
     const validateChartType = standardizeChartType(chartType);
     validateDateAvailability(year, month, day, validateChartType);
     const age = Math.floor(Number(year) / 10) * 10;
@@ -188,10 +178,7 @@ export class Melon implements PlatformModule {
       };
 
     const url = `https://www.melon.com/chart/search/list.htm?chartType=${validateChartType}&age=${age.toString()}&year=${year}&mon=${month}&day=${startDay}^${endDay}&classCd=DP0000&startDay=${startDay}&endDay=${endDay}&moved=Y`;
-
     const melonHtml = await getHtml(url, options);
-    // const $ = cheerio.load(melonHtml);
-    // const songSelectors = $('tr.lst50, tr.lst100');
     const chartDetails = await this.makeChartDetails(melonHtml);
 
     if (validateChartType === 'WE') {
@@ -208,7 +195,7 @@ export class Melon implements PlatformModule {
     };
   }
 
-  public async fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize = 10) {
+  public async fetchChartsInParallel(startDate: Date, endDate: Date, chartType: ChartType, chunkSize = 10): Promise<FetchWeeklyChartResult[] | FetchMonthlyChartResult[]> {
     const copiedStartDate = new Date(startDate);
     const copiedEndDate = new Date(endDate);
     if (chunkSize > 31) {
@@ -216,20 +203,30 @@ export class Melon implements PlatformModule {
     }
     const dates = generateDatesForChartType(copiedStartDate, copiedEndDate, chartType);
     const dateChunks = _.chunk(dates, chunkSize);
-    const result = await Promise.all(dateChunks.map(async (chunk) => {
-      const chunkResults = await Promise.all(chunk.map((date) => {
-        const { year, month, day } = extractYearMonthDay(date);
-        return this.fetchChart(year, month, day, chartType).catch((err: unknown) => {
-          winLogger.error({
-            err, year, month, day, chartType,
-          });
-          return [];
-        });
-      }));
-      return chunkResults.flat();
-    }));
 
-    return result.flat();
+    const result = await Promise.all(
+      dateChunks.map(async (chunk) => {
+        const chunkResults = await Promise.all(
+          chunk.map((date) => {
+            const { year, month, day } = extractYearMonthDay(date);
+            return this.fetchChart(year, month, day, chartType).catch(
+              (err: unknown) => {
+                winLogger.error({
+                  err, year, month, day, chartType,
+                });
+                return []; // 에러 발생 시 빈 배열 반환
+              },
+            );
+          }),
+        );
+        return chunkResults.flat();
+      }),
+    );
+    if (chartType === 'w') {
+      return result.flat() as FetchWeeklyChartResult[];
+    }
+
+    return result.flat() as FetchMonthlyChartResult[];
   }
 
   public async fetchAddInfoOfTrack(trackID:string) {
