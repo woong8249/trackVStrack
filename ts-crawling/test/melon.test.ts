@@ -7,7 +7,7 @@ import melon from '../src/platforms/melon';
 
 import type {
   MonthlyChartScope, WeeklyChartScope, FetchWeeklyChartResult, FetchMonthlyChartResult,
-} from '../src/types';
+} from '../src/types/platform';
 import { getRandomDateRange, moveToNearestFutureDay } from './util';
 import { extractYearMonthDay } from '../src/util/time';
 

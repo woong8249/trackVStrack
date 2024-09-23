@@ -7,7 +7,7 @@ import genie from '../src/platforms/genie';
 import { extractYearMonthDay } from '../src/util/time';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util';
-import type { FetchMonthlyChartResult, FetchWeeklyChartResult } from '../src/types';
+import type { FetchMonthlyChartResult, FetchWeeklyChartResult } from '../src/types/platform';
 
 // Genie's weekly chart has been based on Mondays since March 25, 2012, up to the present.
 describe('The fetchChart func Test', () => {

@@ -14,7 +14,7 @@ import type {
   DailyChartScope,
   Artist,
   // Artist,
-} from 'src/types';
+} from 'src/types/platform';
 
 import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';

@@ -21,7 +21,7 @@ import type {
   FetchMonthlyChartResult,
   PlatformModule,
   Artist,
-} from 'src/types';
+} from 'src/types/platform';
 
 type GenieChartType = 'W' |'M'
 

@@ -7,7 +7,7 @@ import bugs from '../src/platforms/bugs';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
-import type { FetchDailyChartResult, FetchWeeklyChartResult } from 'src/types';
+import type { FetchDailyChartResult, FetchWeeklyChartResult } from 'src/types/platform';
 
 describe('The fetchChart func Test', () => {
   it('The Bugs daily chart has been available since September 22, 2006. So fetchChart(\'2006\', \'03\', \'21\', \'d\') is going to throw Error.', async () => {

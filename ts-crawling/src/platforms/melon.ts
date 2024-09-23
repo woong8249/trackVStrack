@@ -1,9 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-len */
 
-// import type{
-//   Element,
-// } from 'node_modules/.pnpm/domhandler@5.0.3/node_modules/domhandler/lib/esm/index.d.ts';
 import * as cheerio from 'cheerio';
 import _ from 'lodash';
 import {
@@ -21,7 +18,7 @@ import type {
   FetchMonthlyChartResult,
   PlatformModule,
   Artist,
-} from 'src/types';
+} from 'src/types/platform';
 
 type MelonChartType ='WE' | 'MO'
 
