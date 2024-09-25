@@ -1,11 +1,11 @@
-import type { ChartDetail, Track, Artist } from '../types';
+import type { ChartDetail, Track, Artist } from '../types/fetch';
 import winLogger from '../logger/winston';
 
 export function isTrack(value: unknown): value is Track {
   // 먼저 value가 객체인지 확인
   if (typeof value === 'object' && value !== null) {
     return typeof (value as Track).rank === 'string'
-          && typeof (value as Track).title === 'string'
+          && typeof (value as Track).titleName === 'string'
           && typeof (value as Track).titleKeyword === 'string'
           && typeof (value as Track).trackID === 'string';
   }

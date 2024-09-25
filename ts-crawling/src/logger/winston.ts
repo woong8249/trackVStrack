@@ -8,7 +8,7 @@ const { logLevel } = config.app;
 const winLogger = createLogger({
   level: logLevel,
   format: format.combine(
-    format.errors({ stack: true }),
+    format.errors({ stack: false, exitOnError: false }),
     format.splat(),
   ),
   transports: [

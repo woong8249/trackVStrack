@@ -1,4 +1,4 @@
-import type { WeekOfMonth } from 'src/types/platform';
+import type { WeekOfMonth } from 'src/types/fetch';
 
 export function createAllDatesBetween(startDate :Date, endDate:Date) {
   const dates = [];

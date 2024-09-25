@@ -16,12 +16,13 @@ import { getHtml } from '../util/fetch';
 import winLogger from '../logger/winston';
 import { validateChartDetails } from '../util/typeChecker';
 import type {
-  ChartDetail, WeeklyChartScope, ChartType, MonthlyChartScope,
+  ChartDetail, WeeklyChartScope, MonthlyChartScope,
   FetchWeeklyChartResult,
   FetchMonthlyChartResult,
-  PlatformModule,
   Artist,
-} from 'src/types/platform';
+} from 'src/types/fetch';
+import type { PlatformModule } from 'src/types/platform';
+import type { ChartType } from 'src/types/common';
 
 type GenieChartType = 'W' |'M'
 
@@ -94,25 +95,25 @@ export class Genie implements PlatformModule {
 
   private extractCommonData($: cheerio.CheerioAPI, element: Element): Omit<ChartDetail, 'artists'> {
     const rank = $(element).find('td.number').text().match(/\d+/)?.[0] || '';
-    const title = $(element).find('td.info a.title')
+    const titleName = $(element).find('td.info a.title')
       .children('span.icon-19')
       .remove()
       .end()
       .text()
       .trim();
     const trackID = $(element).attr('songid') || '';
-    const titleKeyword = extractKeyword(title) as string;
+    const titleKeyword = extractKeyword(titleName) as string;
     const albumID = $(element).find('td a.cover span.mask').attr('onclick')?.match(/\d+/)?.[0] || '';
 
     return {
-      rank, title, titleKeyword, trackID, albumID,
+      rank, titleName, titleKeyword, trackID, albumID,
     };
   }
 
   private makeChartDetailsSync(bodyList: cheerio.Cheerio<Element>, $: cheerio.CheerioAPI):ChartDetail[] {
     const chartDetails = bodyList.map((_i, element) => {
       const {
-        rank, title, titleKeyword, trackID, albumID,
+        rank, titleName, titleKeyword, trackID, albumID,
       } = this.extractCommonData($, element);
 
       const artistNames = $(element).find('a.artist.ellipsis').text().split('&')
@@ -123,7 +124,7 @@ export class Genie implements PlatformModule {
       const artists = [{ artistName: artistNames[0] as string, artistID }];
 
       return {
-        rank, title, titleKeyword, trackID, artists, albumID,
+        rank, titleName, titleKeyword, trackID, artists, albumID,
       };
     }).get();
 
@@ -134,14 +135,14 @@ export class Genie implements PlatformModule {
   private async makeChartDetails(bodyList: cheerio.Cheerio<Element>, $: cheerio.CheerioAPI):Promise<ChartDetail[]> {
     const chartDetailsMap = bodyList.map(async (_i, element) => {
       const {
-        rank, title, titleKeyword, trackID, albumID,
+        rank, titleName, titleKeyword, trackID, albumID,
       } = this.extractCommonData($, element);
 
       const artistNames = $(element).find('a.artist.ellipsis').text().split('&')
         .map((item) => item.trim());
       if (artistNames.length === 0) {
         winLogger.error('check', {
-          rank, title, titleKeyword, trackID, albumID,
+          rank, titleName, titleKeyword, trackID, albumID,
         });
       }
       const artistKeywords = extractKeyword(artistNames);
@@ -154,16 +155,16 @@ export class Genie implements PlatformModule {
           if (artists.length === 0) {
             const artists = [{ artistName: artistNames[0] as string, artistKeyword: artistKeywords[0], artistID: groupedArtistID }];
             return {
-              rank, title, titleKeyword, trackID, albumID, artists,
+              rank, titleName, titleKeyword, trackID, albumID, artists,
             };
           }
           return {
-            rank, title, titleKeyword, trackID, artists, albumID,
+            rank, titleName, titleKeyword, trackID, artists, albumID,
           };
         });
       }
       return {
-        rank, title, titleKeyword, trackID, albumID, artists: [{ artistName: artistNames[0], artistID: groupedArtistID, artistKeyword: artistKeywords[0] }],
+        rank, titleName, titleKeyword, trackID, albumID, artists: [{ artistName: artistNames[0], artistID: groupedArtistID, artistKeyword: artistKeywords[0] }],
       };
     }).get();
     const chartDetails = await Promise.all(chartDetailsMap);
@@ -220,7 +221,7 @@ export class Genie implements PlatformModule {
     const chartDetails = hasGroupedArtistID ? await this.makeChartDetails(bodyList, $) : this.makeChartDetailsSync(bodyList, $);
 
     const result = {
-      chartDetails: chartDetails.filter((item) => item.title),
+      chartDetails: chartDetails.filter((item) => item.titleName),
       chartScope,
       platform: this.platformName,
     } as FetchWeeklyChartResult | FetchMonthlyChartResult;
@@ -282,28 +283,14 @@ export class Genie implements PlatformModule {
     const $ = cheerio.load(html);
     const $2 = cheerio.load(html2);
     const lyrics = $2('pre#pLyrics p').text().trim();
-
-    // 발매일을 찾아 Date로 변환
-    const releaseDateText = $('.info-data li')
+    const releaseDate = $('.info-data li')
       // eslint-disable-next-line func-names
       .filter(function () {
         return $(this).find('img').attr('alt') === '발매일';
       }).find('.value').text()
-      .trim();
-
-    let releaseDate: Date;
-    if (releaseDateText) {
-      const formattedDate = releaseDateText.split('.').join('-'); // "2022.01.01" -> "2022-01-01"
-      releaseDate = new Date(formattedDate);
-
-      // 날짜 형식이 잘못된 경우 예외 처리
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(releaseDate.getTime())) {
-        throw new Error(`Invalid release date: ${releaseDateText}`);
-      }
-    } else {
-      throw new Error('Release date not found');
-    }
+      .trim()
+      .split('.')
+      .join('-'); // "2022.01.01" -> "2022-01-01"
 
     // 트랙 이미지를 처리
     let trackImage = $('div.album-detail-infos img').attr('src') as string;
@@ -322,12 +309,15 @@ export class Genie implements PlatformModule {
     return { releaseDate, trackImage, lyrics };
   }
 
-  async fetchAddInfoOArtist(artistID:string) {
+  async fetchAddInfoOfArtist(artistID:string) {
     const url = `https://www.genie.co.kr/detail/artistInfo?xxnm=${artistID}`;
     const html = await getHtml(url);
     const $ = cheerio.load(html);
 
-    const artistImage = $('div.photo-zone a').attr('href') as string;
+    let artistImage = $('div.photo-zone a').attr('href') as string;
+    if (artistImage && !artistImage.startsWith('https:')) {
+      artistImage = `https:${artistImage}`;
+    }
     // eslint-disable-next-line func-names
     const debutInfo = $('li').filter(function () {
       return $(this).find('img').attr('alt') === '데뷔';
@@ -337,17 +327,26 @@ export class Genie implements PlatformModule {
     const debutMatch = debutInfo.match(/\d{4}/);
     const debut = debutMatch ? debutMatch[0] : 'missing';
 
-    if (!artistImage || !debut) {
+    if (artistImage === 'missing' || debut === 'missing') {
       const missingFields = {
         artistImage,
         debut,
+        url,
       };
 
-      winLogger.warn('Missing required artist information', {
-        artistID,
-        ...missingFields,
-      });
+      if (artistImage === 'missing') {
+        winLogger.error('Missing required artist information', {
+          artistID,
+          ...missingFields,
+        });
+      } else {
+        winLogger.warn('Missing required artist information', {
+          artistID,
+          ...missingFields,
+        });
+      }
     }
+
     return { artistImage, debut };
   }
 }

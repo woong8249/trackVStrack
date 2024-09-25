@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.7",
     "cheerio": "^1.0.0",
     "lodash": "^4.17.21",
     "winston": "^3.14.2",
@@ -23,6 +24,7 @@
     "@tsconfig/esm": "^1.0.5",
     "@tsconfig/node22": "^22.0.0",
     "@tsconfig/strictest": "^2.0.5",
+    "@types/axios": "^0.14.0",
     "@types/cheerio": "^0.22.35",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.5",

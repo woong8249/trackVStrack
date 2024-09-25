@@ -15,7 +15,7 @@ function required(key: string, defaultValue: undefined | string | number): strin
 
 const config = {
   app: {
-    logLevel: required('VITE_APP_LEVEL', 'info') as string,
+    logLevel: required('VITE_APP_LEVEL', 'debug') as string,
     env: required('VITE_APP_ENV', 'production') as string,
     port: Number(required('VITE_APP_PORT', '3000')),
   },

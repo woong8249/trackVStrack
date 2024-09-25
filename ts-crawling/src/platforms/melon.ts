@@ -13,12 +13,13 @@ import { getHtml } from '../util/fetch';
 import winLogger from '../logger/winston';
 import { validateChartDetails } from '../util/typeChecker';
 import type {
-  ChartDetail, WeeklyChartScope, ChartType, MonthlyChartScope,
+  ChartDetail, WeeklyChartScope, MonthlyChartScope,
   FetchWeeklyChartResult,
   FetchMonthlyChartResult,
-  PlatformModule,
   Artist,
-} from 'src/types/platform';
+} from 'src/types/fetch';
+import type { PlatformModule } from 'src/types/platform';
+import type { ChartType } from 'src/types/common';
 
 type MelonChartType ='WE' | 'MO'
 
@@ -108,9 +109,9 @@ export class Melon implements PlatformModule {
     // 각 트랙의 상세 정보를 비동기적으로 처리하는 부분
     const chartDetailsPromises = songSelectors.map(async (_i, element) => {
       const rank = $(element).find('span.rank').text().match(/\d+/)?.[0];
-      const title = $(element).find('div.ellipsis.rank01 strong').text().trim();
+      const titleName = $(element).find('div.ellipsis.rank01 strong').text().trim();
       const trackID = $(element).find('input.input_check').val();
-      const titleKeyword = extractKeyword(title);
+      const titleKeyword = extractKeyword(titleName);
 
       const artistElements = $(element).find('div.ellipsis.rank02 span.checkEllipsis');
       const artistNames = artistElements.text().trim().split(',');
@@ -138,7 +139,7 @@ export class Melon implements PlatformModule {
         artists = await this.fetchIndividualArtistIDs(artists[0]?.artistID as string);
       }
       return {
-        rank, title, titleKeyword, artists, trackID,
+        rank, titleName, titleKeyword, artists, trackID,
       };
     }).get();
     const chartDetails = await Promise.all(chartDetailsPromises);
@@ -180,13 +181,13 @@ export class Melon implements PlatformModule {
 
     if (validateChartType === 'WE') {
       return {
-        chartDetails: chartDetails.filter((item) => item.title),
+        chartDetails: chartDetails.filter((item) => item.titleName),
         chartScope: chartScope as WeeklyChartScope, // 타입 단언
         platform: 'melon',
       };
     }
     return {
-      chartDetails: chartDetails.filter((item) => item.title),
+      chartDetails: chartDetails.filter((item) => item.titleName),
       chartScope: chartScope as MonthlyChartScope, // 타입 단언
       platform: 'melon',
     };
@@ -222,7 +223,6 @@ export class Melon implements PlatformModule {
     if (chartType === 'w') {
       return result.flat() as FetchWeeklyChartResult[];
     }
-
     return result.flat() as FetchMonthlyChartResult[];
   }
 
@@ -234,31 +234,44 @@ export class Melon implements PlatformModule {
     const releaseDateText = $('dt').filter(function () {
       return $(this).text().trim() === '발매일';
     }).next('dd').text()
-      .trim();
-    const releaseDate = new Date(releaseDateText.split('.').join('-'));
-    const trackImage = $('div.thumb img').attr('src');
-    const lyrics = $('div.lyric').text();
-    if (!(trackImage && lyrics)) {
-      winLogger.warn('Fail extract trackImage or lyrics', {
-        trackID, lyrics, trackImage, releaseDate,
-      });
-      throw new Error(`Fail extract trackImage or lyrics  from trackID: ${trackID}`);
+      .trim() || '';
+    const releaseDate = releaseDateText.split('.').join('-');
+    const trackImage = $('div.thumb img').attr('src') || 'missing';
+    const lyrics = $('div.lyric').text().trim() || 'missing';
+    if (trackImage === 'missing' || lyrics === 'missing') {
+      const fields = {
+        trackID,
+        lyrics,
+        trackImage,
+        releaseDate,
+        url,
+      };
+
+      if (trackImage === 'missing') {
+        winLogger.error('Missing required artist information', {
+          ...fields,
+        });
+      } else {
+        winLogger.warn('Missing required artist information', {
+          ...fields,
+        });
+      }
     }
 
     return { releaseDate, trackImage, lyrics };
   }
 
-  public async fetchAddInfoOArtist(artistID:string) {
+  public async fetchAddInfoOfArtist(artistID:string) {
     const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
     const html = await getHtml(url);
     const $ = cheerio.load(html);
-    const artistImage = $('span#artistImgArea img').attr('src') || null;
+    const artistImage = $('span#artistImgArea img').attr('src') || 'missing';
     const candi1 = $('span.gubun').text().trim();
     const candi2 = $('dd.debut_song').text().trim();
     const candi3 = $('dd.debut_song span.ellipsis').contents().first().text()
       .trim();
 
-    let debut = null;
+    let debut;
     if (isValidDate(candi1)) {
       debut = candi1;
     } else if (isValidDate(candi3)) {
@@ -267,20 +280,28 @@ export class Melon implements PlatformModule {
       const possibleDate = (candi2.split('\n')[0] as string).trim();
       if (isValidDate(possibleDate)) {
         debut = possibleDate;
+      } else {
+        debut = 'missing';
       }
     }
-    if (!artistImage || !debut) {
+    if (artistImage === 'missing' || debut === 'missing') {
       const missingFields = {
-        artistImage: artistImage || 'missing',
-        debut: debut || 'missing',
+        artistImage,
+        debut,
+        url,
       };
 
-      winLogger.warn('Missing required artist information', {
-        artistID,
-        ...missingFields,
-      });
-
-      throw new Error(`Fail extract artist information from artistID ${artistID}`);
+      if (artistImage === 'missing') {
+        winLogger.error('Missing required artist information', {
+          artistID,
+          ...missingFields,
+        });
+      } else {
+        winLogger.warn('Missing required artist information', {
+          artistID,
+          ...missingFields,
+        });
+      }
     }
 
     return { artistImage, debut };

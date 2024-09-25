@@ -7,7 +7,7 @@ import melon from '../src/platforms/melon';
 
 import type {
   MonthlyChartScope, WeeklyChartScope, FetchWeeklyChartResult, FetchMonthlyChartResult,
-} from '../src/types/platform';
+} from '../src/types/fetch';
 import { getRandomDateRange, moveToNearestFutureDay } from './util';
 import { extractYearMonthDay } from '../src/util/time';
 
@@ -38,7 +38,7 @@ describe('Test func fetchChart', () => {
     expect(weekOfMonth).toHaveProperty('year');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(7);
   });
 
@@ -59,7 +59,7 @@ describe('Test func fetchChart', () => {
     expect(chartType).toBe('m');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(4);
   });
 });
@@ -91,7 +91,7 @@ describe('Test func fetchAdditionalInformationOfTrack', () => {
     const { releaseDate, trackImage, lyrics } = await melon.fetchAddInfoOfTrack('36713849');
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
     const isURL = urlPattern.test(trackImage);
-    expect(releaseDate.getTime()).toBe(new Date('2023-08-21').getTime());
+    expect(releaseDate).toBe('2023-08-21');
     expect(isURL).toBe(true);
     expect(lyrics.length > 100).toBe(true);
     expect.assertions(3);

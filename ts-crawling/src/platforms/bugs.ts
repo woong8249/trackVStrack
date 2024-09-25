@@ -1,3 +1,4 @@
+import type { PlatformModule } from '../types/platform';
 /* eslint-disable class-methods-use-this */
 import * as cheerio from 'cheerio';
 
@@ -7,14 +8,14 @@ import {
 } from '../util/time';
 import _ from 'lodash';
 import type {
-  ChartDetail, WeeklyChartScope, ChartType,
+  ChartDetail, WeeklyChartScope,
   FetchWeeklyChartResult,
-  PlatformModule,
   FetchDailyChartResult,
   DailyChartScope,
   Artist,
   // Artist,
-} from 'src/types/platform';
+} from 'src/types/fetch';
+import type { ChartType } from 'src/types/common';
 
 import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';
@@ -80,8 +81,8 @@ export class Bugs implements PlatformModule {
 
     const chartDetailsPromises = list.map((_i, element) => {
       const rank = $(element).find('div.ranking strong').text().trim();
-      const title = $(element).find('p.title a').text().trim();
-      const titleKeyword = extractKeyword(title);
+      const titleName = $(element).find('p.title a').text().trim();
+      const titleKeyword = extractKeyword(titleName);
       const albumID = $(element).attr('albumid');
       const trackID = $(element).attr('trackid');
 
@@ -110,7 +111,7 @@ export class Bugs implements PlatformModule {
       }
       return {
         rank,
-        title,
+        titleName,
         titleKeyword,
         artists,
         albumID,
@@ -118,7 +119,7 @@ export class Bugs implements PlatformModule {
       };
     }).get();
 
-    const chartDetails = (chartDetailsPromises).filter((chartD) => chartD.title);
+    const chartDetails = (chartDetailsPromises).filter((chartD) => chartD.titleName);
 
     // 유효성 검사
     validateChartDetails(chartDetails);
@@ -135,19 +136,19 @@ export class Bugs implements PlatformModule {
     const chartDetails = this.makeChartDetails(melonHtml);
     if (validateChartType === 'week') {
       return {
-        chartDetails: chartDetails.filter((item) => item.title),
+        chartDetails: chartDetails.filter((item) => item.titleName),
         chartScope: chartScope as WeeklyChartScope, // 타입 단언
         platform: 'bugs',
       };
     }
     return {
-      chartDetails: chartDetails.filter((item) => item.title),
+      chartDetails: chartDetails.filter((item) => item.titleName),
       chartScope: chartScope as unknown as DailyChartScope, // 타입 단언
       platform: 'bugs',
     };
   }
 
-  async fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize = 10):Promise<FetchWeeklyChartResult[] | FetchDailyChartResult[]> {
+  async fetchChartsInParallel(startDate:Date, endDate:Date, chartType:ChartType, chunkSize = 3):Promise<FetchWeeklyChartResult[] | FetchDailyChartResult[]> {
     const copiedStartDate = new Date(startDate);
     const copiedEndDate = new Date(endDate);
     if (chunkSize > 31) {
@@ -189,27 +190,35 @@ export class Bugs implements PlatformModule {
 
   async fetchAddInfoOfTrack(trackID:string, albumID:string) {
     const url = `https://music.bugs.co.kr/album/${albumID}`;
-    const url2 = `https://music.bugs.co.kr/track/${trackID}?wl_ref=list_tr_08_ab`;
-    const [html, html2] = await Promise.all([getHtml(url), getHtml(url2)]);
+    const url2 = `https://music.bugs.co.kr/track/${trackID}`;
+    winLogger.debug('start bugs fetchAddInfoOfTrack', {
+      trackID, albumID, url, url2,
+    });
+    const [html, html2] = await Promise.all([getHtml(url, { timeout: 60000 * 60 }), getHtml(url2, { timeout: 60000 * 60 })]);
+    winLogger.debug('success bugs fetchAddInfoOfTrack', {
+      trackID, albumID, url, url2,
+    });
     const $ = cheerio.load(html);
     const $2 = cheerio.load(html2);
     const lyrics = $2('div.lyricsContainer xmp').text().trim();
 
     const trackImage = $('div.innerContainer img').attr('src') as string;
     // eslint-disable-next-line func-names
-    const releaseDate = new Date($('table.info th').filter(function () {
+    const releaseDate = $('table.info th').filter(function () {
       return $(this).text().trim() === '발매일';
     }).next('td').find('time')
       .text()
       .trim()
       .split('.')
-      .join('-'));
+      .join('-');
     return { releaseDate, trackImage, lyrics };
   }
 
-  async fetchAddInfoOArtist(artistID:string) {
-    const url = `https://music.bugs.co.kr/artist/${artistID}?wl_ref=list_ar_01_search`;
-    const html = await getHtml(url);
+  async fetchAddInfoOfArtist(artistID:string) {
+    const url = `https://music.bugs.co.kr/artist/${artistID}`;
+    winLogger.debug('start bugs fetchAddInfoOfArtist', { artistID, url });
+    const html = await getHtml(url, { timeout: 60000 * 60 });
+    winLogger.debug('success bugs fetchAddInfoOfArtist', { artistID, url });
     const $ = cheerio.load(html);
     const artistImage = $('li.big img').attr('src') as string;
     // eslint-disable-next-line func-names
@@ -227,7 +236,7 @@ export class Bugs implements PlatformModule {
         artistID,
         ...missingFields,
       });
-      throw new Error(`Fail extract artist information from artistID ${artistID}`);
+      // throw new Error(`Fail extract artist information from artistID ${artistID}`);
     }
     return { artistImage, debut };
   }

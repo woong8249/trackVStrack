@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import globals from "globals";
 
 const filename = fileURLToPath(import.meta.url);
 const dirName = dirname(filename);
@@ -25,6 +24,17 @@ const defaultConfig = [
       ...tsPlugin.configs.base.rules,
       ...tsPlugin.configs['eslint-recommended'].rules,
       ...tsPlugin.configs['strict-type-checked'].rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
     settings: {
       'import/resolver': {
@@ -49,8 +59,13 @@ const customConfig = [
       'no-shadow': 'off',
       'no-underscore-dangle': ['error', { allow: ['__filename', '__dirname'] }],
       'max-len': ['error', { code: 200 }],
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "error",
+      'no-unused-vars': ['error', {
+        args: 'after-used',
+        caughtErrors: 'all',
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+        argsIgnorePattern: '^_',
+      }],
     },
   },
 ];

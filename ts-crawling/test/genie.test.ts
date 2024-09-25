@@ -7,7 +7,7 @@ import genie from '../src/platforms/genie';
 import { extractYearMonthDay } from '../src/util/time';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util';
-import type { FetchMonthlyChartResult, FetchWeeklyChartResult } from '../src/types/platform';
+import type { FetchMonthlyChartResult, FetchWeeklyChartResult } from '../src/types/fetch';
 
 // Genie's weekly chart has been based on Mondays since March 25, 2012, up to the present.
 describe('The fetchChart func Test', () => {
@@ -30,7 +30,7 @@ describe('The fetchChart func Test', () => {
     expect(weekOfMonth).toHaveProperty('year');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(7);
   });
 
@@ -50,7 +50,7 @@ describe('The fetchChart func Test', () => {
     expect(chartType).toBe('m');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(4);
   });
 });
@@ -82,7 +82,7 @@ describe('func fetchAdditionalInformationOfTrack', () => {
     const { releaseDate, trackImage, lyrics } = await genie.fetchAddInfoOfTrack('103151984', '84181610');
     const urlPattern = /^https?:\/\/[\w-]+(\.[\w-]+)+\/[\w-\\/]+\.JPG(\/[\w-]+\/[\w-]+\/[\w-]+,[\w-]+)?$/;
     const isURL = urlPattern.test(trackImage);
-    expect(releaseDate.getTime()).toBe(new Date('2023-08-21').getTime());
+    expect(releaseDate).toBe('2023-08-21');
     expect(isURL).toBe(true);
     expect(lyrics.length > 100).toBe(true);
     expect.assertions(3);
@@ -91,7 +91,7 @@ describe('func fetchAdditionalInformationOfTrack', () => {
 
 describe('Test ArtistInfo function', () => {
   it('ArtistInfo function', async () => {
-    const result = await genie.fetchAddInfoOArtist('82007551');
+    const result = await genie.fetchAddInfoOfArtist('82007551');
     expect(typeof (result.artistImage)).toBe('string');
     expect(typeof (result.debut)).toBe('string');
   });

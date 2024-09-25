@@ -7,7 +7,7 @@ import bugs from '../src/platforms/bugs';
 import { extractYearMonthDay } from '../src/util/time.js';
 
 import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
-import type { FetchDailyChartResult, FetchWeeklyChartResult } from 'src/types/platform';
+import type { FetchDailyChartResult, FetchWeeklyChartResult } from 'src/types/fetch';
 
 describe('The fetchChart func Test', () => {
   it('The Bugs daily chart has been available since September 22, 2006. So fetchChart(\'2006\', \'03\', \'21\', \'d\') is going to throw Error.', async () => {
@@ -27,7 +27,7 @@ describe('The fetchChart func Test', () => {
     expect(chartType).toBe('d');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(4);
   });
 
@@ -50,7 +50,7 @@ describe('The fetchChart func Test', () => {
     expect(weekOfMonth).toHaveProperty('year');
     expect(chartDetails[0]).toHaveProperty('rank');
     expect(chartDetails[0]).toHaveProperty('artists');
-    expect(chartDetails[0]).toHaveProperty('title');
+    expect(chartDetails[0]).toHaveProperty('titleName');
     expect.assertions(7);
   });
 });
@@ -81,7 +81,7 @@ describe('func fetchAdditionalInformationOfTrack', () => {
     const { releaseDate, trackImage, lyrics } = await bugs.fetchAddInfoOfTrack('6218218', '4091551');
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\\/?%&=]*)?$/;
     const isURL = urlPattern.test(trackImage);
-    expect(releaseDate.getTime()).toBe(new Date('2023-10-13').getTime());
+    expect(releaseDate).toBe('2023-10-13');
     expect(lyrics.length > 100).toBe(true);
     expect(isURL).toBe(true);
     expect.assertions(3);
