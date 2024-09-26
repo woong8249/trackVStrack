@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 /* eslint-disable max-len */
 
 import * as cheerio from 'cheerio';
@@ -11,7 +10,7 @@ import {
 import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';
 import winLogger from '../logger/winston';
-import { validateChartDetails } from '../util/typeChecker';
+import { checkFetchAddInfoOfArtist, checkFetchAddInfoOfTrack, validateChartDetails } from '../util/typeChecker';
 import type {
   ChartDetail, WeeklyChartScope, MonthlyChartScope,
   FetchWeeklyChartResult,
@@ -96,8 +95,7 @@ export class Melon implements PlatformModule {
     });
 
     if (artists.length === 0) {
-      winLogger.warn('No individual artists found for groupedArtistID:', groupedArtistID);
-      // throw new Error(`No individual artists found for groupedArtistID: ${groupedArtistID}`);
+      winLogger.warn(`No individual artists found for groupedArtistID in ${this.platformName}:`, groupedArtistID);
     }
     return artists;
   }
@@ -238,26 +236,15 @@ export class Melon implements PlatformModule {
     const releaseDate = releaseDateText.split('.').join('-');
     const trackImage = $('div.thumb img').attr('src') || 'missing';
     const lyrics = $('div.lyric').text().trim() || 'missing';
-    if (trackImage === 'missing' || lyrics === 'missing') {
-      const fields = {
-        trackID,
-        lyrics,
-        trackImage,
-        releaseDate,
-        url,
-      };
 
-      if (trackImage === 'missing') {
-        winLogger.error('Missing required artist information', {
-          ...fields,
-        });
-      } else {
-        winLogger.warn('Missing required artist information', {
-          ...fields,
-        });
-      }
-    }
-
+    const fields = {
+      trackID,
+      lyrics,
+      trackImage,
+      releaseDate,
+      url,
+    };
+    checkFetchAddInfoOfTrack(fields, this.platformName);
     return { releaseDate, trackImage, lyrics };
   }
 
@@ -284,25 +271,13 @@ export class Melon implements PlatformModule {
         debut = 'missing';
       }
     }
-    if (artistImage === 'missing' || debut === 'missing') {
-      const missingFields = {
-        artistImage,
-        debut,
-        url,
-      };
-
-      if (artistImage === 'missing') {
-        winLogger.error('Missing required artist information', {
-          artistID,
-          ...missingFields,
-        });
-      } else {
-        winLogger.warn('Missing required artist information', {
-          artistID,
-          ...missingFields,
-        });
-      }
-    }
+    const fields = {
+      artistImage,
+      debut,
+      url,
+      artistID,
+    };
+    checkFetchAddInfoOfArtist(fields, this.platformName);
 
     return { artistImage, debut };
   }

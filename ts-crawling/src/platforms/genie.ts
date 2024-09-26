@@ -14,7 +14,7 @@ import {
 import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';
 import winLogger from '../logger/winston';
-import { validateChartDetails } from '../util/typeChecker';
+import { checkFetchAddInfoOfArtist, checkFetchAddInfoOfTrack, validateChartDetails } from '../util/typeChecker';
 import type {
   ChartDetail, WeeklyChartScope, MonthlyChartScope,
   FetchWeeklyChartResult,
@@ -282,7 +282,7 @@ export class Genie implements PlatformModule {
     const [html, html2] = await Promise.all([getHtml(url), getHtml(url2)]);
     const $ = cheerio.load(html);
     const $2 = cheerio.load(html2);
-    const lyrics = $2('pre#pLyrics p').text().trim();
+    const lyrics = $2('pre#pLyrics p').text().trim() || 'missing';
     const releaseDate = $('.info-data li')
       // eslint-disable-next-line func-names
       .filter(function () {
@@ -290,22 +290,22 @@ export class Genie implements PlatformModule {
       }).find('.value').text()
       .trim()
       .split('.')
-      .join('-'); // "2022.01.01" -> "2022-01-01"
+      .join('-') || 'missing'; // "2022.01.01" -> "2022-01-01"
 
     // 트랙 이미지를 처리
-    let trackImage = $('div.album-detail-infos img').attr('src') as string;
+    let trackImage = $('div.album-detail-infos img').attr('src') || 'missing' as string;
     if (trackImage && !trackImage.startsWith('https:')) {
       trackImage = `https:${trackImage}`;
     }
 
-    // 트랙 이미지와 가사가 모두 있는지 확인
-    if (!(trackImage && lyrics)) {
-      winLogger.warn('Fail to extract trackImage or lyrics', {
-        trackID, lyrics, trackImage, releaseDate,
-      });
-      throw new Error(`Fail to extract trackImage or lyrics from trackID: ${trackID}`);
-    }
-
+    const fields = {
+      trackID,
+      lyrics,
+      trackImage,
+      releaseDate,
+      url,
+    };
+    checkFetchAddInfoOfTrack(fields, this.platformName);
     return { releaseDate, trackImage, lyrics };
   }
 
@@ -327,26 +327,13 @@ export class Genie implements PlatformModule {
     const debutMatch = debutInfo.match(/\d{4}/);
     const debut = debutMatch ? debutMatch[0] : 'missing';
 
-    if (artistImage === 'missing' || debut === 'missing') {
-      const missingFields = {
-        artistImage,
-        debut,
-        url,
-      };
-
-      if (artistImage === 'missing') {
-        winLogger.error('Missing required artist information', {
-          artistID,
-          ...missingFields,
-        });
-      } else {
-        winLogger.warn('Missing required artist information', {
-          artistID,
-          ...missingFields,
-        });
-      }
-    }
-
+    const fields = {
+      artistImage,
+      debut,
+      url,
+      artistID,
+    };
+    checkFetchAddInfoOfArtist(fields, this.platformName);
     return { artistImage, debut };
   }
 }

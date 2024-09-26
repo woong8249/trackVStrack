@@ -21,7 +21,7 @@ import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';
 import winLogger from '../logger/winston';
 
-import { validateChartDetails } from '../util/typeChecker';
+import { checkFetchAddInfoOfArtist, checkFetchAddInfoOfTrack, validateChartDetails } from '../util/typeChecker';
 
 type BugsChartType = 'week' |'day'
 
@@ -191,18 +191,12 @@ export class Bugs implements PlatformModule {
   async fetchAddInfoOfTrack(trackID:string, albumID:string) {
     const url = `https://music.bugs.co.kr/album/${albumID}`;
     const url2 = `https://music.bugs.co.kr/track/${trackID}`;
-    winLogger.debug('start bugs fetchAddInfoOfTrack', {
-      trackID, albumID, url, url2,
-    });
     const [html, html2] = await Promise.all([getHtml(url, { timeout: 60000 * 60 }), getHtml(url2, { timeout: 60000 * 60 })]);
-    winLogger.debug('success bugs fetchAddInfoOfTrack', {
-      trackID, albumID, url, url2,
-    });
     const $ = cheerio.load(html);
     const $2 = cheerio.load(html2);
-    const lyrics = $2('div.lyricsContainer xmp').text().trim();
+    const lyrics = $2('div.lyricsContainer xmp').text().trim() || 'missing';
 
-    const trackImage = $('div.innerContainer img').attr('src') as string;
+    const trackImage = $('div.innerContainer img').attr('src') || 'missing' as string;
     // eslint-disable-next-line func-names
     const releaseDate = $('table.info th').filter(function () {
       return $(this).text().trim() === '발매일';
@@ -210,7 +204,16 @@ export class Bugs implements PlatformModule {
       .text()
       .trim()
       .split('.')
-      .join('-');
+      .join('-') || 'missing';
+
+    const fields = {
+      trackID,
+      lyrics,
+      trackImage,
+      releaseDate,
+      url,
+    };
+    checkFetchAddInfoOfTrack(fields, this.platformName);
     return { releaseDate, trackImage, lyrics };
   }
 
@@ -226,18 +229,13 @@ export class Bugs implements PlatformModule {
       return $(this).find('th').text() === '데뷔';
     }).find('td').text() || 'missing';
 
-    if (!artistImage || !debut) {
-      const missingFields = {
-        artistImage,
-        debut,
-      };
-
-      winLogger.warn('Missing required artist information', {
-        artistID,
-        ...missingFields,
-      });
-      // throw new Error(`Fail extract artist information from artistID ${artistID}`);
-    }
+    const fields = {
+      artistImage,
+      debut,
+      url,
+      artistID,
+    };
+    checkFetchAddInfoOfArtist(fields, this.platformName);
     return { artistImage, debut };
   }
 }
