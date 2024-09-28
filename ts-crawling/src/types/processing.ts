@@ -16,7 +16,7 @@ export type TrackFormatWithoutAddInfo ={
     genie?: Platform
     bugs?:Platform
   }
-type PlatformWhitAddInfo =Omit<Platform, 'artists'> & {artists:Artist&ArtistAddInfo} &TrackAddInfo
+export type PlatformWhitAddInfo =Omit<Platform, 'artists'> & {artists:Artist&ArtistAddInfo} &TrackAddInfo
 
 export type TrackFormatWithAddInfo ={
     trackKeyword: string
@@ -25,4 +25,9 @@ export type TrackFormatWithAddInfo ={
     bugs?:PlatformWhitAddInfo
   }
 
-// export type TrackFormatWithUniqueKeyword =TrackFormatWithoutAddInfo&{ trackUniqueKeyword: string }
+export type ArtistFormatWithAddInfo ={
+    artistKeyword: string
+    melon?: Artist&ArtistAddInfo
+    genie?: Artist&ArtistAddInfo
+    bugs?:Artist&ArtistAddInfo
+  }

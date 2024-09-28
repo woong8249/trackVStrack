@@ -19,6 +19,14 @@ const config = {
     env: required('VITE_APP_ENV', 'production') as string,
     port: Number(required('VITE_APP_PORT', '3000')),
   },
+  typeorm: {
+    type: 'mysql' as const,
+    host: required('VITE_DB_HOST', undefined) as string,
+    port: required('VITE_DB_PORT', undefined) as number,
+    username: required('VITE_DB_USERNAME', undefined) as string,
+    password: required('VITE_DB_PASSWORD', undefined) as string,
+    database: required('VITE_DB_DATABASE', undefined) as string,
+  },
   // redis: {
   //   socket: {
   //     port: required('VITE_REDIS_SOCKET_PORT', undefined),

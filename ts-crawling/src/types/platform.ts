@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import type {
   ArtistAddInfo, FetchDailyChartResult, FetchMonthlyChartResult, FetchWeeklyChartResult, TrackAddInfo,
 } from './fetch';

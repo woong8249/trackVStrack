@@ -4,6 +4,9 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "emitDecoratorMetadata": true, // for typeorm
+    "experimentalDecorators": true, //for typeorm
+    "strictPropertyInitialization": false,//for typeorm
     "types": [
       "node",
     ],
