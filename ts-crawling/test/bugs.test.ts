@@ -6,7 +6,7 @@ import {
 import bugs from '../src/platforms/bugs';
 import { extractYearMonthDay } from '../src/util/time.js';
 
-import { getRandomDateRange, moveToNearestFutureDay } from './util.js';
+import { getRandomDateRange, moveToNearestFutureDay } from './util';
 import type { FetchDailyChartResult, FetchWeeklyChartResult } from 'src/types/fetch';
 
 describe('The fetchChart func Test', () => {

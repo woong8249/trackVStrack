@@ -16,7 +16,7 @@ if (command === 'fetch') {
 // pnpm run fetch 2018-01-01  2018-12-30 => 2018
 // pnpm run fetch 2018-12-31  2019-12-29 => 2019
 // pnpm run fetch 2019-12-30  2020-12-27 => 2020
-// pnpm run fetch 2020-12-28  2021-12-26 => 2021cd
+// pnpm run fetch 2020-12-28  2021-12-26 => 2021
 // pnpm run fetch 2021-12-27  2022-12-25 => 2022
 // pnpm run fetch 2022-12-26  2023-12-31 => 2023
 

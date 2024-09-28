@@ -5,4 +5,6 @@ dataCollectedBeforeIntegration
 crawling/src/**/*.json
 !package.json
 !.vscode/settings.json  
+data
 dist
+log

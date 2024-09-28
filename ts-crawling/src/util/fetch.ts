@@ -5,14 +5,13 @@ import * as cheerio from 'cheerio';
 
 // 2분
 const MAX_DELAY = 120_000;
-
 const customRetryDelay = (retryNumber: number) => {
   const delay = axiosRetry.exponentialDelay(retryNumber);
   return Math.min(delay, MAX_DELAY);
 };
 
 axiosRetry(axios, {
-  retries: 20,
+  retries: 30,
   retryDelay: customRetryDelay,
   onRetry: (retryCount, error, requestConfig) => {
     winLogger.warn(`Retry attempt ${retryCount.toString()} for ${String(requestConfig.url)}`, { error: error.message });
@@ -23,7 +22,7 @@ const delay = (ms: number) => new Promise((resolve) => { setTimeout(resolve, ms)
 
 export async function getHtml(
   url: string,
-  opt: AxiosRequestConfig = { timeout: 60_000 },
+  opt: AxiosRequestConfig = { timeout: 300_000 },
   retries: number = 20, // Number of manual retries
   delayFactor: number = 3000, // default delay time
 ) {

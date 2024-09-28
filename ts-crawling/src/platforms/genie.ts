@@ -85,6 +85,22 @@ function standardizeChartType(chartType:ChartType) {
 export class Genie implements PlatformModule {
   readonly platformName = 'genie';
 
+  async fetchLyricsWithLogin(trackID:string) {
+    const GENIE_COOKIES = [
+      // check developer tools
+    ].join('; ');
+    const option = {
+      headers: {
+        Cookie: GENIE_COOKIES,
+      },
+    };
+    const url = `https://www.genie.co.kr/detail/songInfo?xgnm=${trackID}`;
+    const html = await getHtml(url, option);
+    const $ = cheerio.load(html);
+    const lyrics = $('pre#pLyrics p').text().trim() || 'inst';
+    return { lyrics };
+  }
+
   private hasGroupedArtistID(bodyList: cheerio.Cheerio<Element>, $: cheerio.CheerioAPI): boolean {
     return bodyList.toArray().some((element) => {
       const artistNames = $(element).find('a.artist.ellipsis').text().split('&')

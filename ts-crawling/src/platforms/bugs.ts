@@ -91,10 +91,10 @@ export class Bugs implements PlatformModule {
       if (multiArtist) {
         const artistOnClickData = $(element).find('a[name="atag_martist_list"]').attr('onclick');
         if (artistOnClickData) {
-          const artistDataPattern = /'([^']+)'/;
+          const artistDataPattern = /this([^;]*);/;
           const artistDataMatch = artistOnClickData.match(artistDataPattern);
           if (artistDataMatch && artistDataMatch[1]) {
-            artists = artistDataMatch[1].split('OK').filter((item) => item).map((item) => {
+            artists = artistDataMatch[1].split('OK').filter((item) => item.includes('||')).map((item) => {
               const ar = item.split('||');
               return { artistName: ar[1] as string, artistID: ar[2] as string, artistKeyword: extractKeyword(ar[1] as string) as string };
             });
@@ -131,7 +131,6 @@ export class Bugs implements PlatformModule {
     validateDateAvailability(year, month, day, validateChartType);
     const chartScope = determineChartScope(year, month, day, validateChartType);
     const url = `https://music.bugs.co.kr/chart/track/${validateChartType}/total?chartdate=${year}${month}${day}`;
-    // console.log(url);
     const melonHtml = await getHtml(url);
     const chartDetails = this.makeChartDetails(melonHtml);
     if (validateChartType === 'week') {
@@ -211,10 +210,26 @@ export class Bugs implements PlatformModule {
       lyrics,
       trackImage,
       releaseDate,
-      url,
+      url: url2,
     };
     checkFetchAddInfoOfTrack(fields, this.platformName);
     return { releaseDate, trackImage, lyrics };
+  }
+
+  async fetchLyricsWithLogin(trackID:string) {
+    const BUGS_COOKIES = [
+      // check developer tools
+    ].join('; ');
+    const option = {
+      headers: {
+        Cookie: BUGS_COOKIES,
+      },
+    };
+    const url = `https://music.bugs.co.kr/track/${trackID}`;
+    const [html] = await Promise.all([getHtml(url, option)]);
+    const $ = cheerio.load(html);
+    const lyrics = $('div.lyricsContainer xmp').text().trim() || 'inst';
+    return { lyrics };
   }
 
   async fetchAddInfoOfArtist(artistID:string) {

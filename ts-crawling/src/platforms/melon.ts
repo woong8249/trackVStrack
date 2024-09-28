@@ -74,6 +74,23 @@ function isValidDate(dateString:string) {
 export class Melon implements PlatformModule {
   public readonly platformName = 'melon';
 
+  // eslint-disable-next-line class-methods-use-this
+  async fetchLyricsWithLogin(trackID:string) {
+    const MELON_COOKIES = [
+      // check developer tools
+    ].join('; ');
+    const option = {
+      headers: {
+        Cookie: MELON_COOKIES,
+      },
+    };
+    const url = `https://www.melon.com/song/detail.htm?songId=${trackID}`;
+    const html = await getHtml(url, option);
+    const $ = cheerio.load(html);
+    const lyrics = $('div.lyric').text().trim() || 'inst';
+    return { lyrics };
+  }
+
   private async fetchIndividualArtistIDs(groupedArtistID: string): Promise<Artist[]> {
     const url = `https://www.melon.com/artist/timeline.htm?artistId=${groupedArtistID}`;
     const html = await getHtml(url);
