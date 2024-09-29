@@ -9,7 +9,8 @@
     "start": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node ${1:-index.ts}; }; tsc --noEmit && run",
     "dev": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node --watch ${1:-index.ts}; }; tsc --noEmit && run",
     "test": "vitest",
-    "fetch": "vite-node index.ts fetch"
+    "fetch": "vite-node index.ts fetch",
+    "insert": "vite-node index.ts insert"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "axios-retry": "^4.5.0",
     "cheerio": "^1.0.0",
     "lodash": "^4.17.21",
+    "mysql2": "^3.11.3",
     "string-similarity": "^4.0.4",
     "typeorm": "^0.3.20",
     "winston": "^3.14.2",

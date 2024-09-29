@@ -4,6 +4,7 @@
 import type { TrackFormatWithAddInfo } from 'src/types/processing';
 import {
   Column,
+  Entity,
   PrimaryGeneratedColumn,
   type ValueTransformer,
 } from 'typeorm';
@@ -14,17 +15,18 @@ class JsonTransformer implements ValueTransformer {
     return JSON.stringify(value);
   }
 
-  from(value: string): Omit<TrackFormatWithAddInfo, 'trackKeyword'> {
-    return JSON.parse(value) as Omit<TrackFormatWithAddInfo, 'trackKeyword'>;
+  from(value: Omit<TrackFormatWithAddInfo, 'trackKeyword'>): Omit<TrackFormatWithAddInfo, 'trackKeyword'> {
+    return value;
   }
 }
 
+@Entity()
 export class Track {
   @PrimaryGeneratedColumn()
     id: number;
 
   @Column({
-    type: 'varchar', length: 50,
+    type: 'varchar', length: 100,
   })
     trackKeyword: string;
 

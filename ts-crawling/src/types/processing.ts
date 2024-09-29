@@ -16,7 +16,7 @@ export type TrackFormatWithoutAddInfo ={
     genie?: Platform
     bugs?:Platform
   }
-export type PlatformWhitAddInfo =Omit<Platform, 'artists'> & {artists:Artist&ArtistAddInfo} &TrackAddInfo
+export type PlatformWhitAddInfo =Omit<Platform, 'artists'> & {artists:(Artist&ArtistAddInfo)[]} &TrackAddInfo
 
 export type TrackFormatWithAddInfo ={
     trackKeyword: string

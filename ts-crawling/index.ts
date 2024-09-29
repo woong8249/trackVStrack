@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import type { TrackFormatWithoutAddInfo } from 'src/types/processing';
 import type { PlatformName } from 'src/types/common';
+import { processTracksAndArtists } from 'src/service/insert';
 
 const command = validateCommand(process.argv[2]);
 
@@ -19,7 +20,6 @@ if (command === 'fetch') {
 // pnpm run fetch 2020-12-28  2021-12-26 => 2021
 // pnpm run fetch 2021-12-27  2022-12-25 => 2022
 // pnpm run fetch 2022-12-26  2023-12-31 => 2023
-
   const startDate = validateDate(process.argv[3]);
   const endDate = validateDate(process.argv[4]);
   const startDateString = (startDate.toISOString().split('T')[0] as string).split('-').join('');
@@ -34,4 +34,6 @@ if (command === 'fetch') {
     const fileName = `${platformName}.json`;
     fs.writeFileSync(path.join(dirPath, fileName), JSON.stringify(result));
   });
+} else if (command === 'insert') {
+  await processTracksAndArtists();
 }
