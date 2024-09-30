@@ -2,6 +2,7 @@ import type {
   ChartDetail, Track, Artist, TrackAddInfo,
   ArtistAddInfo,
 } from '../types/fetch';
+import ss from 'string-similarity';
 import winLogger from '../logger/winston';
 import type { PlatformName } from 'src/types/common';
 
@@ -121,4 +122,9 @@ export function validateDate(dateString:string | undefined) {
     throw new Error('Invalid date provided');
   }
   return date;
+}
+
+export function checkSS(string1:string, string2:string) {
+  const similarity = ss.compareTwoStrings(string1.toLowerCase(), string2.toLowerCase());
+  return similarity;
 }

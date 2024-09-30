@@ -24,10 +24,11 @@ export type TrackFormatWithAddInfo ={
     genie?: PlatformWhitAddInfo
     bugs?:PlatformWhitAddInfo
   }
+export type ArtistWithAddInfo =Artist&ArtistAddInfo
 
 export type ArtistFormatWithAddInfo ={
     artistKeyword: string
-    melon?: Artist&ArtistAddInfo
-    genie?: Artist&ArtistAddInfo
-    bugs?:Artist&ArtistAddInfo
+    melon?: ArtistWithAddInfo
+    genie?: ArtistWithAddInfo
+    bugs?:ArtistWithAddInfo
   }

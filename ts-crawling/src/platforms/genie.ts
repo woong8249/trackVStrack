@@ -161,24 +161,15 @@ export class Genie implements PlatformModule {
           rank, titleName, titleKeyword, trackID, albumID,
         });
       }
-      const artistKeywords = extractKeyword(artistNames);
+      const artistKeywords = extractKeyword(artistNames) as string[];
       // @ts-ignore
       const groupedArtistID:string = $(element).find('a.artist.ellipsis').attr('onclick').toString()
         .match(/fnViewArtist\('(\d+)'\)/)[1] as string;
 
       if (artistNames.length > 1) {
-        return this.fetchIndividualArtistIDs(groupedArtistID).then((artists) => {
-          if (artists.length === 0) {
-            const artists = [{ artistName: artistNames[0] as string, artistKeyword: artistKeywords[0], artistID: groupedArtistID }];
-            return {
-              rank, titleName, titleKeyword, trackID, albumID, artists,
-            };
-          }
-          return {
-            rank, titleName, titleKeyword, trackID, artists, albumID,
-          };
-        });
+        return this.fetchIndividualArtistIDs(groupedArtistID);
       }
+
       return {
         rank, titleName, titleKeyword, trackID, albumID, artists: [{ artistName: artistNames[0], artistID: groupedArtistID, artistKeyword: artistKeywords[0] }],
       };
@@ -188,7 +179,7 @@ export class Genie implements PlatformModule {
     return chartDetails;
   }
 
-  private async fetchIndividualArtistIDs(groupedArtistID:string):Promise<Artist[]> {
+  async fetchIndividualArtistIDs(groupedArtistID:string):Promise<Artist[]> {
     const url = `https://www.genie.co.kr/detail/artistInfo?xxnm=${groupedArtistID}`;
     const html = await getHtml(url);
     const $ = cheerio.load(html);
@@ -206,10 +197,16 @@ export class Genie implements PlatformModule {
         });
       }
     });
-    if (artists.length === 0) {
-      winLogger.warn('No artists found for groupedArtistID:', { groupedArtistID, artists });
-    }
 
+    if (artists.length === 0) {
+      // winLogger.warn('No artists found for groupedArtistID:', { groupedArtistID, artists });
+      const artistName = $('.info-zone h2').text().trim();
+      artists.push({
+        artistName,
+        artistKeyword: extractKeyword(artistName) as string,
+        artistID: groupedArtistID,
+      });
+    }
     return artists;
   }
 
@@ -330,8 +327,8 @@ export class Genie implements PlatformModule {
     const html = await getHtml(url);
     const $ = cheerio.load(html);
 
-    let artistImage = $('div.photo-zone a').attr('href') as string;
-    if (artistImage && !artistImage.startsWith('https:')) {
+    let artistImage = $('div.photo-zone a').attr('href')?.trim() || 'missing';
+    if (artistImage !== 'missing' && !artistImage.startsWith('https:')) {
       artistImage = `https:${artistImage}`;
     }
     // eslint-disable-next-line func-names

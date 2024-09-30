@@ -4,21 +4,22 @@
 import type { ArtistFormatWithAddInfo } from 'src/types/processing';
 import {
   Column,
+  Entity,
   PrimaryGeneratedColumn,
   type ValueTransformer,
 } from 'typeorm';
 
 // 커스텀 변환기 정의
 class JsonTransformer implements ValueTransformer {
-  to(value: ArtistFormatWithAddInfo): string {
+  to(value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>): string {
     return JSON.stringify(value);
   }
 
-  from(value: string): ArtistFormatWithAddInfo {
-    return JSON.parse(value) as ArtistFormatWithAddInfo;
+  from(value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>): Omit<ArtistFormatWithAddInfo, 'artistKeyword'> {
+    return value;
   }
 }
-
+@Entity()
 export class Artist {
     @PrimaryGeneratedColumn()
       id: number;
@@ -32,5 +33,5 @@ export class Artist {
       type: 'json',
       transformer: new JsonTransformer(),
     })
-      platforms: ArtistFormatWithAddInfo[];
+      platforms: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>;
 }

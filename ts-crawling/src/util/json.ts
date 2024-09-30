@@ -1,8 +1,22 @@
 // /* eslint-disable no-restricted-syntax */
 // /* eslint-disable no-empty */
 // /* eslint-disable no-param-reassign */
-// import fs from 'fs';
-// import path from 'path';
+import fs from 'fs';
+import path from 'path';
+
+export function getAllJsonFiles(directory: string): string[] {
+  const entries = fs.readdirSync(directory);
+  const filePaths = entries.map((entry) => path.join(directory, entry));
+  return filePaths.flatMap((filePath) => {
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) {
+      return getAllJsonFiles(filePath);
+    } if (stat.isFile() && path.extname(filePath) === '.json') {
+      return [filePath];
+    }
+    return [];
+  });
+}
 
 // export function parseJSONProperties(obj) {
 //   Object.keys(obj).forEach(key => {

@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import type { TrackFormatWithoutAddInfo } from 'src/types/processing';
 import type { PlatformName } from 'src/types/common';
-import { processTracksAndArtists } from 'src/service/insert';
+import { insertTrackSAndArtists } from 'src/service/insert';
 
 const command = validateCommand(process.argv[2]);
 
@@ -35,5 +35,5 @@ if (command === 'fetch') {
     fs.writeFileSync(path.join(dirPath, fileName), JSON.stringify(result));
   });
 } else if (command === 'insert') {
-  await processTracksAndArtists();
+  await insertTrackSAndArtists();
 }

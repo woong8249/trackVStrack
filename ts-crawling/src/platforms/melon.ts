@@ -251,7 +251,10 @@ export class Melon implements PlatformModule {
     }).next('dd').text()
       .trim() || '';
     const releaseDate = releaseDateText.split('.').join('-');
-    const trackImage = $('div.thumb img').attr('src') || 'missing';
+    let trackImage = $('div.thumb img').attr('src')?.trim();
+    if (trackImage === 'https://cdnimg.melon.co.kr' || !trackImage) {
+      trackImage = 'missing';
+    }
     const lyrics = $('div.lyric').text().trim() || 'missing';
 
     const fields = {
@@ -269,7 +272,10 @@ export class Melon implements PlatformModule {
     const url = `https://www.melon.com/artist/timeline.htm?artistId=${artistID}`;
     const html = await getHtml(url);
     const $ = cheerio.load(html);
-    const artistImage = $('span#artistImgArea img').attr('src') || 'missing';
+    let artistImage = $('span#artistImgArea img').attr('src')?.trim();
+    if (artistImage === 'https://cdnimg.melon.co.kr' || !artistImage) {
+      artistImage = 'missing';
+    }
     const candi1 = $('span.gubun').text().trim();
     const candi2 = $('dd.debut_song').text().trim();
     const candi3 = $('dd.debut_song span.ellipsis').contents().first().text()

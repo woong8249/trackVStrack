@@ -20,12 +20,16 @@ axiosRetry(axios, {
 
 const delay = (ms: number) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
+const cache = new Map<string, string>();
 export async function getHtml(
   url: string,
   opt: AxiosRequestConfig = { timeout: 300_000 },
   retries: number = 20, // Number of manual retries
   delayFactor: number = 3000, // default delay time
 ) {
+  if (cache.has(url)) {
+    return cache.get(url) as string; // 캐시된 결과 반환
+  }
   try {
     const response = await axios.get(url, opt);
     const $ = cheerio.load(response.data as string);
@@ -40,6 +44,7 @@ export async function getHtml(
       }
       throw new Error('Max retries reached: Blocked response not resolved.');
     }
+    cache.set(url, response.data as string);
     return response.data as string;
   } catch (err: unknown) {
     let errorMessage = 'Unknown error';
