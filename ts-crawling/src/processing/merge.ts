@@ -1,6 +1,6 @@
-import type { WeeklyChartScope } from 'src/types/fetch';
+import type { WeeklyChartScope } from '../types/fetch';
 import type { Platform, TrackFormatWithoutAddInfo } from '../types/processing';
-import type { PlatformName } from 'src/types/common';
+import type { PlatformName } from '../types/common';
 
 // 일단은 week 기준으로
 export function groupDuplicateTracksByPlatform(

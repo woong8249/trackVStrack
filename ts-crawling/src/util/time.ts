@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import type { WeekOfMonth } from 'src/types/fetch';
+import type { WeekOfMonth } from '../types/fetch';
 
 export function createAllDatesBetween(startDate :Date, endDate:Date) {
   const dates = [];

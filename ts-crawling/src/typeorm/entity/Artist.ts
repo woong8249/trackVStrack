@@ -1,13 +1,18 @@
 // entity/Artist.ts
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-classes-per-file */
-import type { ArtistFormatWithAddInfo } from 'src/types/processing';
+import type { ArtistFormatWithAddInfo } from '../../types/processing';
 import {
   Column,
+  CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
   type ValueTransformer,
 } from 'typeorm';
+import { Track } from './Track';
 
 // 커스텀 변환기 정의
 class JsonTransformer implements ValueTransformer {
@@ -34,4 +39,15 @@ export class Artist {
       transformer: new JsonTransformer(),
     })
       platforms: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>;
+
+    // owner side
+    @ManyToMany(() => Track, (track) => track.artists)
+    @JoinTable()
+      tracks: Track[];
+
+    @CreateDateColumn({ type: 'timestamp' })
+      createDate: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+      updateDate: Date;
 }

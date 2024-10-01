@@ -4,7 +4,7 @@ import type {
 } from '../types/fetch';
 import ss from 'string-similarity';
 import winLogger from '../logger/winston';
-import type { PlatformName } from 'src/types/common';
+import type { PlatformName } from '../types/common';
 
 export function isTrack(value: unknown): value is Track {
   // 먼저 value가 객체인지 확인

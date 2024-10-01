@@ -2,7 +2,7 @@
 import axios from 'axios';
 import resemble from 'resemblejs';
 import sharp from 'sharp';
-import winLogger from 'src/logger/winston';
+import winLogger from '../logger/winston';
 
 const imageCache = new Map<string, Buffer>();
 

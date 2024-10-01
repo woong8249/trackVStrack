@@ -5,8 +5,8 @@ import type { ArtistAddInfo, FetchWeeklyChartResult, TrackAddInfo } from '../typ
 import winLogger from '../logger/winston';
 import { convertWeeklyChartToTrackFormat } from '../processing/format';
 import { groupDuplicateTracksByPlatform } from '..//processing/merge';
-import type { Platform, TrackFormatWithAddInfo, TrackFormatWithoutAddInfo } from 'src/types/processing';
-import type { PlatformName } from 'src/types/common';
+import type { Platform, TrackFormatWithAddInfo, TrackFormatWithoutAddInfo } from '../types/processing';
+import type { PlatformName } from '../types/common';
 
 const modules = { bugs, melon, genie };
 

@@ -13,9 +13,8 @@ import type {
   FetchDailyChartResult,
   DailyChartScope,
   Artist,
-  // Artist,
-} from 'src/types/fetch';
-import type { ChartType } from 'src/types/common';
+} from '../types/fetch';
+import type { ChartType } from '../types/common';
 
 import extractKeyword from '../util/regex';
 import { getHtml } from '../util/fetch';

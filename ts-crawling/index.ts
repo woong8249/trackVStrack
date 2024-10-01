@@ -2,9 +2,9 @@ import { validateCommand, validateDate } from './src/util/typeChecker';
 import { fetchWeeklyCharts } from './src/service/fetchChart';
 import fs from 'fs';
 import path from 'path';
-import type { TrackFormatWithoutAddInfo } from 'src/types/processing';
-import type { PlatformName } from 'src/types/common';
-import { insertTrackSAndArtists } from 'src/service/insert';
+import type { TrackFormatWithoutAddInfo } from './src/types/processing';
+import type { PlatformName } from './src/types/common';
+import { insertTrackSAndArtists } from './src/service/insert';
 
 const command = validateCommand(process.argv[2]);
 

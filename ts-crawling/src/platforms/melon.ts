@@ -16,9 +16,9 @@ import type {
   FetchWeeklyChartResult,
   FetchMonthlyChartResult,
   Artist,
-} from 'src/types/fetch';
-import type { PlatformModule } from 'src/types/platform';
-import type { ChartType } from 'src/types/common';
+} from '../types/fetch';
+import type { PlatformModule } from '../types/platform';
+import type { ChartType } from '../types/common';
 
 type MelonChartType ='WE' | 'MO'
 

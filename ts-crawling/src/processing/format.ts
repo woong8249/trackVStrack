@@ -1,5 +1,5 @@
-import type { FetchWeeklyChartResult } from 'src/types/fetch';
-import type { TrackFormatWithoutAddInfo, Platform } from 'src/types/processing';
+import type { FetchWeeklyChartResult } from '../types/fetch';
+import type { TrackFormatWithoutAddInfo, Platform } from '../types/processing';
 
 export function convertWeeklyChartToTrackFormat(
   chartOrCharts: FetchWeeklyChartResult[] | FetchWeeklyChartResult,
