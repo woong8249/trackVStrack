@@ -10,7 +10,8 @@
     "dev": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node --watch ${1:-index.ts}; }; tsc --noEmit && run",
     "test": "vitest",
     "fetch": "vite-node index.ts fetch",
-    "insert": "vite-node index.ts insert"
+    "insert": "vite-node index.ts insert",
+    "insertAll": "vite-node index.ts insertAll"
   },
   "keywords": [],
   "author": "",

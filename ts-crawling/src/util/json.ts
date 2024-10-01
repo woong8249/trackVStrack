@@ -4,13 +4,13 @@
 import fs from 'fs';
 import path from 'path';
 
-export function getAllJsonFiles(directory: string): string[] {
+export function findAllJsonFilePaths(directory: string): string[] {
   const entries = fs.readdirSync(directory);
   const filePaths = entries.map((entry) => path.join(directory, entry));
   return filePaths.flatMap((filePath) => {
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
-      return getAllJsonFiles(filePath);
+      return findAllJsonFilePaths(filePath);
     } if (stat.isFile() && path.extname(filePath) === '.json') {
       return [filePath];
     }

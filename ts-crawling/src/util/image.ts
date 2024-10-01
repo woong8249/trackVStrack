@@ -25,10 +25,10 @@ async function resizeImageToMatch(imageBuffer: Buffer, width: number, height: nu
 }
 
 export async function compareImages(url1: string, url2: string, info?: unknown): Promise<number> {
-  if (url1.includes('missing') || url2.includes('missing')) {
-    return 100;
-  }
   try {
+    if (url1.includes('missing') || url2.includes('missing')) {
+      return 100;
+    }
     const imageBuffer1 = await downloadImageAsBuffer(url1);
     const imageBuffer2 = await downloadImageAsBuffer(url2);
 

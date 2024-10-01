@@ -119,30 +119,20 @@ describe.skip(`
   });
 });
 
-// 1번조건: lyrics 유사도가 다르거나 & artistName 유사도가 낮을것이다.
-// 2번 조건: trackImage가 유사도가 매우 낮을것이다.
-// 1. trackKeyword가 같은 track들은
-// 1번조건이 만족하지않으면 2번조건을 만족할 것이다.
+// const tracksWithArtistIds = await trackRepo.find({
+//   where: { trackKeyword: '고백' },
+//   join: {
+//     alias: 'track', // Track 엔티티의 별칭 지정
+//     leftJoinAndSelect: {
+//       artists: 'track.artists', // Track 테이블과 Artist 테이블을 조인
+//     },
+//   },
+//   select: {
+//     id: true,
+//     trackKeyword: true,
+//     platforms: true,
+//     artists: { id: true },
+//   },
+// });
 
-// 1. 번조건 : artistName 유사도가 낮을 것이다.
-// 2. artistIamge 유사도가 매우 낮을것이다.
-
-// const artistKeywords:{artistKeyword:string}[] = await artistRepo
-//   .createQueryBuilder('artist')
-//   .select('artistKeyword')
-//   .groupBy('artistKeyword')
-//   .having('COUNT(artistKeyword) >= 2')
-//   .getRawMany();
-
-// const artists = await Promise.all(artistKeywords.map((artistKeyword) => artistRepo.find({ where: { artistKeyword: artistKeyword.artistKeyword } })));
-// fs.writeFileSync(path.join(__dirname, 'sample.json'), JSON.stringify(artists));
-
-// // SELECT trackKeyword, COUNT(*) AS count
-// // FROM Track
-// // GROUP BY trackKeyword
-// // HAVING COUNT(*) >= 2
-
-// // SELECT artistKeyword, COUNT(*) AS count
-// // FROM Artist
-// // GROUP BY artistKeyword
-// // HAVING COUNT(*) >= 2
+// console.dir(tracksWithArtistIds, { depth: 5 });

@@ -14,7 +14,7 @@ export default async function createDataSource(): Promise<DataSource> {
     return dataSourceInstance;
   }
 
-  const option = { ...typeorm, synchronize: false, entities: [Artist, Track] };
+  const option = { ...typeorm, synchronize: true, entities: [Artist, Track] };
   const dataSource = new DataSource(option);
 
   try {
