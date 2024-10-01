@@ -7,17 +7,6 @@ import type { PlatformName } from './src/types/common';
 import { insertAllTrackSAndArtists, insertTrackSAndArtists } from './src/service/insert';
 import { findAllJsonFilePaths } from './src/util/json';
 
-// 2012-12-31  2014-01-05 => 2013
-// 2014-01-06  2015-01-04 => 2014
-// 2015-01-05  2016-01-03 => 2015
-// 2016-01-04  2017-01-01 => 2016
-// 2017-01-02  2017-12-31 => 2017
-// 2018-01-01  2018-12-30 => 2018
-// 2018-12-31  2019-12-29 => 2019
-// 2019-12-30  2020-12-27 => 2020
-// 2020-12-28  2021-12-26 => 2021
-// 2021-12-27  2022-12-25 => 2022
-// 2022-12-26  2023-12-31 => 2023
 const command = validateCommand(process.argv[2]);
 
 switch (command) {
