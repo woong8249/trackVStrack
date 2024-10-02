@@ -18,5 +18,8 @@
         {
             "path": "./ts-crawling"
         },
+        {
+            "path": "./nest-server"
+        },
     ],
 }
