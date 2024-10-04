@@ -32,7 +32,7 @@ export class ArtistsService {
   async find(
     limit: number,
     offset: number,
-    sort: 'asc' | 'desc',
+    sort: 'asc' | 'desc' | 'random',
     query?: string,
   ): Promise<ArtistResponse[] | []> {
     const queryBuilder = this.artistRepo.createQueryBuilder('artist');

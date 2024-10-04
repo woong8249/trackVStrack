@@ -1,6 +1,5 @@
 // entity/track.ts
-/* eslint-disable class-methods-use-this */
-/* eslint-disable max-classes-per-file */
+
 import type { TrackFormatWithAddInfo } from '../../types/processing';
 import {
   Column,
@@ -9,20 +8,9 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  type ValueTransformer,
+
 } from 'typeorm';
 import { Artist } from './Artist';
-
-// 커스텀 변환기 정의
-class JsonTransformer implements ValueTransformer {
-  to(value: Omit<TrackFormatWithAddInfo, 'trackKeyword'>): string {
-    return JSON.stringify(value);
-  }
-
-  from(value: Omit<TrackFormatWithAddInfo, 'trackKeyword'>): Omit<TrackFormatWithAddInfo, 'trackKeyword'> {
-    return value;
-  }
-}
 
 @Entity()
 export class Track {
@@ -36,7 +24,6 @@ export class Track {
 
   @Column({
     type: 'json',
-    transformer: new JsonTransformer(),
   })
     platforms: Omit<TrackFormatWithAddInfo, 'trackKeyword'>;
 

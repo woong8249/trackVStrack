@@ -1,8 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { TracksService } from './tracks.service';
-import { FindDto } from 'src/common/find.dto';
+
 import { FindOneByIdDTO } from 'src/common/findOneByID.dto';
+import { FindWithChartDurationDTO } from 'src/common/findWIthChartDuration.doto';
 
 @ApiTags('Tracks') // Swagger 태그 설정
 @Controller('tracks')
@@ -28,34 +29,38 @@ export class TracksController {
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Limit the number of results',
-    example: 10,
+    description: 'Limit the number of results. default is 10',
   })
   @ApiQuery({
     name: 'offset',
     required: false,
     description: 'Offset the results for pagination',
-    example: 0,
   })
   @ApiQuery({
     name: 'sort',
     required: false,
-    description: 'Sort order',
-    enum: ['asc', 'desc'],
+    description: 'Sort order.default is desc',
+    enum: ['asc', 'desc', 'random'],
     example: 'desc',
   })
   @ApiQuery({
     name: 'query',
     required: false,
     description: 'Search query to filter tracks by keyword',
-    example: 'some keyword',
   })
-  async find(@Query() query: FindDto) {
+  @ApiQuery({
+    name: 'minWeeksOnChart',
+    required: false,
+    description:
+      'Filter tracks that have been on the chart for at least the specified number of weeks. default is 10',
+  })
+  async find(@Query() query: FindWithChartDurationDTO) {
     return this.trackService.find(
       query.limit || 10,
       query.offset || 0,
       query.sort || 'desc',
       query.query,
+      query.minWeeksOnChart || 0,
     );
   }
 }

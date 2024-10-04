@@ -6,23 +6,10 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  type ValueTransformer,
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
 import { ArtistFormatWithAddInfo } from 'src/database/types/processing';
 
-// 커스텀 변환기 정의
-class JsonTransformer implements ValueTransformer {
-  to(value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>): string {
-    return JSON.stringify(value);
-  }
-
-  from(
-    value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>,
-  ): Omit<ArtistFormatWithAddInfo, 'artistKeyword'> {
-    return value;
-  }
-}
 @Entity()
 export class Artist {
   @PrimaryGeneratedColumn()
@@ -36,7 +23,6 @@ export class Artist {
 
   @Column({
     type: 'json',
-    transformer: new JsonTransformer(),
   })
   platforms: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>;
 

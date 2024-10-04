@@ -40,8 +40,9 @@ export class TracksService {
   async find(
     limit: number,
     offset: number,
-    sort: 'asc' | 'desc',
+    sort: 'asc' | 'desc' | 'random',
     query?: string,
+    minWeeksOnChart?: number,
   ): Promise<TrackResponse[] | []> {
     const queryBuilder = this.trackRepo.createQueryBuilder('track');
     if (query) {
@@ -49,11 +50,24 @@ export class TracksService {
         query: `%${query}%`,
       });
     }
-    const tracks = await queryBuilder
-      .orderBy('track.createDate', sort.toUpperCase() as 'DESC' | 'ASC')
-      .skip(offset)
-      .take(limit)
-      .getMany();
+
+    if (minWeeksOnChart) {
+      queryBuilder.andWhere(
+        `COALESCE(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(track.platforms, '$.melon.weeklyChartScope'))), 0) > :minWeeksOnChart`,
+        { minWeeksOnChart },
+      );
+    }
+
+    if (sort === 'random') {
+      queryBuilder.orderBy('RAND()');
+    } else {
+      queryBuilder.orderBy(
+        'track.createDate',
+        sort.toUpperCase() as 'DESC' | 'ASC',
+      );
+    }
+
+    const tracks = await queryBuilder.skip(offset).take(limit).getMany();
     return tracks.map((track) => ({
       id: track.id,
       ...this.mapTrackToResponse(track),

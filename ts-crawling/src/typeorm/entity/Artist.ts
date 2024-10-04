@@ -1,6 +1,5 @@
 // entity/Artist.ts
-/* eslint-disable class-methods-use-this */
-/* eslint-disable max-classes-per-file */
+
 import type { ArtistFormatWithAddInfo } from '../../types/processing';
 import {
   Column,
@@ -10,20 +9,9 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  type ValueTransformer,
 } from 'typeorm';
 import { Track } from './Track';
 
-// 커스텀 변환기 정의
-class JsonTransformer implements ValueTransformer {
-  to(value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>): string {
-    return JSON.stringify(value);
-  }
-
-  from(value: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>): Omit<ArtistFormatWithAddInfo, 'artistKeyword'> {
-    return value;
-  }
-}
 @Entity()
 export class Artist {
     @PrimaryGeneratedColumn()
@@ -36,7 +24,6 @@ export class Artist {
 
     @Column({
       type: 'json',
-      transformer: new JsonTransformer(),
     })
       platforms: Omit<ArtistFormatWithAddInfo, 'artistKeyword'>;
 

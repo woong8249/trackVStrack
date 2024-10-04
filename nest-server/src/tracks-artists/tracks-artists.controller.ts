@@ -1,11 +1,12 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { TracksArtistsService } from './tracks-artists.service';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
-import { FindDto as FindDTO } from 'src/common/find.dto';
-import { FindOneByIdDTO as FindOneByIdDTO } from 'src/common/findOneByID.dto';
+
+import { FindOneByIdDTO } from 'src/common/findOneByID.dto';
+import { FindWithChartDurationDTO } from 'src/common/findWIthChartDuration.doto';
 
 @ApiTags('TracksArtists')
-@Controller('tracks_artists')
+@Controller('tracks-artists')
 export class TracksArtistsController {
   constructor(private trackArtistService: TracksArtistsService) {}
 
@@ -25,21 +26,48 @@ export class TracksArtistsController {
 
   @Get()
   @ApiOperation({
-    summary: 'Find Track info with Artist',
+    summary: 'Find Tracks joined Artist',
     description: 'Retrieve a list of track info with artist with pagination',
   })
   @ApiQuery({
-    name: 'query',
+    name: 'limit',
+    type: 'number',
     required: false,
-    description: 'Search query to filter by keyword',
-    example: 'some keyword',
+    description: 'Limit the number of results. default is 10',
   })
-  async find(@Query() query: FindDTO) {
+  @ApiQuery({
+    name: 'offset',
+    type: 'number',
+    required: false,
+    description: 'Offset the results for pagination. default is 0',
+  })
+  @ApiQuery({
+    name: 'sort',
+    enum: ['asc', 'desc', 'random'],
+    required: false,
+    description: 'Sort order.default is desc',
+    example: 'desc',
+  })
+  @ApiQuery({
+    name: 'query',
+    type: 'string',
+    required: false,
+    description: 'Search query to filter tracks by keyword',
+  })
+  @ApiQuery({
+    name: 'minWeeksOnChart',
+    type: 'number',
+    required: false,
+    description:
+      'Filter tracks that have been on the chart for at least the specified number of weeks.',
+  })
+  async find(@Query() query: FindWithChartDurationDTO) {
     return this.trackArtistService.find(
       query.limit || 10,
       query.offset || 0,
       query.sort || 'desc',
       query.query,
+      query.minWeeksOnChart || 0,
     );
   }
 }

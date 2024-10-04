@@ -35,20 +35,37 @@ export class TracksArtistsService {
   async find(
     limit: number,
     offset: number,
-    sort: 'asc' | 'desc',
+    sort: 'asc' | 'desc' | 'random',
     query?: string,
+    minWeeksOnChart?: number,
   ): Promise<TrackWithArtistResponse[] | []> {
-    const queryBuilder = this.trackRepo
-      .createQueryBuilder('track')
-      .leftJoinAndSelect('track.artists', 'artist'); // Artist와 조인
+    const queryBuilder = this.trackRepo.createQueryBuilder('track');
 
     if (query) {
       queryBuilder.andWhere('track.trackKeyword LIKE :query', {
         query: `%${query}%`,
       });
     }
+
+    if (minWeeksOnChart) {
+      queryBuilder.andWhere(
+        `COALESCE(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(track.platforms, '$.melon.weeklyChartScope'))), 0) > :minWeeksOnChart`,
+        { minWeeksOnChart },
+      );
+    }
+
+    // 랜덤 정렬 처리
+    if (sort === 'random') {
+      queryBuilder.orderBy('RAND()');
+    } else {
+      queryBuilder.orderBy(
+        'track.createDate',
+        sort.toUpperCase() as 'DESC' | 'ASC',
+      );
+    }
+
     const tracks = await queryBuilder
-      .orderBy('track.createDate', sort.toUpperCase() as 'DESC' | 'ASC')
+      .leftJoinAndSelect('track.artists', 'artist')
       .skip(offset)
       .take(limit)
       .getMany();

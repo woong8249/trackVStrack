@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsNumberString } from 'class-validator';
+import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
 
-export class FindDto {
+export class FindDTO {
   @IsOptional()
   @IsNumberString()
   limit?: number;
@@ -10,8 +10,8 @@ export class FindDto {
   offset?: number;
 
   @IsOptional()
-  @IsString()
-  sort?: 'asc' | 'desc' = 'desc';
+  @IsIn(['asc', 'desc', 'random'])
+  sort?: 'asc' | 'desc' | 'random' = 'desc';
 
   @IsOptional()
   @IsString()

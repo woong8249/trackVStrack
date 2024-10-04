@@ -1,7 +1,7 @@
 import { ArtistsService } from './artists.service';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
-import { FindDto } from 'src/common/find.dto';
+import { FindDTO } from 'src/common/find.dto';
 import { FindOneByIdDTO } from 'src/common/findOneByID.dto';
 
 @ApiTags('Artists')
@@ -50,7 +50,7 @@ export class ArtistsController {
     description: 'Search query to filter artists by keyword',
     example: 'some keyword',
   })
-  async find(@Query() query: FindDto) {
+  async find(@Query() query: FindDTO) {
     return this.artistsService.find(
       query.limit || 10,
       query.offset || 0,
