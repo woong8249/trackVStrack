@@ -1,7 +1,7 @@
-import { TrackShortInfo } from 'src/types/track';
+import { TrackWithArtistResponse } from '@typings/track-artist';
 
 interface Props {
-    track: TrackShortInfo;
+    track: TrackWithArtistResponse;
   }
 
 export default function TrackInfoCard({ track }: Props) {

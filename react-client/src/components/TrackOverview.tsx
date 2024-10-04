@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import ChartGraph from './ChartGraph';
 import TrackInfoCard from './TrackInfoCard';
-import { Track } from 'src/types/track';
+import { TrackWithArtistResponse } from '@typings/track-artist';
 
 interface Props {
-  track: Track;
+  track: TrackWithArtistResponse;
   isLargeViewport:boolean
 }
 

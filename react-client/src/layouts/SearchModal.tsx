@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import SearchBar from '@components/SearchBar';
-import { Track } from 'src/types/track';
-import { searchTracks } from '@utils/axios';
+import { TrackResponse } from '@typings/track';
+import { trackWithArtistApi } from '@utils/axios';
 import TrackInfoCard from '@components/TrackInfoCard';
 
 export default function SearchModal() {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
   const [query, setQuery] = useState('');
-  const [tracks, setTracks] = useState<Track[]>([]);
+  const [tracks, setTracks] = useState<TrackResponse[]>([]);
 
   useEffect(() => {
     if (query !== '') {
-      searchTracks(query).then((tracks) => {
+      trackWithArtistApi.getTracksWithArtist({ query }).then((tracks) => {
         setTracks(tracks);
       });
     }

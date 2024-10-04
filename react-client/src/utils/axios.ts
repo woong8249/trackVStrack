@@ -1,27 +1,48 @@
-import axios from 'axios';
-import { Track } from 'src/types/track';
+import axios, { AxiosResponse } from 'axios';
+import { ArtistResponse } from '@typings/artist';
+import { TrackWithArtistResponse } from '@typings/track-artist';
+import { TrackResponse } from '@typings/track';
 
-const API_BASE_URL = 'http://localhost:3000';
-const axiosInstance = axios.create({ baseURL: API_BASE_URL });
-
-export async function searchTracks(query: string) {
-  try {
-    const { data } = await axiosInstance.get(`/track?q=${query}`) as {data: {tracks:Track[]}};
-    return data.tracks;
-  } catch (error) {
-    console.error('Error fetching track results:', error);
-    return [];
-  }
+interface PaginatedRequest {
+  limit?: number;
+  offset?: number;
+  sort?: 'asc' | 'desc';
+  query?: string;
 }
 
-// async function searchArtists(query) {
-//   try {
-//     const response = await fetch(`${API_BASE_URL}/artist?q=${query}`);
-//     const data = await response.json();
-//     console.log('Artist results:', data);
-//     return data.artists;
-//   } catch (error) {
-//     console.error('Error fetching artist results:', error);
-//     return [];
-//   }
-// }
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3000',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const tracksApi = {
+  async getTrackById(id: number): Promise<AxiosResponse<TrackResponse|null>> {
+    return (await apiClient.get(`/tracks/${id}`)).data;
+  },
+
+  async getTracks(params: PaginatedRequest): Promise<AxiosResponse<TrackResponse[]|[]>> {
+    return (await apiClient.get('/tracks', { params })).data;
+  },
+};
+
+export const artistsApi = {
+  async getArtistById(id: number): Promise<AxiosResponse<ArtistResponse|null>> {
+    return (await apiClient.get(`/artists/${id}`)).data;
+  },
+  async getArtists(params: PaginatedRequest): Promise<AxiosResponse<ArtistResponse[]|[]>> {
+    return (await apiClient.get('/artists', { params })).data;
+  },
+};
+
+export const trackWithArtistApi = {
+  async getTracksWithArtistById(id: number): Promise<AxiosResponse<TrackWithArtistResponse|null>> {
+    return (await apiClient.get(`/tracks_artists/${id}`)).data;
+  },
+
+  async getTracksWithArtist(params: PaginatedRequest): Promise<TrackWithArtistResponse[]|[]> {
+    return (await apiClient.get('/tracks_artists', { params })).data;
+  },
+};

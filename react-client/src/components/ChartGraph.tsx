@@ -1,5 +1,4 @@
 import { Line } from 'react-chartjs-2';
-import { Track } from 'src/types/track';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { TrackResponse } from '@typings/track';
 
 ChartJS.register(
   CategoryScale,
@@ -22,35 +22,35 @@ ChartJS.register(
 );
 
 interface Props {
-    track: Track;
+    track: TrackResponse;
   }
 
 export default function ChartGraph({ track }: Props) {
   const labels = Object.values(track.platforms).reduce((pre, cur) => {
-    if (pre.chartInfos.length < cur.chartInfos.length) {
+    if (pre.weeklyChartScope.length < cur.weeklyChartScope.length) {
       return cur;
     }
     return pre;
-  }).chartInfos.map((info) => `${info.weekOfMonth.year}-${info.weekOfMonth.month}-${info.weekOfMonth.week}`);
+  }).weeklyChartScope.map((info) => `${info.weekOfMonth.year}-${info.weekOfMonth.month}-${info.weekOfMonth.week}`);
 
   const chartData = {
     labels,
     datasets: [
       {
         label: 'Melon',
-        data: track.platforms?.melon?.chartInfos.map((info) => info.rank),
+        data: track.platforms?.melon?.weeklyChartScope.map((info) => info.rank),
         borderColor: '#00C73C',
         backgroundColor: '#00C73C',
       },
       {
         label: 'Genie',
-        data: track.platforms?.genie?.chartInfos.map((info) => info.rank),
+        data: track.platforms?.genie?.weeklyChartScope.map((info) => info.rank),
         borderColor: '#3498DB',
         backgroundColor: '#3498DB',
       },
       {
         label: 'Bugs',
-        data: track.platforms?.bugs?.chartInfos.map((info) => info.rank),
+        data: track.platforms?.bugs?.weeklyChartScope.map((info) => info.rank),
         borderColor: '#E44C29',
         backgroundColor: '#E44C29',
       },

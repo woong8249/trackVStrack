@@ -1,11 +1,25 @@
 import Logo from '@components/Logo';
-import tracks from '../assets/track.json';
 import TrackOverview from '@components/TrackOverview';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { trackWithArtistApi } from '@utils/axios';
+import { TrackWithArtistResponse } from '@typings/track-artist';
 
 function Main() {
   const [isLargeViewport, setIsLargeViewport] = useState(false);
+  const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
+
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        const response = await trackWithArtistApi.getTracksWithArtist({ offset: 100 });
+        setTracks(response); // 데이터 상태에 저장
+      } catch (error) {
+        console.error('Failed to fetch tracks:', error);
+      }
+    };
+    fetchTracks();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
