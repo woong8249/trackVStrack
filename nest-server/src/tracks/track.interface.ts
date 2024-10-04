@@ -1,11 +1,4 @@
-import { WeeklyChartScope } from '../db/fetch';
-
-export type ArtistResponse = {
-  id: number;
-  artistName: string;
-  artistImage: string | null;
-  debut: string | null;
-};
+import { WeeklyChartScope } from 'src/database/types/fetch';
 
 export type Platform = {
   weeklyChartScope: (WeeklyChartScope & { rank: string })[];
@@ -22,8 +15,4 @@ export type TrackResponse = {
     genie?: Platform;
     bugs?: Platform;
   };
-};
-
-export type TrackWithArtistResponse = TrackResponse & {
-  artists: ArtistResponse[];
 };

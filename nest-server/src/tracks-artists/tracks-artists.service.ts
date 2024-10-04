@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { Track } from '../tracks/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyLogger } from '../logger/logger.service';
-import { TrackWithArtistResponse } from 'src/types/responseDTO/track';
+import { TrackWithArtistResponse } from './track-artist.interface';
 import { TracksService } from 'src/tracks/tracks.service';
 import { ArtistsService } from 'src/artists/artists.service';
 

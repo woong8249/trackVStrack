@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Artist } from './artist.entity';
-import { ArtistResponse } from 'src/types/responseDTO/track';
+import { ArtistResponse } from 'src/artists/artist.interface';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyLogger } from 'src/logger/logger.service';

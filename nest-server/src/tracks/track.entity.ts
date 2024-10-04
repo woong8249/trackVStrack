@@ -1,4 +1,3 @@
-import type { TrackFormatWithAddInfo } from '../types/db/processing';
 import {
   Column,
   CreateDateColumn,
@@ -9,6 +8,7 @@ import {
   type ValueTransformer,
 } from 'typeorm';
 import { Artist } from '../artists/artist.entity';
+import { TrackFormatWithAddInfo } from 'src/database/types/processing';
 
 // 커스텀 변환기 정의
 class JsonTransformer implements ValueTransformer {
