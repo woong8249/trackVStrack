@@ -4,23 +4,32 @@ import { Track } from '../tracks/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyLogger } from '../logger/logger.service';
 import { TrackWithArtistResponse } from 'src/types/responseDTO/track';
+import { TracksService } from 'src/tracks/tracks.service';
+import { ArtistsService } from 'src/artists/artists.service';
 
 @Injectable()
 export class TracksArtistsService {
   constructor(
     @InjectRepository(Track)
     private trackRepo: Repository<Track>,
+    private tracksService: TracksService,
+    private artistsService: ArtistsService,
     private myLogger: MyLogger,
   ) {
     this.myLogger.setContext(TracksArtistsService.name);
   }
 
-  async findById(id: number): Promise<Track | null> {
-    return this.trackRepo
+  async findById(id: number): Promise<TrackWithArtistResponse | null> {
+    const track = await this.trackRepo
       .createQueryBuilder('track')
       .leftJoinAndSelect('track.artists', 'artist')
-      .where({ id })
+      .where('track.id = :id', { id })
       .getOne();
+    const mappedArtists = track.artists.map((artist) =>
+      this.artistsService.mapArtistToResponse(artist),
+    );
+    const mappedTrack = this.tracksService.mapTrackToResponse(track);
+    return { id: track.id, ...mappedTrack, artists: mappedArtists };
   }
 
   async find(
@@ -43,36 +52,13 @@ export class TracksArtistsService {
       .skip(offset)
       .take(limit)
       .getMany();
+
     return tracks.map<TrackWithArtistResponse>((track) => {
-      const { artists, platforms, id } = track;
-      const { bugs, melon, genie } = platforms;
-      const availablePlatform = bugs || melon || genie;
-
-      const mappedTrack: TrackWithArtistResponse = {
-        id,
-        titleName: availablePlatform.titleName,
-        trackImage: availablePlatform.trackImage,
-        releaseDate: availablePlatform.releaseDate,
-        lyrics: availablePlatform.lyrics,
-        platforms: {
-          bugs: { weeklyChartScope: bugs?.weeklyChartScope },
-          melon: { weeklyChartScope: melon?.weeklyChartScope },
-          genie: { weeklyChartScope: genie?.weeklyChartScope },
-        },
-        artists: artists.map((artist) => {
-          const { id, platforms } = artist;
-          const { bugs, melon, genie } = platforms;
-          const availablePlatform = bugs || melon || genie;
-
-          return {
-            id,
-            artistName: availablePlatform.artistName,
-            artistImage: availablePlatform.artistImage,
-            debut: availablePlatform.debut,
-          };
-        }),
-      };
-      return mappedTrack;
+      const mappedArtists = track.artists.map((artist) =>
+        this.artistsService.mapArtistToResponse(artist),
+      );
+      const mappedTrack = this.tracksService.mapTrackToResponse(track);
+      return { id: track.id, ...mappedTrack, artists: mappedArtists };
     });
   }
 }
