@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { TracksService } from './tracks.service';
+import { FindDto } from 'src/common/find.dto';
+import { FindOneByIdDTO } from 'src/common/findOneByID.dto';
 
 @ApiTags('Tracks') // Swagger 태그 설정
 @Controller('tracks')
@@ -13,8 +15,8 @@ export class TracksController {
     description: 'Retrieve a specific track by ID',
   })
   @ApiParam({ name: 'id', description: 'ID of the track', type: Number })
-  async findOneByID(@Param('id') id: number) {
-    return this.trackService.findById(id);
+  async findOneByID(@Param() parm: FindOneByIdDTO) {
+    return this.trackService.findById(parm.id);
   }
 
   @Get()
@@ -48,12 +50,12 @@ export class TracksController {
     description: 'Search query to filter tracks by keyword',
     example: 'some keyword',
   })
-  async find(
-    @Query('limit') limit: number = 10,
-    @Query('offset') offset: number = 0,
-    @Query('sort') sort: 'asc' | 'desc' = 'desc',
-    @Query('query') query?: string,
-  ) {
-    return this.trackService.find(limit, offset, sort, query);
+  async find(@Query() query: FindDto) {
+    return this.trackService.find(
+      query.limit,
+      query.offset,
+      query.sort,
+      query.query,
+    );
   }
 }
