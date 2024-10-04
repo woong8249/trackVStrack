@@ -3,11 +3,11 @@ import { IsOptional, IsString, IsNumberString } from 'class-validator';
 export class FindDto {
   @IsOptional()
   @IsNumberString()
-  limit?: number = 10;
+  limit?: number;
 
   @IsOptional()
   @IsNumberString()
-  offset?: number = 0;
+  offset?: number;
 
   @IsOptional()
   @IsString()

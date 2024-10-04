@@ -52,9 +52,9 @@ export class ArtistsController {
   })
   async find(@Query() query: FindDto) {
     return this.artistsService.find(
-      query.limit,
-      query.offset,
-      query.sort,
+      query.limit || 10,
+      query.offset || 0,
+      query.sort || 'desc',
       query.query,
     );
   }

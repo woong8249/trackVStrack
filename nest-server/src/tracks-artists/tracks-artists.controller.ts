@@ -36,9 +36,9 @@ export class TracksArtistsController {
   })
   async find(@Query() query: FindDTO) {
     return this.trackArtistService.find(
-      query.limit,
-      query.offset,
-      query.sort,
+      query.limit || 10,
+      query.offset || 0,
+      query.sort || 'desc',
       query.query,
     );
   }
