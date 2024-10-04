@@ -1,13 +1,13 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { TracksService } from './tracks.service';
+import { TracksArtistsService } from './tracks-artists.service';
 
-@Controller('tracks')
-export class TracksController {
-  constructor(private trackService: TracksService) {}
+@Controller('tracks_artists')
+export class TracksArtistsController {
+  constructor(private trackArtistService: TracksArtistsService) {}
 
   @Get(':id')
   async findOneByID(@Param('id') id: number) {
-    return this.trackService.findById(id);
+    return this.trackArtistService.findById(id);
   }
 
   @Get()
@@ -17,6 +17,6 @@ export class TracksController {
     @Query('sort') sort: 'asc' | 'desc' = 'desc',
     @Query('query') query?: string,
   ) {
-    return this.trackService.find(limit, offset, sort, query);
+    return this.trackArtistService.find(limit, offset, sort, query);
   }
 }

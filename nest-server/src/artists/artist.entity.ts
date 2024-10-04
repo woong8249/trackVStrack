@@ -1,4 +1,4 @@
-import type { ArtistFormatWithAddInfo } from '../types/processing';
+import type { ArtistFormatWithAddInfo } from '../types/db/processing';
 import {
   Column,
   CreateDateColumn,

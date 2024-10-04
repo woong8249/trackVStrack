@@ -1,4 +1,4 @@
-import type { TrackFormatWithAddInfo } from '../types/processing';
+import type { TrackFormatWithAddInfo } from '../types/db/processing';
 import {
   Column,
   CreateDateColumn,
