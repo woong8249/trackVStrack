@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .responsive-text {
+      @apply text-sm; /* 기본 크기 */
+    }
+  
+    @screen sm {
+      .responsive-text {
+        @apply text-base;
+      }
+    }
+  
+    @screen md {
+      .responsive-text {
+        @apply text-lg;
+      }
+    }
+  
+    @screen lg {
+      .responsive-text {
+        @apply text-xl;
+      }
+    }
+  
+    /* @screen xl {
+      .responsive-text {
+        @apply text-2xl;
+      }
+    } */
+  }
+  

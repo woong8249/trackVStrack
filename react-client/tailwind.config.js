@@ -7,11 +7,21 @@ export default {
   theme: {
     extend: {
       textShadow: {
-        // 커스텀 텍스트 그림자 정의
-        default: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+        default: '2px 2px 4px rgba(0, 0, 0, 0.3)', // 커스텀 텍스트 그림자 정의
       },
       screens: {
         mobile: '400px', // 400px 이상일 때 적용되는 브레이크포인트 추가
+      },
+      container: {
+        center: true, // container를 중앙에 정렬
+        padding: '2rem', // 기본 패딩 설정
+        // screens: {
+        //   sm: '600px', // sm:640
+        //   md: '700px', // md:768
+        //   lg: '900px', //  lg: 1024
+        //   xl: '1200px', // xl: 1280
+        //   '2xl': '1400px', // 2xl: 1536
+        // },
       },
     },
   },

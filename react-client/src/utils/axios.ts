@@ -3,11 +3,15 @@ import { ArtistResponse } from '@typings/artist';
 import { TrackWithArtistResponse } from '@typings/track-artist';
 import { TrackResponse } from '@typings/track';
 
-interface PaginatedRequest {
+interface FindDTO {
   limit?: number;
   offset?: number;
-  sort?: 'asc' | 'desc';
+  sort?: 'asc' | 'desc'|'random';
   query?: string;
+}
+export interface FindWithChartDurationDTO extends FindDTO {
+  minWeeksOnChart?: number;
+  random?: boolean
 }
 
 const apiClient = axios.create({
@@ -23,7 +27,7 @@ export const tracksApi = {
     return (await apiClient.get(`/tracks/${id}`)).data;
   },
 
-  async getTracks(params: PaginatedRequest): Promise<AxiosResponse<TrackResponse[]|[]>> {
+  async getTracks(params: FindWithChartDurationDTO): Promise<AxiosResponse<TrackResponse[]|[]>> {
     return (await apiClient.get('/tracks', { params })).data;
   },
 };
@@ -32,17 +36,18 @@ export const artistsApi = {
   async getArtistById(id: number): Promise<AxiosResponse<ArtistResponse|null>> {
     return (await apiClient.get(`/artists/${id}`)).data;
   },
-  async getArtists(params: PaginatedRequest): Promise<AxiosResponse<ArtistResponse[]|[]>> {
+  async getArtists(params: FindDTO): Promise<AxiosResponse<ArtistResponse[]|[]>> {
     return (await apiClient.get('/artists', { params })).data;
   },
 };
 
 export const trackWithArtistApi = {
   async getTracksWithArtistById(id: number): Promise<AxiosResponse<TrackWithArtistResponse|null>> {
-    return (await apiClient.get(`/tracks_artists/${id}`)).data;
+    return (await apiClient.get(`/tracks-artists/${id}`)).data;
   },
 
-  async getTracksWithArtist(params: PaginatedRequest): Promise<TrackWithArtistResponse[]|[]> {
-    return (await apiClient.get('/tracks_artists', { params })).data;
+  async getTracksWithArtist(params: FindWithChartDurationDTO):
+   Promise<TrackWithArtistResponse[]|[]> {
+    return (await apiClient.get('/tracks-artists', { params })).data;
   },
 };
