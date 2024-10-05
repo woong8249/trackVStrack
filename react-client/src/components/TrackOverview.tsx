@@ -1,56 +1,73 @@
-import { useState } from 'react';
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import { useState, useEffect, useRef } from 'react';
 import ChartGraph from './ChartGraph';
 import TrackInfoCard from './TrackInfoCard';
 import { TrackWithArtistResponse } from '@typings/track-artist';
 
 interface Props {
   track: TrackWithArtistResponse;
-  isLargeViewport:boolean
+  isLargeViewport: boolean;
 }
 
 export default function TrackOverview({ track, isLargeViewport }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const handleEscKey = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      setIsModalOpen(false);
+    }
+  };
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setIsModalOpen(false);
+    }
+  };
+
+  // ESC key to close modal
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, []);
+
+  // Click outside to close modal
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [modalRef]);
+
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
     <div
+    className="border-[1px] border-[#9A9A9A] rounded-md hover:bg-gray-200 transition cursor-pointer shadow-2xl"
+    onClick={() => { setIsModalOpen(!isModalOpen); }}
     role="button"
     tabIndex={0}
-    onClick={() => { setIsModalOpen(true); }}
-    className='border-[1px] border-[#9A9A9A] rounded-md hover:bg-gray-200 transition cursor-pointer shadow-2xl'
     >
       <TrackInfoCard track={track} />
-      {isLargeViewport && <ChartGraph track={track} />}
 
-      {/* modal */}
+      {isLargeViewport && (
+        <>
+          <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+          <ChartGraph track={track} />
+        </>
+      )}
+
+      {/* Modal */}
       {isModalOpen && (
-        <div
-          role='button'
-          tabIndex={0}
-          key={track.id}
-           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-15"
-           onClick={(e) => {
-             if (e.target === e.currentTarget) { // 모달 외부 클릭 시
-               e.stopPropagation();
-               setIsModalOpen(false);
-             }
-           }}
-           onKeyDown={(e) => {
-             if (e.key === 'Escape') {
-               setIsModalOpen(false); // ESC 키를 누르면 모달 닫기
-             }
-           }}
-           >
-          <div className="bg-white rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto" >
-            <button
-            className="fixed top-4 right-4 text-gray-600 hover:text-gray-800 font-bold text-[3rem]"
-            onClick={(e) => {
-              e.stopPropagation(); // 이벤트 버블링 방지
-              setIsModalOpen(false);
-            }}>
-              ×
-            </button>
-
-            <div className="w-[50rem] sm:w-[70rem]  overflow-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-15">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+            role="button"
+            tabIndex={0}
+            >
+            <div className="w-[50rem] sm:w-[70rem] overflow-auto">
+              <TrackInfoCard track={track} />
+              <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
               <ChartGraph track={track} />
             </div>
           </div>

@@ -67,14 +67,13 @@ function TopNavBar() {
 
         {/* Right: Buttons for large screens */}
         <div className="hidden md:flex items-center space-x-4">
-          <button className=" py-[0.5rem] px-[1rem] responsive-text font-bold rounded hover:text-[#9ab867] whitespace-nowrap">
+          <button className="  px-[0.5rem] responsive-text font-bold rounded hover:text-[#9ab867] whitespace-nowrap">
             DashBoard
           </button>
 
-          {/* Divider line */}
           <span className="text-gray-300">|</span>
 
-          <button className="py-[0.5rem] px-[1rem] responsive-text font-bold rounded hover:text-[#9ab867] whitespace-nowrap">
+          <button className=" px-[0.5rem] responsive-text font-bold rounded hover:text-[#9ab867] whitespace-nowrap">
             Real-Time Chart
           </button>
         </div>
@@ -82,7 +81,7 @@ function TopNavBar() {
         {/* Hamburger Menu for small screens */}
         <div className="md:hidden flex items-center">
           <button
-            className="py-[0.5rem] px-[1rem] font-bold rounded focus:outline-none"
+            className=" px-[0.5rem] font-bold rounded focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             &#x22EE;

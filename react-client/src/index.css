@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer utilities {
+
+    .responsive-h1 {
+        @apply text-2xl; /* 기본 크기 */
+        @apply font-bold; /* 굵은 폰트 */
+      }
+    
     .responsive-text {
       @apply text-sm; /* 기본 크기 */
     }
@@ -11,19 +17,26 @@
       .responsive-text {
         @apply text-base;
       }
+      .responsive-h1 {
+        @apply text-3xl;
+      }
     }
   
     @screen md {
       .responsive-text {
         @apply text-lg;
       }
+      .responsive-h1 {
+        @apply text-4xl;
+      }
     }
   
-    @screen lg {
+    /* @screen lg {
       .responsive-text {
         @apply text-xl;
       }
-    }
+      
+    } */
   
     /* @screen xl {
       .responsive-text {
