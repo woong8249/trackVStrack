@@ -30,7 +30,7 @@ export default function TrackOverview({ track, isLargeViewport }: Props) {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-15">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-15 backdrop-blur-sm">
           <div
             ref={modalRef}
             className="bg-white rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto"

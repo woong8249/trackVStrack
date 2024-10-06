@@ -1,5 +1,5 @@
 import { ArtistResponse } from '@typings/artist';
-import { TrackResponse } from '@typings/track';
+import { TrackWithArtistResponse } from '@typings/track-artist';
 import { trackWithArtistApi, artistsApi } from '@utils/axios';
 import React, { useState, useRef, useEffect } from 'react';
 import TrackInfoCard from './TrackInfoCard';
@@ -8,7 +8,7 @@ import ArtistsInfoCard from './ArtistsInfoCard';
 export default function ModalSearch() {
   const [modalQuery, setModalQuery] = useState(''); // 모달 내 검색창 상태
   const [artistList, setArtistList] = useState<ArtistResponse[]>([]);
-  const [trackList, setTrackList] = useState<TrackResponse[]>([]);
+  const [trackList, setTrackList] = useState<TrackWithArtistResponse[]>([]);
   const modalSearchRef = useRef<HTMLInputElement>(null); // 모달 내부 검색창 참조
 
   // 모달 내 검색 요청 함수

@@ -41,7 +41,7 @@ export function SearchBar() {
           {/* 모달 컨텐츠 */}
           <div
             ref={modalRef}
-            className="bg-white w-full max-w-4xl mx-auto border border-gray-300 rounded-lg shadow-lg max-h-[40rem] min-h-[20rem] overflow-y-auto p-4 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            className="bg-white w-full max-w-4xl mx-auto border border-gray-300 rounded-lg shadow-lg max-h-[40rem] min-h-[70vh] overflow-y-auto p-4 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
             onClick={(e) => e.stopPropagation()}
             role="button"
             tabIndex={0}

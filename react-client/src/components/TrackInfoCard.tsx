@@ -2,59 +2,53 @@ import { TrackWithArtistResponse } from '@typings/track-artist';
 import { Link } from 'react-router-dom';
 
 interface Props {
-  track: TrackWithArtistResponse | Omit<TrackWithArtistResponse, 'artists'>;
+  track: TrackWithArtistResponse;
 }
 
 export default function TrackInfoCard({ track }: Props) {
   return (
     <div className="flex justify-between items-center px-[0.5rem] group">
-      <div className="flex flex-grow items-center">
+      <div className="flex flex-grow items-center overflow-x-auto">
+        {/* 부모 요소에도 overflow-x-auto를 추가합니다 */}
         <img
           src={track.trackImage}
           alt="album jacket"
           className="w-[6rem] h-[6rem] sm:w-[8rem] sm:h-[8rem] mr-[2rem] sm:mr-[3rem]"
         />
 
-        {('artists' in track && track.artists) ? (
-          <div className="text-xs overflow-auto max-h-[5rem] flex flex-col gap-1">
-            <Link
-              to={{ pathname: '/track' }}
-              state={{ track }}
-              className="text-[#3D3D3D] w-[15rem] sm:max-w-[20rem] sm:w-[20rem] responsive-small-text font-bold group-hover:underline"
-            >
-              <p>{track.titleName}</p>
-            </Link>
+        {/* 텍스트 컨테이너에 최소 크기 설정 */}
+        <div className="text-xs max-h-[5rem] flex flex-col gap-1 overflow-x-auto whitespace-nowrap min-w-[150px] sm:min-w-[200px] md:min-w-[300px] lg:min-w-[330px]">
+          {/* 제목이 줄바꿈 없이 스크롤 가능하게 설정 */}
+          <Link
+            to={{ pathname: '/track' }}
+            state={{ track }}
+            className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold group-hover:underline"
+          >
+            <p>{track.titleName}</p>
+          </Link>
 
-            {track.artists.map((artist) => (
+          {/* 아티스트 리스트 부분을 한 줄로 만들고 좌우 스크롤 가능하게 설정 */}
+          <div className="whitespace-nowrap overflow-x-auto">
+            {track.artists.map((artist, index) => (
               <Link
                 key={artist.id}
                 to={{ pathname: '/artist' }}
                 state={{ artist }}
-                className="text-[#9A9A9A] responsive-extra-small-text font-bold cursor-pointer"
+                className="text-[#9A9A9A] responsive-extra-small-text font-bold cursor-pointer inline-block hover:underline"
               >
-                {artist.artistName}
+                <span>
+                  {artist.artistName}
+                  {index !== track.artists.length - 1 && ', '}
+                </span>
               </Link>
             ))}
-
-            <p className="text-[#707070] responsive-extra-small-text">
-              {track.releaseDate ? track.releaseDate.split('T')[0] : '정보 없음'}
-            </p>
           </div>
-        ) : (
-          <div className="text-xs overflow-auto max-h-[5rem] flex flex-col gap-1">
-            <Link
-              to={{ pathname: '/track' }}
-              state={{ track }}
-              className="text-[#3D3D3D] w-[15rem] sm:max-w-[20rem] sm:w-[20rem] responsive-small-text font-bold group-hover:underline"
-            >
-              <p>{track.titleName}</p>
-            </Link>
 
-            <p className="text-[#707070] responsive-extra-small-text">
-              {track.releaseDate ? track.releaseDate.split('T')[0] : '정보 없음'}
-            </p>
-          </div>
-        )}
+          {/* 날짜 표시 부분도 줄바꿈 없이 처리 */}
+          <p className="text-[#707070] responsive-extra-small-text whitespace-nowrap">
+            {track.releaseDate ? track.releaseDate.split('T')[0] : '정보 없음'}
+          </p>
+        </div>
       </div>
     </div>
   );
