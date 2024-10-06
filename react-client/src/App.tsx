@@ -5,18 +5,18 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 
-import Main from '@pages/Main';
+import MainPage from '@pages/MainPage';
 import './index.css';
-import Dashboard from '@pages/Dashboard';
+import TrackPage from '@pages/TrackPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Main />,
+    element: <MainPage />,
   },
   {
-    path: '/dashboard',
-    element: <Dashboard />,
+    path: '/track',
+    element: <TrackPage />,
   },
 ]);
 
