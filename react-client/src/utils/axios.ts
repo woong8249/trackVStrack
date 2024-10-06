@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { ArtistResponse } from '@typings/artist';
 import { TrackWithArtistResponse } from '@typings/track-artist';
 import { TrackResponse } from '@typings/track';
@@ -23,26 +23,26 @@ const apiClient = axios.create({
 });
 
 export const tracksApi = {
-  async getTrackById(id: number): Promise<AxiosResponse<TrackResponse|null>> {
+  async getTrackById(id: number): Promise<TrackResponse|null> {
     return (await apiClient.get(`/tracks/${id}`)).data;
   },
 
-  async getTracks(params: FindWithChartDurationDTO): Promise<AxiosResponse<TrackResponse[]|[]>> {
+  async getTracks(params: FindWithChartDurationDTO): Promise<TrackResponse[]|[]> {
     return (await apiClient.get('/tracks', { params })).data;
   },
 };
 
 export const artistsApi = {
-  async getArtistById(id: number): Promise<AxiosResponse<ArtistResponse|null>> {
+  async getArtistById(id: number): Promise<ArtistResponse|null> {
     return (await apiClient.get(`/artists/${id}`)).data;
   },
-  async getArtists(params: FindDTO): Promise<AxiosResponse<ArtistResponse[]|[]>> {
+  async getArtists(params: FindDTO): Promise<ArtistResponse[]|[]> {
     return (await apiClient.get('/artists', { params })).data;
   },
 };
 
 export const trackWithArtistApi = {
-  async getTracksWithArtistById(id: number): Promise<AxiosResponse<TrackWithArtistResponse|null>> {
+  async getTracksWithArtistById(id: number): Promise<TrackWithArtistResponse|null> {
     return (await apiClient.get(`/tracks-artists/${id}`)).data;
   },
 

@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useState, useEffect, useRef } from 'react';
+import { useModal } from '@hooks/useModal';
 import ChartGraph from './ChartGraph';
 import TrackInfoCard from './TrackInfoCard';
 import { TrackWithArtistResponse } from '@typings/track-artist';
@@ -10,34 +10,7 @@ interface Props {
 }
 
 export default function TrackOverview({ track, isLargeViewport }: Props) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const handleEscKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      setIsModalOpen(false);
-    }
-  };
-  const handleClickOutside = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      setIsModalOpen(false);
-    }
-  };
-
-  // ESC key to close modal
-  useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, []);
-
-  // Click outside to close modal
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [modalRef]);
+  const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 
   return (
     <div

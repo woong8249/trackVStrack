@@ -1,6 +1,6 @@
 export type ArtistResponse = {
     id: number;
     artistName: string;
-    artistImage: string | null;
+    artistImage: string;
     debut: string | null;
   };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import SearchBar from '@components/SearchBar';
+import SearchBar from '@components/SearchBar3';
 import { TrackResponse } from '@typings/track';
 import { trackWithArtistApi } from '@utils/axios';
 import TrackInfoCard from '@components/TrackInfoCard';

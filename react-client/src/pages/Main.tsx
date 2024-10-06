@@ -4,7 +4,7 @@ import { trackWithArtistApi } from '@utils/axios';
 import { TrackWithArtistResponse } from '@typings/track-artist';
 import TopNavBar from '@layouts/TopNavBar';
 
-function Main2() {
+function Main() {
   const [isLargeViewport, setIsLargeViewport] = useState(false);
   const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
 
@@ -60,4 +60,4 @@ function Main2() {
   );
 }
 
-export default Main2;
+export default Main;
