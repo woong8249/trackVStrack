@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => {
         '@pages': path.resolve(__dirname, 'src/pages'),
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@typings': path.resolve(__dirname, 'src/typings'),
+        '@assets': path.resolve(__dirname, 'src/assets'),
       },
     },
   };
