@@ -13,7 +13,7 @@ export default function TrackInfoCard({ track }: Props) {
         <img
           src={track.trackImage}
           alt="album jacket"
-          className="w-[6rem] h-[6rem] sm:w-[8rem] sm:h-[8rem] mr-[2rem] sm:mr-[3rem]"
+          className="w-[100px] h-[100px]  mr-[2rem] sm:mr-[3rem]"
         />
 
         {/* 텍스트 컨테이너에 최소 크기 설정 */}

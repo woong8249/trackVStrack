@@ -1,6 +1,6 @@
 export type WeeklyChartScope = {
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   weekOfMonth: {
     year: string;
     month: string;

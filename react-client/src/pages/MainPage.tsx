@@ -1,18 +1,20 @@
-/* eslint-disable consistent-return */
 import TrackOverview from '@components/TrackOverview';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { trackWithArtistApi } from '@utils/axios';
 import { TrackWithArtistResponse } from '@typings/track-artist';
 import TopNavBar from '@layouts/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
 
+// 뷰포트 타입을 '소', '중', '대'로 변경
+type ViewportType = 'small' | 'medium' | 'large';
+
 function MainPage() {
-  const [isLargeViewport, setIsLargeViewport] = useState(false);
   const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
   const [loading, setLoading] = useState(true); // 로딩 상태 관리
   const [error, setError] = useState<Error | null>(null); // 에러 상태 관리
   const containerRef = useRef<HTMLDivElement>(null);
+  const [viewportType, setViewportType] = useState<ViewportType>('large'); // 뷰포트 타입 상태
 
   const fetchTracks = async () => {
     setLoading(true);
@@ -31,33 +33,41 @@ function MainPage() {
   };
 
   useEffect(() => {
-    fetchTracks();
-  }, []);
-
-  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
     const resizeObserver = new ResizeObserver((entries) => {
-      const [_container] = entries;
-      if (_container.contentRect.width >= 768) {
-        setIsLargeViewport(true);
+      const entry = entries[0];
+      const { width } = entry.contentRect;
+
+      // width에 따른 '소', '중', '대' 크기 설정
+      if (width < 768) {
+        setViewportType('small'); // 768px 미만은 소형 뷰포트
+      } else if (width >= 768 && width < 1024) {
+        setViewportType('medium'); // 768px 이상, 1024px 미만은 중형 뷰포트
       } else {
-        setIsLargeViewport(false);
+        setViewportType('large'); // 1024px 이상은 대형 뷰포트
       }
     });
 
     resizeObserver.observe(container);
 
+    // eslint-disable-next-line consistent-return
     return () => {
       resizeObserver.unobserve(container);
     };
   }, [containerRef]);
 
+  // 데이터 요청
+  useEffect(() => {
+    fetchTracks();
+  }, []);
+
   return (
     <div className="min-h-screen min-w-[375px]" ref={containerRef}>
       <TopNavBar />
 
-      <h1 className="text-center responsive-h1 font-bold mt-[10rem] mb-[1rem] text-shadow">
+      <h1 className="p-[1rem] text-center responsive-h1 font-bold mt-[10rem] mb-[1rem] text-shadow">
         "Easily View and Compare Track Charts."
       </h1>
 
@@ -73,7 +83,7 @@ function MainPage() {
       {!loading && !error && (
         <div className="flex justify-center items-center gap-[2rem] flex-wrap mt-[3rem] pb-[3rem]">
           {tracks.map((track) => (
-            <TrackOverview key={track.id} track={track} isLargeViewport={isLargeViewport} />
+            <TrackOverview key={track.id} track={track} viewportType={viewportType} />
           ))}
         </div>
       )}
