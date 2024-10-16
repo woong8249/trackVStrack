@@ -4,6 +4,7 @@ import { TracksService } from './tracks.service';
 
 import { FindOneByIdDTO } from 'src/common/findOneByID.dto';
 import { FindWithChartDurationDTO } from 'src/common/findWIthChartDuration.doto';
+import { FindDTO } from 'src/common/find.dto';
 
 @ApiTags('Tracks') // Swagger 태그 설정
 @Controller('tracks')
@@ -16,8 +17,14 @@ export class TracksController {
     description: 'Retrieve a specific track by ID',
   })
   @ApiParam({ name: 'id', description: 'ID of the track', type: Number })
-  async findOneByID(@Param() parm: FindOneByIdDTO) {
-    return this.trackService.findById(parm.id);
+  @ApiQuery({
+    name: 'withArtists',
+    required: false,
+    example: false,
+    description: 'Whether artist information is included',
+  })
+  async findOneByID(@Param() parm: FindOneByIdDTO, @Query() query: FindDTO) {
+    return this.trackService.findById(parm.id, query.withArtists);
   }
 
   @Get()
@@ -54,11 +61,18 @@ export class TracksController {
     description:
       'Filter tracks that have been on the chart for at least the specified number of weeks. default is 10',
   })
+  @ApiQuery({
+    name: 'withArtists',
+    required: false,
+    example: false,
+    description: 'Whether artist information is included',
+  })
   async find(@Query() query: FindWithChartDurationDTO) {
     return this.trackService.find(
       query.limit || 10,
       query.offset || 0,
       query.sort || 'desc',
+      query.withArtists,
       query.query,
       query.minWeeksOnChart || 0,
     );

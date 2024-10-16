@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumberString,
+  IsIn,
+  IsBoolean,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class FindDTO {
   @IsOptional()
@@ -16,4 +23,14 @@ export class FindDTO {
   @IsOptional()
   @IsString()
   query?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => value === 'true') // 문자열을 boolean으로 변환
+  @IsBoolean()
+  withArtists?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => value === 'true') // 문자열을 boolean으로 변환
+  @IsBoolean()
+  withTracks?: boolean;
 }

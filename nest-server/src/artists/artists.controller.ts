@@ -14,9 +14,15 @@ export class ArtistsController {
     summary: 'Get Artist by ID',
     description: 'Retrieve a specific artist by ID',
   })
+  @ApiQuery({
+    name: 'withTracks',
+    required: false,
+    example: false,
+    description: 'Whether Tracks information is included',
+  })
   @ApiParam({ name: 'id', description: 'ID of the artist', type: Number })
-  async findOneByID(@Param() parm: FindOneByIdDTO) {
-    return this.artistsService.findById(parm.id);
+  async findOneByID(@Param() parm: FindOneByIdDTO, @Query() query: FindDTO) {
+    return this.artistsService.findById(parm.id, query.withTracks);
   }
 
   @Get()
@@ -50,11 +56,18 @@ export class ArtistsController {
     description: 'Search query to filter artists by keyword',
     example: 'some keyword',
   })
+  @ApiQuery({
+    name: 'withTracks',
+    required: false,
+    example: false,
+    description: 'Whether Tracks information is included',
+  })
   async find(@Query() query: FindDTO) {
     return this.artistsService.find(
       query.limit || 10,
       query.offset || 0,
       query.sort || 'desc',
+      query.withTracks,
       query.query,
     );
   }

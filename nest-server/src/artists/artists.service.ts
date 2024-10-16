@@ -1,14 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Artist } from './artist.entity';
-import { ArtistResponse } from 'src/artists/artist.interface';
+import {
+  ArtistResponse,
+  ArtistWithTracksResponse,
+} from 'src/artists/artist.interface';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyLogger } from 'src/logger/logger.service';
+import { TracksService } from 'src/tracks/tracks.service';
 @Injectable()
 export class ArtistsService {
   constructor(
     @InjectRepository(Artist)
     private artistRepo: Repository<Artist>,
+    @Inject(forwardRef(() => TracksService))
+    private readonly tracksService: TracksService,
     private myLogger: MyLogger,
   ) {
     this.myLogger.setContext(ArtistsService.name);
@@ -25,14 +31,36 @@ export class ArtistsService {
     };
   }
 
-  async findById(id: number): Promise<ArtistResponse | null> {
+  async findById(
+    id: number,
+    withTracks: boolean,
+  ): Promise<ArtistResponse | ArtistWithTracksResponse | null> {
+    if (withTracks) {
+      const artistWithTracks = await this.artistRepo
+        .createQueryBuilder('artist')
+        .leftJoinAndSelect('artist.tracks', 'track') // leftJoinAndSelect로 수정
+        .where('artist.id = :id', { id })
+        .getOne();
+
+      const mappedArtist = this.mapArtistToResponse(artistWithTracks);
+      const mappedTracks = artistWithTracks.tracks.map((track) =>
+        this.tracksService.mapTrackToResponse(track),
+      );
+      return {
+        ...mappedArtist,
+        tracks: mappedTracks,
+      };
+    }
+
     const artist = await this.artistRepo.findOneBy({ id });
-    return { id, ...this.mapArtistToResponse(artist) };
+    return { ...this.mapArtistToResponse(artist) };
   }
+
   async find(
     limit: number,
     offset: number,
     sort: 'asc' | 'desc' | 'random',
+    withTracks?: boolean,
     query?: string,
   ): Promise<ArtistResponse[] | []> {
     const queryBuilder = this.artistRepo.createQueryBuilder('artist');
@@ -41,11 +69,34 @@ export class ArtistsService {
         query: `%${query}%`,
       });
     }
-    const artists = await queryBuilder
-      .orderBy('artist.createDate', sort.toUpperCase() as 'ASC' | 'DESC')
-      .skip(offset)
-      .take(limit)
-      .getMany();
+
+    if (withTracks) {
+      // tracks를 artist와 함께 조인하여 조회
+      queryBuilder.leftJoinAndSelect('artist.tracks', 'track');
+    }
+
+    if (sort === 'random') {
+      queryBuilder.orderBy('RAND()');
+    } else {
+      queryBuilder.orderBy(
+        'artist.createDate',
+        sort.toUpperCase() as 'ASC' | 'DESC',
+      );
+    }
+
+    const artists = await queryBuilder.skip(offset).take(limit).getMany();
+
+    if (withTracks) {
+      // 트랙이 포함된 아티스트 데이터를 반환
+      return artists.map((artist) => ({
+        ...this.mapArtistToResponse(artist),
+        tracks: artist.tracks.map((track) =>
+          this.tracksService.mapTrackToResponse(track),
+        ),
+      }));
+    }
+
+    // 트랙이 없는 기본 아티스트 데이터를 반환
     return artists.map((artist) => this.mapArtistToResponse(artist));
   }
 }

@@ -1,4 +1,5 @@
 import { WeeklyChartScope } from 'src/database/types/fetch';
+import { ArtistResponse } from '../artists/artist.interface';
 
 export type Platform = {
   weeklyChartScope: (WeeklyChartScope & { rank: string })[];
@@ -15,4 +16,8 @@ export type TrackResponse = {
     genie?: Platform;
     bugs?: Platform;
   };
+};
+
+export type TrackWithArtistResponse = TrackResponse & {
+  artists: ArtistResponse[];
 };
