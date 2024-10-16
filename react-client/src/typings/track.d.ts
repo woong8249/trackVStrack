@@ -1,3 +1,5 @@
+import { ArtistResponse } from '@typings/artist';
+
 export type WeeklyChartScope = {
   startDate: string;
   endDate: string;
@@ -24,4 +26,8 @@ export type TrackResponse = {
     genie?: Platform;
     bugs?: Platform;
   };
+};
+
+export type TrackWithArtistResponse = TrackResponse & {
+  artists: ArtistResponse[];
 };

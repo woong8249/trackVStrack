@@ -1,4 +1,4 @@
-import { TrackWithArtistResponse } from '@typings/track-artist';
+import { TrackWithArtistResponse } from '@typings/track';
 import { Link } from 'react-router-dom';
 
 interface Props {
@@ -46,7 +46,7 @@ export default function TrackInfoCard({ track }: Props) {
 
           {/* 날짜 표시 부분도 줄바꿈 없이 처리 */}
           <p className="text-[#707070] responsive-extra-small-text whitespace-nowrap">
-            {track.releaseDate ? track.releaseDate.split('T')[0] : '정보 없음'}
+            {track.releaseDate ? track.releaseDate.split('T')[0] : ''}
           </p>
         </div>
       </div>

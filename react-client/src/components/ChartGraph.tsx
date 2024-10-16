@@ -111,7 +111,6 @@ export default function ChartGraph({ track }: Props) {
     });
   }
   const options :ChartOptions<'line'> = {
-    responsive: true,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -153,7 +152,8 @@ export default function ChartGraph({ track }: Props) {
   };
 
   return (
-    <>
+
+    <div className="chart-container">
       <WeekRangePicker
         startDate={startDate}
         endDate={endDate}
@@ -161,7 +161,6 @@ export default function ChartGraph({ track }: Props) {
       />
 
       <Line data={chartData} options={options} />
-
-    </>
+    </div>
   );
 }

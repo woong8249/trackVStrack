@@ -3,33 +3,46 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* 기존 responsive-h1 */
   .responsive-h1 {
     @apply text-2xl; /* 기본 크기 */
     @apply font-bold; /* 굵은 폰트 */
   }
+  .responsive-h2 {
+    @apply text-lg; /* 기본 크기 */
+    @apply font-semibold; /* 조금 덜 굵은 폰트 */
+  }
 
-  /* 기존 responsive-text */
+  .responsive-h3 {
+    @apply text-lg; /* 기본 크기 */
+    @apply font-medium; /* 더 작은 굵기 */
+  }
+
   .responsive-text {
     @apply text-sm; /* 기본 크기 */
   }
 
-  /* 기존 responsive-small-text */
   .responsive-small-text {
     @apply text-xs; /* 기본 크기 */
   }
 
-  /* 새로운 responsive-extra-small-text */
   .responsive-extra-small-text {
     @apply text-[0.625rem]; /* 기본 크기 (text-xs보다 작음) */
   }
 
   @screen sm {
-    .responsive-text {
-      @apply text-base;
-    }
     .responsive-h1 {
       @apply text-3xl;
+    }
+
+    .responsive-h2 {
+      @apply text-xl; /* 크기 줄임 */
+    }
+
+    .responsive-h3 {
+      @apply text-xl;
+    }
+    .responsive-text {
+      @apply text-base;
     }
     .responsive-small-text {
       @apply text-[0.75rem]; /* sm에서 작은 크기 */
@@ -40,11 +53,17 @@
   }
 
   @screen md {
-    .responsive-text {
-      @apply text-lg;
-    }
     .responsive-h1 {
       @apply text-4xl;
+    }
+    .responsive-h2 {
+      @apply text-2xl; /* 크기 줄임 */
+    }
+    .responsive-h3 {
+      @apply text-2xl;
+    }
+    .responsive-text {
+      @apply text-lg;
     }
     .responsive-small-text {
       @apply text-[0.875rem]; /* md에서 작은 크기 */
@@ -56,3 +75,7 @@
 
   /* @screen lg 및 @screen xl에서는 크기 변동 없음 */
 }
+
+
+
+

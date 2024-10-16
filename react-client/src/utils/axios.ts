@@ -1,17 +1,18 @@
 import axios from 'axios';
-import { ArtistResponse } from '@typings/artist';
-import { TrackWithArtistResponse } from '@typings/track-artist';
-import { TrackResponse } from '@typings/track';
+import { ArtistResponse, ArtistWithTracksResponse } from '@typings/artist';
+import { TrackResponse, TrackWithArtistResponse } from '@typings/track';
 
 interface FindDTO {
   limit?: number;
   offset?: number;
-  sort?: 'asc' | 'desc'|'random';
+  sort?: 'asc' | 'desc'| 'random';
   query?: string;
+  withArtists?: boolean;
+  withTracks?: boolean;
 }
+
 export interface FindWithChartDurationDTO extends FindDTO {
   minWeeksOnChart?: number;
-  random?: boolean
 }
 
 const apiClient = axios.create({
@@ -23,31 +24,24 @@ const apiClient = axios.create({
 });
 
 export const tracksApi = {
-  async getTrackById(id: number): Promise<TrackResponse|null> {
-    return (await apiClient.get(`/tracks/${id}`)).data;
+  async getTrackById(id: number, params?:{withArtists: boolean;}):
+   Promise<TrackResponse |TrackWithArtistResponse | null> {
+    return (await apiClient.get(`/tracks/${id}`, { params })).data;
   },
 
-  async getTracks(params: FindWithChartDurationDTO): Promise<TrackResponse[]|[]> {
+  async getTracks(params: FindWithChartDurationDTO):
+   Promise<TrackResponse[] |TrackWithArtistResponse[]| []> {
     return (await apiClient.get('/tracks', { params })).data;
   },
 };
 
 export const artistsApi = {
-  async getArtistById(id: number): Promise<ArtistResponse|null> {
-    return (await apiClient.get(`/artists/${id}`)).data;
+  async getArtistById(id: number, params?:{withTracks: boolean;}):
+   Promise<ArtistResponse|ArtistWithTracksResponse | null> {
+    return (await apiClient.get(`/artists/${id}`, { params })).data;
   },
-  async getArtists(params: FindDTO): Promise<ArtistResponse[]|[]> {
+
+  async getArtists(params: FindDTO): Promise<ArtistResponse[] |ArtistWithTracksResponse[]| []> {
     return (await apiClient.get('/artists', { params })).data;
-  },
-};
-
-export const trackWithArtistApi = {
-  async getTracksWithArtistById(id: number): Promise<TrackWithArtistResponse|null> {
-    return (await apiClient.get(`/tracks-artists/${id}`)).data;
-  },
-
-  async getTracksWithArtist(params: FindWithChartDurationDTO):
-   Promise<TrackWithArtistResponse[]|[]> {
-    return (await apiClient.get('/tracks-artists', { params })).data;
   },
 };
