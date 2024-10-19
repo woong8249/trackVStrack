@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import homeMessages from '../constants/homeMessages';
 import TopNavBar from '@components/type2/TopNavBar';
+
 export default function Test2MainPage() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [fadeOut, setFadeOut] = useState(false); // 텍스트 페이드 효과
   const intervalTime = 3000;
 
   useEffect(() => {
-    // 텍스트 업데이트
     const messageInterval = setTimeout(() => {
       setFadeOut(true); // 페이드 아웃 시작
       setTimeout(() => {
@@ -22,8 +22,16 @@ export default function Test2MainPage() {
   }, [currentMessageIndex]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 relative min-w-[350px]">
+    <div className="min-h-screen flex flex-col items-center justify-center relative bg-gray-100">
       <TopNavBar currentPage="home" />
+
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(/lineBg.jpg)', // 경로 앞에 'url()' 추가
+          opacity: 0.2,
+        }}
+      />
 
       <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-20">
         <div className="w-full lg:w-[464px] h-[150px] mb-[4rem]">
@@ -36,7 +44,7 @@ export default function Test2MainPage() {
         <div className="relative w-full sm:w-[544px]">
           <input
             type="text"
-            className="w-full px-6  py-5 lg:py-6 border border-gray-300 rounded-full focus:outline-none pr-16 "
+            className="w-full px-6 py-5 lg:py-6 border border-gray-300 rounded-full focus:outline-none pr-16"
             placeholder="곡명 또는 아티스트명을 입력하세요"
           />
 
