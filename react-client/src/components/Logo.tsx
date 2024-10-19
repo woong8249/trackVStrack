@@ -13,7 +13,7 @@ export default function Logo() {
         />
 
         {/* Title */}
-        <h1 className="responsive-text font-bold italic text-shadow whitespace-nowrap">
+        <h1 className="text-lg font-bold italic ">
           TRACK VS TRACK
         </h1>
       </div>

@@ -13,6 +13,7 @@ import 'react-resizable/css/styles.css';
 import Dashboard from '@pages/Dashboard';
 
 import TestMainPage from '@pages/TestMainPage';
+import Test2MainPage from '@pages/Test2MainPage';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: '/test',
     element: <TestMainPage />,
+  },
+  {
+    path: '/testMain',
+    element: <Test2MainPage />,
   },
 
   {
