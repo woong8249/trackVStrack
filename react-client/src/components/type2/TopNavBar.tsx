@@ -28,13 +28,13 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
   }
 
   return (
-    <div ref={modalRef}>
+    <div ref={modalRef} className='relative z-10'>
       <nav className="fixed top-0 right-0 z-10 w-full bg-white border-b border-gray-200">
         <div className="z-10 flex items-center justify-between px-4 pr-8 py-2">
           <div className="flex items-center">
             <Logo />
 
-            <div className="hidden md:flex space-x-14 ml-8">
+            <div className="hidden md:flex space-x-14 ml-8 text-gray-500">
               <div className="relative">
                 <Link to={'/'} >
                   홈
@@ -75,7 +75,7 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
           isModalOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col  p-2 mt-16">
+        <div className="flex flex-col  p-2 mt-16 text-gray-500">
           <Link to="/" className={`flex items-center p-5 rounded-full ${currentPage === 'home' ? 'bg-[#c2e7ff]' : 'hover:bg-gray-100'}`}>
             <FiHome className="mr-4 w-5 h-5" />
             홈
