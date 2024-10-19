@@ -2,6 +2,7 @@ import Logo from '@components/Logo';
 import { useModal } from '@hooks/useModal';
 import DefaultSearchBar from '@components/DefaultSearchBar';
 import { Link } from 'react-router-dom';
+import DashboardSearchBar from '@components/DashboardSearchBar';
 
 interface prob {
   page?: 'dashboard' | 'real-time';
@@ -16,7 +17,7 @@ function TopNavBar({ page }: prob) {
         {/* Logo */}
         <Logo />
         {/* Center: Search Bar */}
-        <DefaultSearchBar />
+        {page === 'dashboard' ? <DashboardSearchBar /> : <DefaultSearchBar />}
 
         {/* Right: Buttons for large screens */}
         <div className="hidden md:flex items-center space-x-4">

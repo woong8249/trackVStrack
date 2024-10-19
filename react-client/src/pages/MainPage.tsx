@@ -1,10 +1,11 @@
 import TrackOverview from '@components/TrackOverview';
 import { useEffect, useRef, useState } from 'react';
-import { trackWithArtistApi } from '@utils/axios';
-import { TrackWithArtistResponse } from '@typings/track-artist';
+import { tracksApi } from '@utils/axios';
+
 import TopNavBar from '@layouts/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
+import { TrackWithArtistResponse } from '@typings/track';
 
 // 뷰포트 타입을 '소', '중', '대'로 변경
 type ViewportType = 'small' | 'medium' | 'large';
@@ -20,10 +21,11 @@ function MainPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await trackWithArtistApi.getTracksWithArtist({
+      const response = await tracksApi.getTracks({
         minWeeksOnChart: 30,
+        withArtists: true,
         sort: 'random',
-      });
+      }) as TrackWithArtistResponse[];
       setTracks(response);
     } catch (err) {
       setError(err as unknown as Error);

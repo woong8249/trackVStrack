@@ -6,9 +6,10 @@ import { Resizable, ResizeCallbackData } from 'react-resizable';
 import { useModal } from '@hooks/useModal';
 import ChartGraph from './ChartGraph';
 import TrackInfoCard from './TrackInfoCard';
-import { TrackWithArtistResponse } from '@typings/track-artist';
+
 import 'react-resizable/css/styles.css';
 import { FaExpandAlt } from 'react-icons/fa';
+import { TrackWithArtistResponse } from '@typings/track';
 
 interface Props {
   track: TrackWithArtistResponse;
@@ -68,7 +69,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
   return (
     viewportType === 'small' ? (
       <div
-      className="border-[1px] border-[#9A9A9A] rounded-m transition shadow-2xl relative"
+      className="border-[1px] border-gray-300 rounded-m transition shadow-2xl relative"
       style={{ zIndex }}>
         <div
           style={{ width, height }}>
@@ -93,7 +94,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
           >
             <div className="w-[50rem] sm:w-[70rem] overflow-auto">
               <TrackInfoCard track={track} />
-              <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+              <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
               <ChartGraph track={track} />
             </div>
           </div>
@@ -115,7 +116,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
           )}
 
           <div
-            className="border-[1px] border-[#9A9A9A] rounded-m  shadow-2xl"
+            className="border-[1px] border-gray-300 rounded-m  shadow-2xl"
             style={{
               position, // 리사이징 중일 때는 absolute로 설정
               zIndex, // 리사이징 중일 때 더 높은 레이어에 위치
@@ -144,7 +145,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
 
                 { isLargeContainer && (
                 <>
-                  <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+                  <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
                   <ChartGraph track={track} />
                 </>
                 )}
@@ -169,7 +170,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
               >
                 <div className="w-[50rem] sm:w-[70rem] overflow-auto">
                   <TrackInfoCard track={track} />
-                  <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+                  <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
                   <ChartGraph track={track} />
                 </div>
               </div>

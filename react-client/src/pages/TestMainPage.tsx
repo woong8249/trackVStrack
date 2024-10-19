@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useEffect, useRef, useState } from 'react';
-import { trackWithArtistApi } from '@utils/axios';
-import { TrackWithArtistResponse } from '@typings/track-artist';
+import { tracksApi } from '@utils/axios';
+
 import TopNavBar from '@layouts/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
@@ -9,6 +9,7 @@ import TrackInfoCard from '@components/TrackInfoCard';
 import ChartGraph from '@components/ChartGraph';
 import { useModal } from '@hooks/useModal';
 import { FaExpandAlt } from 'react-icons/fa';
+import { TrackWithArtistResponse } from '@typings/track';
 
 // 뷰포트 타입을 '소', '중', '대'로 변경
 type ViewportType = 'small' | 'medium' | 'large';
@@ -32,10 +33,11 @@ function TestMainPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await trackWithArtistApi.getTracksWithArtist({
+      const response = await tracksApi.getTracks({
         minWeeksOnChart: 30,
+        withArtists: true,
         sort: 'random',
-      });
+      }) as TrackWithArtistResponse[];
       setTracks(response);
     } catch (err) {
       setError(err as unknown as Error);
@@ -97,7 +99,7 @@ function TestMainPage() {
           if (viewportType === 'small') {
             return (
               <div
-                className="border-[1px] border-[#9A9A9A] rounded-m  relative"
+                className="border-[1px] border-gray-300 rounded-m  relative"
                 style={{ zIndex }}
                 key={track.id}>
                 <div
@@ -123,7 +125,7 @@ function TestMainPage() {
                     >
                       <div className="w-[40rem] sm:w-[60rem] overflow-auto">
                         <TrackInfoCard track={track} />
-                        <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+                        <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
                         <ChartGraph track={track} />
                       </div>
                     </div>
@@ -134,9 +136,9 @@ function TestMainPage() {
           }
           return (
             <div key={track.id.toString()} className='relative bg-[white] w-[600px]'>
-              <div className="border-[1px] border-[#9A9A9A] rounded-md shadow-2xl relative">
+              <div className="border-[1px] border-gray-300 rounded-md shadow-2xl relative">
                 <TrackInfoCard track={track} />
-                <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+                <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
                 <ChartGraph track={track} />
               </div>
 
@@ -157,7 +159,7 @@ function TestMainPage() {
                 >
                     <div className="w-[40rem] sm:w-[50rem] h-[25rem] sm:h-[35rem] overflow-auto">
                       <TrackInfoCard track={track} />
-                      <div className="border-b-[1px] border-[#9A9A9A] mb-[1rem]"></div>
+                      <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
                       <ChartGraph track={track} />
                     </div>
                   </div>

@@ -7,7 +7,7 @@ interface Props {
 
 export default function TrackInfoCard({ track }: Props) {
   return (
-    <div className="flex justify-between items-center px-[0.5rem] group">
+    <div className="flex justify-between items-center px-[0.5rem] ">
       <div className="flex flex-grow items-center overflow-x-auto">
         {/* 부모 요소에도 overflow-x-auto를 추가합니다 */}
         <img
@@ -22,7 +22,7 @@ export default function TrackInfoCard({ track }: Props) {
           <Link
             to={{ pathname: '/track' }}
             state={{ track }}
-            className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold group-hover:underline"
+            className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold hover:underline"
           >
             <p>{track.titleName}</p>
           </Link>

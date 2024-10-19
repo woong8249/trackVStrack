@@ -1,8 +1,8 @@
 import { useModal } from '@hooks/useModal';
-import ModalSearch from './DefaultModalSearch';
+import DashboardModalSearch from './DashboardModalSearch';
 import { CiSearch } from 'react-icons/ci';
 
-export default function DefaultSearchBar() {
+export default function DashboardSearchBar() {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 
   return (
@@ -31,7 +31,7 @@ export default function DefaultSearchBar() {
             className="bg-white w-full max-w-4xl mx-auto border border-gray-300 rounded-lg shadow-lg max-h-[40rem] min-h-[70vh] overflow-y-auto p-4 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
             >
             {/* 모달 내부의 검색 상태를 따로 관리 */}
-            <ModalSearch />
+            <DashboardModalSearch />
           </div>
         </div>
       )}

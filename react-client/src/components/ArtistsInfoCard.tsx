@@ -10,7 +10,7 @@ export default function ArtistsInfoCard({ artist }: Props) {
     // 해야함
   }
   return (
-    <div className="flex justify-between items-center px-[0.5rem] group">
+    <div className="flex justify-between items-center px-[0.5rem]">
 
       <div className="flex flex-grow items-center overflow-x-auto">
         <img src={artist.artistImage} alt='artist profile img' className="w-[100px] h-[100px]  mr-[2rem] sm:mr-[3rem]" />
@@ -19,7 +19,7 @@ export default function ArtistsInfoCard({ artist }: Props) {
           <Link
             to={{ pathname: '/artist' }}
             state={{ artist }}
-            className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold group-hover:underline"
+            className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold hover:underline"
           >
             <p>{artist.artistName}</p>
           </Link>
