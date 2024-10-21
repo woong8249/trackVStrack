@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import React, { useEffect, useRef, useState } from 'react';
@@ -17,14 +16,14 @@ import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
 function SamplePrevArrow(props: CustomArrowProps) {
   const { className, onClick } = props;
   return (
-    <IoIosArrowRoundBack onClick={onClick} className={`arrow ${className} z-10`} style={{ color: 'white' }} />
+    <IoIosArrowRoundBack onClick={onClick} className={`arrow ${className} z-10 `} style={{ color: 'white' }} />
   );
 }
 
 function SampleNextArrow(props: CustomArrowProps) {
   const { className, onClick } = props;
   return (
-    <IoIosArrowRoundForward onClick={onClick} className={`arrow ${className} z-10`} style={{ color: 'white' }} />
+    <IoIosArrowRoundForward onClick={onClick} className={`arrow ${className}`} style={{ color: 'white' }} />
   );
 }
 
@@ -37,28 +36,33 @@ export default function HomeSection2() {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 
   const settings = {
+    dots: true,
     infinite: true,
     lazyLoad: 'progressive' as const,
-    speed: 600,
-    slidesToScroll: 2,
+    speed: 800,
+    slidesToScroll: 1,
     slidesToShow: 2,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
-    waitForAnimate: false,
-    draggable: false,
 
-    afterChange: (currentSlide: number) => {
-      if (currentSlide === 0) {
-        sliderRef.current?.slickGoTo(2);
-      }
-    },
-    onInit: () => {
-      if (sliderRef.current) {
-        setTimeout(() => {
-          sliderRef.current?.slickNext();
-        }, 300);
-      }
-    },
+    draggable: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          draggable: true,
+        },
+      },
+    ],
   };
 
   const handleModalOpen = (track: TrackWithArtistResponse, e: React.MouseEvent) => {
@@ -84,20 +88,12 @@ export default function HomeSection2() {
     }
   };
 
-  // 모달을 렌더링하는 함수
   const renderModal = (track: TrackWithArtistResponse) => {
     if (!activeModalTrack || activeModalTrack.id !== track.id) return null;
-
     return ReactDOM.createPortal(
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div
-          ref={modalRef}
-          className="bg-white z-50 rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto"
-          onClick={(e) => e.stopPropagation()}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="w-[40rem] sm:w-[50rem] h-[25rem] sm:h-[35rem] overflow-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="bg-white z-50 rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto" ref={modalRef}>
+          <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
             <TrackInfoCard track={track} />
             <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
             <ChartGraph track={track} />
@@ -142,19 +138,18 @@ export default function HomeSection2() {
   if (error) return <ErrorAlert error={error} retryFunc={fetchTracks} />;
 
   return (
-    <div className="w-full bg-gray-100 flex justify-center items-center py-[10rem]">
+    <div className="w-full  bg-[#eaeff8] flex justify-center items-center py-[10rem]">
       <div>
-        <h2 className="text-center text-[#444746] text-2xl md:text-3xl lg:text-4xl m-8">
-          여러 플렛폼을 한번에
-        </h2>
+        <div className="relative">
+          <div className="absolute right-1/2 transform -translate-y-[80%] translate-x-[110px] w-[200px] h-[200px] bg-cover bg-center z-0" style={{ backgroundImage: "url('lineChartBg.png')" }}>
+          </div>
 
-        <h3 className="text-center text-[#444746] mb-12">
-          플랫폼마다 조금씩 상이한 차트순위를 한번에 살펴보세요.
-        </h3>
+          <h2 className="relative text-center text-[#444746] text-2xl md:text-3xl lg:text-4xl m-8">여러 플렛폼을 한번에</h2>
+        </div>
 
-        <Slider ref={sliderRef} {...settings} className="w-[70rem]">
-          <div></div>
-          <div></div>
+        <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
+
+        <Slider ref={sliderRef} {...settings} className="lg:w-[70rem] sm:w-[30rem] w-[22rem] ">
           {contents}
         </Slider>
       </div>

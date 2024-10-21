@@ -28,7 +28,7 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
   }
 
   return (
-    <div ref={modalRef} className='relative z-10'>
+    <div className='relative z-10'>
       <nav className="fixed top-0 right-0 z-10 w-full bg-white border-b border-gray-200">
         <div className="z-10 flex items-center justify-between px-4 pr-8 py-2">
           <div className="flex items-center">
@@ -70,7 +70,8 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
       </nav>
 
       {/* 모달에 애니메이션 추가 */}
-      <div
+      <nav
+      ref={modalRef}
         className={`fixed top-0 right-0 z-5 h-full bg-white shadow-md w-[20rem] transition-transform transform duration-300 ${
           isModalOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -99,7 +100,7 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
             의견 보내기
           </Link>
         </div>
-      </div>
+      </nav>
     </div>
   );
 }
