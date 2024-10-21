@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 export function useModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const key = Math.floor(100 + Math.random() * 900);
 
   // ESC key로 모달 닫기
   useEffect(() => {
@@ -37,6 +36,5 @@ export function useModal() {
     isModalOpen,
     setIsModalOpen,
     modalRef,
-    key,
   };
 }

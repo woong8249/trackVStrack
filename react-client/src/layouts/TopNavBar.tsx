@@ -12,7 +12,7 @@ function TopNavBar({ page }: prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+    <nav className="fixed z-50 top-0  left-0 w-full bg-white shadow-md">
       <div className="container flex justify-center items-center h-16">
         {/* Logo */}
         <Logo />

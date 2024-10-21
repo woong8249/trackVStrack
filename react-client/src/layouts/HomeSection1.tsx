@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import homeMessages from '../constants/homeMessages';
+import HomeExploreBar from '@components/type2/homeExplorebar';
 
 export default function HomeSection1() {
   const intervalTime = 3000;
@@ -20,23 +21,14 @@ export default function HomeSection1() {
     };
   }, [currentMessageIndex]);
   return (
-    <section className='w-full pt-[10rem] pb-[10rem] bg-slate-50'>
+    <section className='w-full pt-[10rem] pb-[10rem] bg-slate-50 relative z-5'>
       <div className='flex flex-col lg:flex-row justify-center items-center h-[300px] relative lg:right-[4rem]'>
         <div className={`w-[340px] text-left text-2xl md:text-3xl lg:text-4xl mb-8 lg:mb-0 transition-opacity duration-500 ease-in-out ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
           {homeMessages[currentMessageIndex]}
         </div>
 
-        <div className='relative lg:left-[2rem] '>
-          <input
-              type="text"
-              className="w-[380px] md:w-[450px] lg:w-[540px] h-[66px] p-8 border border-gray-300 rounded-full focus:outline-none"
-              placeholder="곡명 또는 아티스트명을 입력하세요"
-            />
+        <HomeExploreBar></HomeExploreBar>
 
-          <button className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-8 py-2 rounded-full shadow-md hover:bg-blue-600 transition duration-300">
-            탐색
-          </button>
-        </div>
       </div>
     </section>
   );

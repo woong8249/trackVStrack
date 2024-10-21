@@ -91,8 +91,8 @@ export default function HomeSection2() {
   const renderModal = (track: TrackWithArtistResponse) => {
     if (!activeModalTrack || activeModalTrack.id !== track.id) return null;
     return ReactDOM.createPortal(
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white z-50 rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto" ref={modalRef}>
+      <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="bg-white z-30 rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto" ref={modalRef}>
           <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
             <TrackInfoCard track={track} />
             <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
@@ -138,10 +138,10 @@ export default function HomeSection2() {
   if (error) return <ErrorAlert error={error} retryFunc={fetchTracks} />;
 
   return (
-    <div className="w-full  bg-[#eaeff8] flex justify-center items-center py-[10rem]">
+    <div className="w-full bg-[#eaeff8] flex justify-center items-center py-[10rem]">
       <div>
         <div className="relative">
-          <div className="absolute right-1/2 transform -translate-y-[80%] translate-x-[110px] w-[200px] h-[200px] bg-cover bg-center z-0" style={{ backgroundImage: "url('lineChartBg.png')" }}>
+          <div className="absolute right-1/2 transform -translate-y-[80%] translate-x-[110px] w-[200px] h-[200px] bg-cover bg-center " style={{ backgroundImage: "url('lineChartBg.png')" }}>
           </div>
 
           <h2 className="relative text-center text-[#444746] text-2xl md:text-3xl lg:text-4xl m-8">여러 플렛폼을 한번에</h2>
