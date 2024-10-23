@@ -8,15 +8,16 @@ interface Props {
 
 export default function TrackInfoCard({ track, size = 100 }: Props) {
   return (
-    <div className="flex justify-between items-center px-[0.5rem] ">
-      <div className="flex flex-grow items-center overflow-x-auto">
+    <div className="flex justify-between items-center px-[0.5rem] overflow-x-auto">
+      <div className="flex flex-grow items-center">
         <img
           src={track.trackImage}
           alt="album jacket"
-          className={`w-[${size}px] h-[${size}px]  mr-[2rem] sm:mr-[3rem]`}
+          style={{ width: `${size}px`, height: `${size}px` }} // 인라인 스타일로 적용
+          className="mr-[2rem] sm:mr-[3rem]"
         />
 
-        <div className="text-xs max-h-[5rem] flex flex-col gap-1 overflow-x-auto whitespace-nowrap min-w-[150px] sm:min-w-[200px] md:min-w-[300px] lg:min-w-[330px]">
+        <div className="text-xs max-h-[5rem] flex flex-col gap-1 overflow-x-auto whitespace-nowrap w-full">
           <p className="text-gray-600 whitespace-nowrap responsive-small-text font-bold">{track.titleName}</p>
 
           <div className="whitespace-nowrap overflow-x-auto">

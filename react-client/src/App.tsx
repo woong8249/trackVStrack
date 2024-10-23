@@ -9,10 +9,9 @@ import './index.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-import Dashboard from '@pages/Dashboard';
-
 import TestMainPage from '@pages/TestMainPage';
 import Test2MainPage from '@pages/Test2MainPage';
+import ExplorePage from '@pages/ExplorePage';
 
 const router = createBrowserRouter([
   {
@@ -29,8 +28,8 @@ const router = createBrowserRouter([
   },
 
   {
-    path: '/dashboard',
-    element: <Dashboard />,
+    path: '/explore',
+    element: <ExplorePage />,
   },
 
 ]);
