@@ -7,6 +7,7 @@ import ErrorAlert from '@components/ErrorAlert'; // Error 컴포넌트
 import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴포넌트
 import { ArtistResponse } from '@typings/artist';
 import { useModal } from '@hooks/useModal';
+import { Link } from 'react-router-dom';
 
 type Size = 100 | 80 | 70;
 
@@ -186,9 +187,11 @@ export default function HomeExploreBar() {
 
             <ul>
               {trackList.map((track) => (
-                <li key={track.id} className="px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
-                  <TrackInfoCard track={track} size={size} />
-                </li>
+                <Link to={{ pathname: '/explore' }} state= { { track } }>
+                  <li key={track.id} className="px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
+                    <TrackInfoCard track={track} size={size} />
+                  </li>
+                </Link>
               ))}
             </ul>
 
@@ -211,6 +214,7 @@ export default function HomeExploreBar() {
                 <li key={artist.id} className="py-2 px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
                   <ArtistsInfoCard artist={artist} size={size} />
                 </li>
+
               ))}
             </ul>
 

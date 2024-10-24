@@ -1,14 +1,16 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable consistent-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-param-reassign */
-import TopNavbar from '@components/type2/TopNavBar';
-import SearchTrackBox from '@components/type2/SearchTrackBox';
-import { TrackWithArtistResponse } from '@typings/track';
+
 import { useEffect, useRef, useState } from 'react';
 import { useImmer } from 'use-immer';
-enum Color {
+import { useLocation } from 'react-router-dom';
+import TopNavbar from '@components/type2/TopNavBar';
+import ExploreSection1 from '@layouts/ExploreSection1';
+import { TrackWithArtistResponse } from '@typings/track';
+import ExploreSection2 from '@layouts/ExploreSection2';
+
+export enum Color {
   Blue = 'bg-blue-500',
   Red = 'bg-red-500',
   Green = 'bg-green-500',
@@ -17,76 +19,33 @@ enum Color {
   Black = 'bg-black',
 }
 
-export interface SelectTrackBox {
+export interface SelectedTrack {
   id: number;
-  activate:boolean
-  track?: TrackWithArtistResponse|null;
-  color:Color
+  activate: boolean;
+  track?: TrackWithArtistResponse | null;
+  color: Color;
 }
 
 export default function ExplorePage() {
+  const location = useLocation();
+  const trackData: TrackWithArtistResponse | undefined = location.state?.track;
   const colorArray = Object.values(Color);
-  const initialSelectTrackBoxes = [{ id: 0, activate: true, color: colorArray[0] }];
+  const initialSelectTrackBoxes = [{
+    id: 0, activate: true, color: colorArray[0], track: trackData,
+  }];
+
   const containerRef = useRef<HTMLInputElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0); // 뷰포트 너비 저장
   const [
-    selectTrackBoxes,
-    setSelectTrackBoxes,
-  ] = useImmer<SelectTrackBox[]>(initialSelectTrackBoxes);
+    selectedTracks,
+    setSelectedTracks,
+  ] = useImmer<SelectedTrack[]>(() => {
+    // localStorage에서 상태 복원
+    const savedTracks = localStorage.getItem('selectedTracks');
+    return savedTracks ? JSON.parse(savedTracks) : initialSelectTrackBoxes;
+  });
 
-  const additionalBoxRenderCondition = !!(
-    selectTrackBoxes[selectTrackBoxes.length - 1]?.track && selectTrackBoxes.length < 6);
-  const totalBoxes = selectTrackBoxes.length + (additionalBoxRenderCondition ? 1 : 0);
-
-  const calculateBoxWidth = () => {
-    if (containerWidth >= 1024) {
-      return totalBoxes === 1 ? '90%' : totalBoxes === 2 ? '45%' : '30%';
-    }
-    if (containerWidth >= 640) {
-      return totalBoxes === 1 ? '90%' : '45%';
-    }
-    return '90%';
-  };
-
-  function selectTrack(id: number, selectedTrack: TrackWithArtistResponse) {
-    setSelectTrackBoxes((draft) => {
-      const isSameTrack = draft.some((item) => selectedTrack.id === item?.track?.id);
-      if (isSameTrack) {
-        alert('이미 선택된 곡입니다.');
-        return;
-      }
-      const trackIndex = draft.findIndex((item) => item.id === id);
-      if (trackIndex !== -1) {
-        draft[trackIndex].track = selectedTrack;
-      }
-    });
-  }
-
-  function deleteTrack(id: number) {
-    setSelectTrackBoxes((draft) => {
-      const index = draft.findIndex((box) => box.id === id);
-      if (index !== -1) {
-        draft[index].track = null;
-      }
-    });
-  }
-
-  function addSelectBox(id:number) {
-    setSelectTrackBoxes((draft) => {
-      draft.push({ id, activate: true, color: colorArray[id] });
-    });
-  }
-
-  function deleteSelectBox(id: number) {
-    setSelectTrackBoxes((draft) => {
-      // 해당 id를 가진 박스를 배열에서 삭제
-      const index = draft.findIndex((box) => box.id === id);
-      if (index !== -1) {
-        draft.splice(index, 1); // 배열에서 해당 인덱스의 요소를 제거
-      }
-    });
-  }
-
+  // 브라우저 리사이즈 감지
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -103,9 +62,15 @@ export default function ExplorePage() {
     };
   }, [containerRef]);
 
+  // selectedTracks가 변경될 때마다 localStorage에 저장
   useEffect(() => {
-    if (selectTrackBoxes.length === 0) {
-      setSelectTrackBoxes(initialSelectTrackBoxes);
+    localStorage.setItem('selectedTracks', JSON.stringify(selectedTracks));
+  }, [selectedTracks]);
+
+  // 페이지 로드 시 초기 상태 복원
+  useEffect(() => {
+    if (selectedTracks.length === 0) {
+      setSelectedTracks(initialSelectTrackBoxes);
     }
   }, [initialSelectTrackBoxes]);
 
@@ -113,36 +78,12 @@ export default function ExplorePage() {
     <div ref={containerRef} className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
       <TopNavbar currentPage="explore" />
 
-      <section className="flex flex-wrap gap-4 items-center justify-center mt-[5rem] w-[90%]">
-        {selectTrackBoxes.map((selectedTrack) => (
-          <div style={{ width: calculateBoxWidth() }}>
-            <SearchTrackBox
-              selectTrackBox={selectedTrack}
-              selectTrack={selectTrack}
-              addSelectBox={addSelectBox}
-              deleteSelectBox={deleteSelectBox}
-              deleteTrack={deleteTrack}
-            />
-          </div>
-        ))}
+      <ExploreSection1
+        selectedTracks={selectedTracks}
+        setSelectedTracks={setSelectedTracks}
+        containerWidth={containerWidth} />
 
-        {/* 마지막 인덱스에 추가 박스 렌더링 */}
-        {additionalBoxRenderCondition && (
-          <div style={{ width: calculateBoxWidth() }}>
-            <SearchTrackBox
-              selectTrackBox={{
-                id: selectTrackBoxes.length,
-                activate: false,
-                color: colorArray[selectTrackBoxes.length],
-              }}
-              selectTrack={selectTrack}
-              addSelectBox={addSelectBox}
-              deleteSelectBox={deleteSelectBox}
-              deleteTrack={deleteTrack}
-            />
-          </div>
-        )}
-      </section>
+      <ExploreSection2 selectedTracks={selectedTracks} />
     </div>
   );
 }

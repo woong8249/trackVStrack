@@ -73,16 +73,21 @@
     }
   }
 }
+/* .slick-prev,
+.slick-next {
+  display: none !important;
+} */
+
 .slick-arrow{
   height:10px;
-width: 10px;
+  width: 10px;
 }
 
 .slick-arrow.slick-next,
 .slick-arrow.slick-prev{
 background-color: #428cff;
-height:50px;
-width: 50px;
+height:30px;
+width: 30px;
 display: flex;
 align-items: center;
 justify-content: center;

@@ -1,6 +1,6 @@
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { tracksApi } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -28,7 +28,6 @@ function SampleNextArrow(props: CustomArrowProps) {
 }
 
 export default function HomeSection2() {
-  const sliderRef = useRef<Slider | null>(null);
   const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -149,7 +148,7 @@ export default function HomeSection2() {
 
         <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
 
-        <Slider ref={sliderRef} {...settings} className="lg:w-[70rem] sm:w-[30rem] w-[22rem] ">
+        <Slider {...settings} className="lg:w-[70rem] sm:w-[30rem] w-[22rem] ">
           {contents}
         </Slider>
       </div>

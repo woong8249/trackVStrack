@@ -8,13 +8,13 @@ import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert'; // Error 컴포넌트
 import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴포넌트
 import { useModal } from '@hooks/useModal';
-import { SelectTrackBox } from '@pages/ExplorePage';
+import { SelectedTrack } from '@pages/ExplorePage';
 import { FaPen } from 'react-icons/fa6';
 
 type ImageSize = 100 | 80 | 70;
 
 interface Prob {
-  selectTrackBox:SelectTrackBox
+  selectedTrack:SelectedTrack
   selectTrack :(id: number, selectedTrack: TrackWithArtistResponse) => void;
   addSelectBox:(id:number)=> void
   deleteSelectBox:(id:number) => void
@@ -22,7 +22,7 @@ interface Prob {
 }
 
 export default function SearchTrackBox({
-  selectTrackBox,
+  selectedTrack,
   selectTrack,
   addSelectBox,
   deleteSelectBox,
@@ -162,29 +162,29 @@ export default function SearchTrackBox({
   return (
     <div className={`relative ${width} ${focused ? 'z-[8]' : 'z-5'} `} ref={containerRef} >
 
-      {selectTrackBox.activate === false ? (
+      {selectedTrack.activate === false ? (
         <div
         className={`bg-white ${width} flex items-center rounded-xl bg-[#0b57d11c] hover:bg-gray-400 responsive-text text-gray-500 px-10 ${height}`}
         role='button'
         tabIndex={0}
-        onClick={(e) => { e.stopPropagation(); addSelectBox(selectTrackBox.id); }}
+        onClick={(e) => { e.stopPropagation(); addSelectBox(selectedTrack.id); }}
         >
           + 추가
         </div>
       )
-        : selectTrackBox.track ? (
+        : selectedTrack.track ? (
           <div
             className={`bg-white ${width} ${height} flex items-center rounded-xl hover:bg-gray-300`}
             onClick={ (e) => { e.stopPropagation(); setIsModifyModalOpen((pre) => !pre); }}
             role='button'
             tabIndex={0}>
-            <div className={`w-2.5 h-2.5 ${selectTrackBox.color} rounded-full ml-4  mr-2`}></div>
-            <TrackInfoCard track={selectTrackBox.track} size={imageSize}></TrackInfoCard>
+            <div className={`w-2.5 h-2.5 ${selectedTrack.color} rounded-full ml-4  mr-2`}></div>
+            <TrackInfoCard track={selectedTrack.track} size={imageSize}></TrackInfoCard>
 
             {isModifyModalOpen && (
             <div ref={modifyModalRef} className={'text-gray-500 absolute top-0 right-0  mt-2 bg-white border border-gray-300 shadow-md rounded-md p-2 w-40'}>
               <button
-                onClick={() => { deleteSelectBox(selectTrackBox.id); }}
+                onClick={() => { deleteSelectBox(selectedTrack.id); }}
                 className="flex items-center w-full px-2 py-2 text-sm hover:bg-gray-100 rounded">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -194,7 +194,7 @@ export default function SearchTrackBox({
               </button>
 
               <button
-                onClick={() => { deleteTrack(selectTrackBox.id); }}
+                onClick={(e) => { deleteTrack(selectedTrack.id); e.currentTarget.focus(); }}
                 className="flex items-center w-full px-2 py-2 text-sm hover:bg-gray-100 rounded">
                 <FaPen className="mr-2" />
                 <span>수정</span>
@@ -233,7 +233,7 @@ export default function SearchTrackBox({
                   <ul>
                     {trackList.map((track) => (
                       <li key={track.id} className="px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
-                        <div role='button' tabIndex={0} onClick={(e) => { e.stopPropagation(); selectTrack(selectTrackBox.id, track); }}>
+                        <div role='button' tabIndex={0} onClick={(e) => { e.stopPropagation(); selectTrack(selectedTrack.id, track); }}>
                           <TrackInfoCard track={track} size={imageSize} />
                         </div>
                       </li>

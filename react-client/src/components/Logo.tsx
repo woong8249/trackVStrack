@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
 
 export default function Logo() {
   return (
@@ -8,7 +7,7 @@ export default function Logo() {
         {/* Logo Image */}
         <img
           alt="logo"
-          src={logo}
+          src={'public/logo/logo.png'}
           className="w-[3rem] h-[3rem]"
         />
 
