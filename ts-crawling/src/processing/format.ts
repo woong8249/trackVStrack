@@ -19,7 +19,7 @@ export function convertWeeklyChartToTrackFormat(
       };
 
       const trackFormat: TrackFormatWithoutAddInfo = {
-        trackKeyword: chartDetail.titleKeyword,
+        trackKeyword: chartDetail.titleKeyword.replace(/\s+/g, ''),
         [platform]: platformData,
       };
 

@@ -20,15 +20,17 @@ export function useModal() {
   // 모달 외부 클릭 시 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        setIsModalOpen(false);
+      // 왜인지 모르겠지만 중첩모달이 다꺼짐
+      // 분명 트리거는 한번만되는걸 확인함
+      if (isModalOpen && modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setIsModalOpen((pre) => !pre);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
-  }, [modalRef]);
+  }, [modalRef, isModalOpen]);
 
   return {
     isModalOpen,
