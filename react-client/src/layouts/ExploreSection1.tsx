@@ -74,12 +74,12 @@ export default function ExploreSection1({
       {selectedTracks.map((selectedTrack) => (
         <div style={{ width: calculateBoxWidth() }}>
           <SearchTrackBox
-      selectedTrack={selectedTrack}
-      selectTrack={selectTrack}
-      addSelectBox={addSelectBox}
-      deleteSelectBox={deleteSelectBox}
-      deleteTrack={deleteTrack}
-    />
+            selectedTrack={selectedTrack}
+            selectTrack={selectTrack}
+            addSelectBox={addSelectBox}
+            deleteSelectBox={deleteSelectBox}
+            deleteTrack={deleteTrack}
+          />
         </div>
       ))}
 
@@ -87,16 +87,16 @@ export default function ExploreSection1({
       {additionalBoxRenderCondition && (
         <div style={{ width: calculateBoxWidth() }}>
           <SearchTrackBox
-      selectedTrack={{
-        id: selectedTracks.length,
-        activate: false,
-        color: colorArray[selectedTracks.length],
-      }}
-      selectTrack={selectTrack}
-      addSelectBox={addSelectBox}
-      deleteSelectBox={deleteSelectBox}
-      deleteTrack={deleteTrack}
-    />
+            selectedTrack={{
+              id: selectedTracks.length,
+              activate: false,
+              color: colorArray[selectedTracks.length],
+            }}
+            selectTrack={selectTrack}
+            addSelectBox={addSelectBox}
+            deleteSelectBox={deleteSelectBox}
+            deleteTrack={deleteTrack}
+        />
         </div>
       )}
     </section>

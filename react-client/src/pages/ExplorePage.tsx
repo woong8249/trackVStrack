@@ -1,11 +1,12 @@
 /* eslint-disable consistent-return */
-/* eslint-disable react-hooks/exhaustive-deps */
+
 /* eslint-disable no-unused-vars */
 
 import { useEffect, useRef, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { useLocation } from 'react-router-dom';
 import TopNavbar from '@components/type2/TopNavBar';
+
 import ExploreSection1 from '@layouts/ExploreSection1';
 import { TrackWithArtistResponse } from '@typings/track';
 import ExploreSection2 from '@layouts/ExploreSection2';
@@ -39,11 +40,7 @@ export default function ExplorePage() {
   const [
     selectedTracks,
     setSelectedTracks,
-  ] = useImmer<SelectedTrack[]>(() => {
-    // localStorage에서 상태 복원
-    const savedTracks = localStorage.getItem('selectedTracks');
-    return savedTracks ? JSON.parse(savedTracks) : initialSelectTrackBoxes;
-  });
+  ] = useImmer<SelectedTrack[]>(initialSelectTrackBoxes);
 
   // 브라우저 리사이즈 감지
   useEffect(() => {
@@ -61,18 +58,6 @@ export default function ExplorePage() {
       resizeObserver.unobserve(container);
     };
   }, [containerRef]);
-
-  // selectedTracks가 변경될 때마다 localStorage에 저장
-  useEffect(() => {
-    localStorage.setItem('selectedTracks', JSON.stringify(selectedTracks));
-  }, [selectedTracks]);
-
-  // 페이지 로드 시 초기 상태 복원
-  useEffect(() => {
-    if (selectedTracks.length === 0) {
-      setSelectedTracks(initialSelectTrackBoxes);
-    }
-  }, [initialSelectTrackBoxes]);
 
   return (
     <div ref={containerRef} className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
