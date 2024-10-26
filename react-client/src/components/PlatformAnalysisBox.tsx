@@ -14,6 +14,7 @@ interface Prob {
 }
 
 export type PlatformName = 'melon' | 'genie' | 'bugs';
+const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
 
 export default function PlatformAnalysisBox({ platforms }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
@@ -23,8 +24,9 @@ export default function PlatformAnalysisBox({ platforms }: Prob) {
     bugs: 'public/logo/logo_bugs.png',
   };
 
-  const availablePlatformNames: PlatformName[] = ['melon', 'genie', 'bugs'];
-  const availablePlatformName = availablePlatformNames.find(
+  const availablePlatformNames = platformNames.filter((key) => platforms[key]) as PlatformName[];
+
+  const availablePlatformName = platformNames.find(
     (key) => platforms[key],
   ) as PlatformName;
 

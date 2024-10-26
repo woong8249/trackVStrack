@@ -1,15 +1,16 @@
-/* eslint-disable consistent-return */
-
 /* eslint-disable no-unused-vars */
 
-import { useEffect, useRef, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { useLocation } from 'react-router-dom';
-import TopNavbar from '@components/TopNavBar';
+import TopNavbar from '@layouts/TopNavBar';
 
 import ExploreSection1 from '@layouts/ExploreSection1';
 import { TrackWithArtistResponse } from '@typings/track';
 import ExploreSection2 from '@layouts/ExploreSection2';
+
+// ideal1 :추가될때마다 url을 수정해 state가 유지되는 척 만들기 => 단점 fetch를 다시해야함
+// 캐시되는 방식이 더 좋을 수 있음
+// 이슈파서 하기
 
 export enum Color {
   Blue = 'bg-blue-500',
@@ -35,38 +36,19 @@ export default function ExplorePage() {
     id: 0, activate: true, color: colorArray[0], track: trackData,
   }];
 
-  const containerRef = useRef<HTMLInputElement>(null);
-  const [containerWidth, setContainerWidth] = useState<number>(0); // 뷰포트 너비 저장
   const [
     selectedTracks,
     setSelectedTracks,
   ] = useImmer<SelectedTrack[]>(initialSelectTrackBoxes);
 
-  // 브라우저 리사이즈 감지
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const { width } = entry.contentRect;
-      setContainerWidth(width);
-    });
-
-    resizeObserver.observe(container);
-    return () => {
-      resizeObserver.unobserve(container);
-    };
-  }, [containerRef]);
-
   return (
-    <div ref={containerRef} className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
+    <div className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
       <TopNavbar currentPage="explore" />
 
       <ExploreSection1
         selectedTracks={selectedTracks}
         setSelectedTracks={setSelectedTracks}
-        containerWidth={containerWidth} />
+       />
 
       <ExploreSection2 selectedTracks={selectedTracks} />
     </div>

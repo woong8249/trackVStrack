@@ -37,7 +37,7 @@ export default function TrackOverview({ track }: Prob) {
   };
 
   return (
-    <div key={track.id.toString()} className="w-[600px]">
+    <div key={track.id.toString()} className="w-full">
       <div className="relative">
         <div className="border-[1px] bg-[white] border-gray-300 rounded-md relative">
           <TrackInfoCard track={track} />

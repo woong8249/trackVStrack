@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { tracksApi } from '@utils/axios';
 
-import TopNavBar from '@layouts/TopNavBar';
+import TopNavBar from '@components/legacy/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
 import TrackInfoCard from '@components/TrackInfoCard';
