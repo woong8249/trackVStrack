@@ -1,4 +1,4 @@
-import TrackOverview from '@components/TrackOverview';
+import TrackOverview from '@components/legacy/TrackOverview';
 import { useEffect, useRef, useState } from 'react';
 import { tracksApi } from '@utils/axios';
 

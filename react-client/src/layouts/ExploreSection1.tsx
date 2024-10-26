@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-param-reassign */
-import SearchTrackBox from '@components/type2/SearchTrackBox';
+import SearchTrackBox from '@components/SearchTrackBox';
 import { Color, SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
 import { Updater } from 'use-immer';

@@ -1,6 +1,6 @@
 import ArtistsInfoCard from '@components/ArtistsInfoCard';
-import PlatformAnalysisBox from '@components/type2/PlatformAnalysisBox';
-import TrackOverview from '@components/type2/TrackOverview';
+import PlatformAnalysisBox from '@components/PlatformAnalysisBox';
+import TrackOverview from '@components/TrackOverview';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
 import { RxQuestionMarkCircled } from 'react-icons/rx';

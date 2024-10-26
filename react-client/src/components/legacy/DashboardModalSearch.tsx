@@ -2,11 +2,11 @@ import { ArtistResponse } from '@typings/artist';
 
 import { tracksApi, artistsApi } from '@utils/axios';
 import React, { useState, useRef, useEffect } from 'react';
-import TrackInfoCard from './TrackInfoCard';
-import ArtistsInfoCard from './ArtistsInfoCard';
+import TrackInfoCard from '../TrackInfoCard';
+import ArtistsInfoCard from '../ArtistsInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 
-export default function DefaultModalSearch() {
+export default function DashboardModalSearch() {
   const [modalQuery, setModalQuery] = useState(''); // 모달 내 검색창 상태
   const [artistList, setArtistList] = useState<ArtistResponse[]>([]);
   const [trackList, setTrackList] = useState<TrackWithArtistResponse[]>([]);
@@ -119,51 +119,53 @@ export default function DefaultModalSearch() {
       <>
         {/* 검색 결과: 트랙 리스트 */}
         {trackList.length > 0 && (
-        <div className='mt-[1rem]'>
-          <div className="py-2 px-2 text-base font-bold border  bg-gray-100">{'Tracks >'}</div>
+          <div className='mt-[1rem]'>
+            <div className="py-2 px-2 text-base font-bold border  bg-gray-100">{'Tracks >'}</div>
 
-          <ul>
-            {trackList.map((track) => (
-              <li key={track.id} className="py-1   rounded-md border">
-                <TrackInfoCard track={track} />
-              </li>
-            ))}
-          </ul>
+            <ul>
+              {trackList.map((track) => (
+                <li key={track.id} className="flex justify-between items-center pr-[2rem] py-1 rounded-md border">
+                  <TrackInfoCard track={track} />
+                  <button className=' bg-gray-100 text-sm font-bold py-2 px-3 rounded hover:bg-gray-300'>Add</button>
+                </li>
+              ))}
+            </ul>
 
-          {/* 더 보기 버튼 */}
-          {hasMoreTracks ? (
-            <button
-                className="w-full mt-2 py-2 px-4 text-gray-500 font-bold  rounded-md hover:bg-gray-100"
-                onClick={loadMoreTracks}
-              >
-              Load more tracks
-            </button>
-          ) : ''}
-        </div>
+            {/* 더 보기 버튼 */}
+            {hasMoreTracks ? (
+              <button
+                  className="w-full mt-2 py-2 px-4 text-gray-500 font-bold  rounded-md hover:bg-gray-100"
+                  onClick={loadMoreTracks}
+                >
+                Load more tracks
+              </button>
+            ) : ''}
+          </div>
         )}
 
         {/* 검색 결과: 아티스트 리스트 */}
         {artistList.length > 0 && (
-        <div className='mt-[4rem]'>
-          <div className="py-2 px-2 text-base font-bold border  bg-gray-100">{'Artists >'}</div>
+          <div className='mt-[4rem]'>
+            <div className="py-2 px-2 text-base font-bold border  bg-gray-100">{'Artists >'}</div>
 
-          <ul>
-            {artistList.map((artist) => (
-              <li key={artist.id} className="py-1 rounded-md border">
-                <ArtistsInfoCard artist={artist} />
-              </li>
-            ))}
-          </ul>
+            <ul>
+              {artistList.map((artist) => (
+                <li key={artist.id} className="flex justify-between items-center pr-[2rem] py-1 rounded-md border">
+                  <ArtistsInfoCard artist={artist} />
+                  <button className=' bg-gray-100 text-sm font-bold py-2 px-3 rounded hover:bg-gray-300'>Add</button>
+                </li>
+              ))}
+            </ul>
 
-          {hasMoreArtists && (
-          <button
-                className="w-full mt-2 py-2 px-4 text-gray-500 font-bold  rounded-md hover:bg-gray-100"
-                onClick={loadMoreArtists}
-              >
-            Load more artists
-          </button>
-          )}
-        </div>
+            {hasMoreArtists && (
+            <button
+                  className="w-full mt-2 py-2 px-4 text-gray-500 font-bold  rounded-md hover:bg-gray-100"
+                  onClick={loadMoreArtists}
+                >
+              Load more artists
+            </button>
+            )}
+          </div>
         )}
       </>
     );
@@ -173,13 +175,13 @@ export default function DefaultModalSearch() {
     <>
       {/* 모달 내부의 검색창 */}
       <input
-        ref={modalSearchRef}
-        type="text"
-        placeholder="Search for track or artist..."
-        value={modalQuery}
-        onChange={handleModalInput}
-        className="w-full  py-2 pl-4 pr-10 mb-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+          ref={modalSearchRef}
+          type="text"
+          placeholder="Search for track or artist..."
+          value={modalQuery}
+          onChange={handleModalInput}
+          className="w-full  py-2 pl-4 pr-10 mb-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
 
       {content}
     </>

@@ -1,4 +1,4 @@
-import TopNavBar from '@components/type2/TopNavBar';
+import TopNavBar from '@components/TopNavBar';
 import HomeSection1 from '@layouts/HomeSection1';
 import HomeSection2 from '@layouts/HomeSection2';
 

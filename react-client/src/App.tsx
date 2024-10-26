@@ -3,30 +3,18 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from 'react-router-dom';
-
-import MainPage from '@pages/MainPage';
 import './index.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-import TestMainPage from '@pages/TestMainPage';
-import Test2MainPage from '@pages/Test2MainPage';
+import HomePage from '@pages/HomePage';
 import ExplorePage from '@pages/ExplorePage';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <MainPage />,
+    element: <HomePage />,
   },
-  {
-    path: '/test',
-    element: <TestMainPage />,
-  },
-  {
-    path: '/testMain',
-    element: <Test2MainPage />,
-  },
-
   {
     path: '/explore',
     element: <ExplorePage />,

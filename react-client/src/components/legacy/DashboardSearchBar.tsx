@@ -1,5 +1,5 @@
 import { useModal } from '@hooks/useModal';
-import DashboardModalSearch from './DashboardModalSearch';
+import DashboardModalSearch from './legacy/DashboardModalSearch';
 import { CiSearch } from 'react-icons/ci';
 
 export default function DashboardSearchBar() {

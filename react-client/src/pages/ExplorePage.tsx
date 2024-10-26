@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { useLocation } from 'react-router-dom';
-import TopNavbar from '@components/type2/TopNavBar';
+import TopNavbar from '@components/TopNavBar';
 
 import ExploreSection1 from '@layouts/ExploreSection1';
 import { TrackWithArtistResponse } from '@typings/track';

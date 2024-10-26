@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { tracksApi } from '@utils/axios';
 import React, { useState, useRef, useEffect } from 'react';
-import TrackInfoCard from '../TrackInfoCard';
+import TrackInfoCard from './TrackInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert'; // Error 컴포넌트
 import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴포넌트

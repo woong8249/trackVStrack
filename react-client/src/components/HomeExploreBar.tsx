@@ -1,7 +1,7 @@
 import { tracksApi, artistsApi } from '@utils/axios';
 import React, { useState, useRef, useEffect } from 'react';
-import TrackInfoCard from '../TrackInfoCard';
-import ArtistsInfoCard from '../ArtistsInfoCard';
+import TrackInfoCard from './TrackInfoCard';
+import ArtistsInfoCard from './ArtistsInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert'; // Error 컴포넌트
 import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴포넌트
