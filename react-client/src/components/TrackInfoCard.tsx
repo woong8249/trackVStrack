@@ -22,7 +22,7 @@ export default function TrackInfoCard({ track, size = 100 }: Props) {
 
           <div className="whitespace-nowrap overflow-x-auto">
             {track.artists.map((artist, index) => (
-              <span key={track.id}>
+              <span key={artist.id}>
                 {artist.artistName}
                 {index !== track.artists.length - 1 && ', '}
               </span>
