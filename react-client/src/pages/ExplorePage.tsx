@@ -51,7 +51,7 @@ export default function ExplorePage() {
   async function syncTracks() {
     const queryParams = new URLSearchParams(location.search);
     const selectedTracksParam = queryParams.get('selectedTracks');
-
+    const trackData: TrackWithArtistResponse | undefined = location.state?.track;
     if (selectedTracksParam) {
       try {
         const parsedTracks = JSON.parse(selectedTracksParam) as SelectedTrack[];
@@ -72,14 +72,16 @@ export default function ExplorePage() {
       } catch (error) {
         console.error('Failed to parse selectedTracks from URL:', error);
       }
-    }
-
-    const trackData: TrackWithArtistResponse | undefined = location.state?.track;
-    if (trackData) {
+    } else if (trackData) {
       const initialSelectTracks = [{
         id: 0, activate: true, color: colorArray[0], track: trackData,
       }];
       updateUrl(initialSelectTracks);
+      setSelectedTracks(initialSelectTracks);
+    } else {
+      const initialSelectTracks = [{
+        id: 0, activate: true, color: colorArray[0],
+      }];
       setSelectedTracks(initialSelectTracks);
     }
   }
