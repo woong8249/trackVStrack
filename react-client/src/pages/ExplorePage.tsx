@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
 
 import { useImmer } from 'use-immer';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TopNavbar from '@layouts/TopNavBar';
 
 import ExploreSection1 from '@layouts/ExploreSection1';
 import { TrackWithArtistResponse } from '@typings/track';
 import ExploreSection2 from '@layouts/ExploreSection2';
-
-// ideal1 :추가될때마다 url을 수정해 state가 유지되는 척 만들기 => 단점 fetch를 다시해야함
-// 캐시되는 방식이 더 좋을 수 있음
-// 이슈파서 하기
+import { useEffect } from 'react';
+import { tracksApi } from '@utils/axios';
 
 export enum Color {
   Blue = 'bg-blue-500',
@@ -30,16 +28,65 @@ export interface SelectedTrack {
 
 export default function ExplorePage() {
   const location = useLocation();
-  const trackData: TrackWithArtistResponse | undefined = location.state?.track;
-  const colorArray = Object.values(Color);
-  const initialSelectTrackBoxes = [{
-    id: 0, activate: true, color: colorArray[0], track: trackData,
-  }];
+  const initialSelectTracks: SelectedTrack[] = [];
+  const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
 
-  const [
-    selectedTracks,
-    setSelectedTracks,
-  ] = useImmer<SelectedTrack[]>(initialSelectTrackBoxes);
+  const colorArray = Object.values(Color);
+  const navigate = useNavigate();
+
+  function updateUrl(selectedTracks: SelectedTrack[]) {
+    const urlTracks = selectedTracks.map(({
+      id, activate, color, track,
+    }) => ({
+      id,
+      activate,
+      color,
+      track: track ? { id: track.id } : null,
+    }));
+    const queryParams = new URLSearchParams({ selectedTracks: JSON.stringify(urlTracks) });
+
+    navigate(`?${queryParams.toString()}`, { replace: true });
+  }
+
+  async function syncTracks() {
+    const queryParams = new URLSearchParams(location.search);
+    const selectedTracksParam = queryParams.get('selectedTracks');
+
+    if (selectedTracksParam) {
+      try {
+        const parsedTracks = JSON.parse(selectedTracksParam) as SelectedTrack[];
+
+        // Restore `selectedTracks` with fetched track data for each track ID
+        const restoredTracks = parsedTracks.map((track) => ({
+          ...track,
+          track: track.track ? { id: track.track.id } : null,
+        })) as SelectedTrack[];
+
+        const promises = restoredTracks.map(async (track) => {
+          const { id } = track.track as { id: number };
+          const trackData = await tracksApi.getTrackById(id, { withArtists: true });
+          return { ...track, track: trackData };
+        });
+        const result = await Promise.all(promises) as SelectedTrack[];
+        setSelectedTracks(result);
+      } catch (error) {
+        console.error('Failed to parse selectedTracks from URL:', error);
+      }
+    }
+
+    const trackData: TrackWithArtistResponse | undefined = location.state?.track;
+    if (trackData) {
+      const initialSelectTracks = [{
+        id: 0, activate: true, color: colorArray[0], track: trackData,
+      }];
+      updateUrl(initialSelectTracks);
+      setSelectedTracks(initialSelectTracks);
+    }
+  }
+
+  useEffect(() => {
+    syncTracks();
+  }, []);
 
   return (
     <div className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
@@ -48,6 +95,7 @@ export default function ExplorePage() {
       <ExploreSection1
         selectedTracks={selectedTracks}
         setSelectedTracks={setSelectedTracks}
+        updateUrl={updateUrl}
        />
 
       <ExploreSection2 selectedTracks={selectedTracks} />

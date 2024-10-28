@@ -1,5 +1,5 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable consistent-return */
-
 /* eslint-disable no-param-reassign */
 import SearchTrackBox from '@components/SearchTrackBox';
 import { Color, SelectedTrack } from '@pages/ExplorePage';
@@ -10,11 +10,13 @@ import { Updater } from 'use-immer';
 interface Prob{
     selectedTracks: SelectedTrack[]; // 상태 값
     setSelectedTracks: Updater<SelectedTrack[]>;
+    updateUrl : (tracks:SelectedTrack[]) => void
 }
 
 export default function ExploreSection1({
   setSelectedTracks,
   selectedTracks,
+  updateUrl,
 }:Prob) {
   const additionalBoxRenderCondition = !!(
     selectedTracks[selectedTracks.length - 1]?.track && selectedTracks.length < 6);
@@ -24,6 +26,7 @@ export default function ExploreSection1({
   const colorArray = Object.values(Color);
   const [containerWidth, setContainerWidth] = useState<number>(0); // 뷰포트
   const containerRef = useRef<HTMLInputElement>(null);
+
   // 브라우저 리사이즈 감지
   useEffect(() => {
     const container = containerRef.current;
@@ -51,6 +54,7 @@ export default function ExploreSection1({
       const trackIndex = draft.findIndex((item) => item.id === id);
       if (trackIndex !== -1) {
         draft[trackIndex].track = selectedTrack;
+        updateUrl(draft);
       }
     });
   }
@@ -92,8 +96,8 @@ export default function ExploreSection1({
 
   return (
     <section ref={containerRef} className="flex flex-wrap gap-2 items-center justify-center mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%]">
-      {selectedTracks.map((selectedTrack) => (
-        <div style={{ width: calculateBoxWidth() }}>
+      {selectedTracks.map((selectedTrack, index) => (
+        <div key={index} style={{ width: calculateBoxWidth() }}>
           <SearchTrackBox
             selectedTrack={selectedTrack}
             selectTrack={selectTrack}

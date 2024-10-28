@@ -186,9 +186,9 @@ export default function HomeExploreBar() {
             <div className="py-2 px-3 text-base text-[14px] font-semibold bg-gradient-to-b from-gray-200 to-gray-50">트랙</div>
 
             <ul>
-              {trackList.map((track) => (
-                <Link to={{ pathname: '/explore' }} state= { { track } }>
-                  <li key={track.id} className="px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
+              {trackList.map((track, index) => (
+                <Link key={index} to={{ pathname: '/explore' }} state= { { track } }>
+                  <li className="px-2 hover:bg-gray-100 rounded-md border-b last:border-b-0">
                     <TrackInfoCard track={track} size={size} />
                   </li>
                 </Link>
