@@ -1,12 +1,19 @@
-import useDebounce from './useDebounce';
+import useDebounce from '@hooks/useDebounce';
 import useSWRInfinite from 'swr/infinite';
-import { findArtists } from '@utils/\bswrFetcher';
+import { artistsApi } from '@utils/axios';
+import { ArtistResponse } from '@typings/artist';
 
-interface Prob{
-query:string
+async function findArtists(query: string, offset: number) {
+  return await artistsApi.getArtists({
+    sort: 'desc',
+    offset,
+    limit: 5,
+    query: query.replace(/\s+/g, ''),
+    withTracks: false,
+  }) as ArtistResponse[];
 }
 
-export function useFindArtists({ query }:Prob) {
+export function useFindArtists(query :string) {
   const debouncedQuery = useDebounce(query, 100);
   const {
     data: artistData,

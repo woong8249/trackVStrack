@@ -25,7 +25,7 @@ const apiClient = axios.create({
 
 export const tracksApi = {
   async getTrackById(id: number, params?:{withArtists: boolean;}):
-   Promise<TrackResponse |TrackWithArtistResponse | null> {
+   Promise<TrackResponse |TrackWithArtistResponse > {
     return (await apiClient.get(`/tracks/${id}`, { params })).data;
   },
 
@@ -37,7 +37,7 @@ export const tracksApi = {
 
 export const artistsApi = {
   async getArtistById(id: number, params?:{withTracks: boolean;}):
-   Promise<ArtistResponse|ArtistWithTracksResponse | null> {
+   Promise<ArtistResponse|ArtistWithTracksResponse> {
     return (await apiClient.get(`/artists/${id}`, { params })).data;
   },
 

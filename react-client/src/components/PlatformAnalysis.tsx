@@ -6,7 +6,7 @@ import {
   TooltipItem,
 } from 'chart.js';
 import { Platform } from '@typings/track';
-import { PlatformName } from './PlatformAnalysisBox';
+import { PlatformName } from '@layouts/PlatformAnalysisBox';
 
 // Chart.js에서 필요한 요소들을 등록
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

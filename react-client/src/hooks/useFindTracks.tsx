@@ -1,12 +1,19 @@
-import useDebounce from './useDebounce';
+import { tracksApi } from '@utils/axios';
+import useDebounce from '@hooks/useDebounce';
 import useSWRInfinite from 'swr/infinite';
-import { findTracks } from '@utils/\bswrFetcher';
+import { TrackWithArtistResponse } from '@typings/track';
 
-interface Prob{
-query:string
+async function findTracks(query: string, offset: number) {
+  return await tracksApi.getTracks({
+    sort: 'desc',
+    offset,
+    limit: 5,
+    query: query.replace(/\s+/g, ''),
+    withArtists: true,
+  }) as TrackWithArtistResponse[];
 }
 
-export function useFindTracks({ query }:Prob) {
+export function useFindTracks(query:string) {
   const debouncedQuery = useDebounce(query, 100);
   // 트랙 데이터 관리
   const {

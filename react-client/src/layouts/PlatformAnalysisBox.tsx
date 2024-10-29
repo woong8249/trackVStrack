@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Platform } from '@typings/track';
-import PlatformAnalysis from './PlatformAnalysis';
+import PlatformAnalysis from '@components/PlatformAnalysis';
 import { useState } from 'react';
 import { useModal } from '@hooks/useModal';
 import { FaChevronDown } from 'react-icons/fa';

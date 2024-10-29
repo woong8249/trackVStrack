@@ -41,6 +41,8 @@ export default defineConfig(({ mode }) => {
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@typings': path.resolve(__dirname, 'src/typings'),
         '@assets': path.resolve(__dirname, 'src/assets'),
+        '@constants': path.resolve(__dirname, 'src/constants'),
+        '@sections': path.resolve(__dirname, 'src/sections'),
       },
     },
   };

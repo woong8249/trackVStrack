@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
-import SearchTrackBox from '@components/SearchTrackBox';
+import SearchTrackBox from '@layouts/SearchTrackBox';
 import { Color, SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useEffect, useRef, useState } from 'react';
@@ -26,23 +26,6 @@ export default function ExploreSection1({
   const colorArray = Object.values(Color);
   const [containerWidth, setContainerWidth] = useState<number>(0); // 뷰포트
   const containerRef = useRef<HTMLInputElement>(null);
-
-  // 브라우저 리사이즈 감지
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const { width } = entry.contentRect;
-      setContainerWidth(width);
-    });
-
-    resizeObserver.observe(container);
-    return () => {
-      resizeObserver.unobserve(container);
-    };
-  }, [containerRef]);
 
   function selectTrack(id: number, selectedTrack: TrackWithArtistResponse) {
     setSelectedTracks((draft) => {
@@ -93,6 +76,23 @@ export default function ExploreSection1({
     }
     return (containerWidth - gap * 8) / 3;
   }
+
+  // 브라우저 리사이즈 감지
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const { width } = entry.contentRect;
+      setContainerWidth(width);
+    });
+
+    resizeObserver.observe(container);
+    return () => {
+      resizeObserver.unobserve(container);
+    };
+  }, [containerRef]);
 
   return (
     <section ref={containerRef} className="flex flex-wrap gap-2 items-center justify-center mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%]">

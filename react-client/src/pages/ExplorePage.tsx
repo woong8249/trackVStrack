@@ -4,11 +4,12 @@ import { useImmer } from 'use-immer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TopNavbar from '@layouts/TopNavBar';
 
-import ExploreSection1 from '@layouts/ExploreSection1';
+import ExploreSection1 from '@sections/ExploreSection1';
+import ExploreSection2 from '@sections/ExploreSection2';
 import { TrackWithArtistResponse } from '@typings/track';
-import ExploreSection2 from '@layouts/ExploreSection2';
 import { useEffect } from 'react';
-import { tracksApi } from '@utils/axios';
+import { mutate } from 'swr';
+import { findTrackById } from '@hooks/useFindTrackById';
 
 export enum Color {
   Blue = 'bg-blue-500',
@@ -27,6 +28,7 @@ export interface SelectedTrack {
 }
 
 export default function ExplorePage() {
+  // useFindTrackById
   const location = useLocation();
   const initialSelectTracks: SelectedTrack[] = [];
   const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
@@ -52,23 +54,31 @@ export default function ExplorePage() {
     const queryParams = new URLSearchParams(location.search);
     const selectedTracksParam = queryParams.get('selectedTracks');
     const trackData: TrackWithArtistResponse | undefined = location.state?.track;
+
     if (selectedTracksParam) {
       try {
         const parsedTracks = JSON.parse(selectedTracksParam) as SelectedTrack[];
 
-        // Restore `selectedTracks` with fetched track data for each track ID
-        const restoredTracks = parsedTracks.map((track) => ({
-          ...track,
-          track: track.track ? { id: track.track.id } : null,
-        })) as SelectedTrack[];
-
-        const promises = restoredTracks.map(async (track) => {
+        const restoredTracks = await Promise.all(parsedTracks.map(async (track) => {
           const { id } = track.track as { id: number };
-          const trackData = await tracksApi.getTrackById(id, { withArtists: true });
+
+          // 'track'와 id로 SWR 캐시에서 데이터 조회
+          const trackKey = ['track', id];
+
+          // 캐시에 데이터가 있는지 확인, 없으면 fetcher를 호출하여 데이터 가져오기
+          const cachedTrack = await mutate(
+            trackKey,
+            undefined,
+            { revalidate: false },
+          );
+          console.log(cachedTrack);
+
+          const trackData = cachedTrack || await findTrackById(id);
+
           return { ...track, track: trackData };
-        });
-        const result = await Promise.all(promises) as SelectedTrack[];
-        setSelectedTracks(result);
+        }));
+
+        setSelectedTracks(restoredTracks as SelectedTrack[]);
       } catch (error) {
         console.error('Failed to parse selectedTracks from URL:', error);
       }

@@ -1,5 +1,5 @@
 import ArtistsInfoCard from '@components/ArtistsInfoCard';
-import PlatformAnalysisBox from '@components/PlatformAnalysisBox';
+import PlatformAnalysisBox from '@layouts/PlatformAnalysisBox';
 import TrackOverview from '@components/TrackOverview';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';

@@ -4,8 +4,8 @@
 import React, {
   useState, useRef, useEffect, MutableRefObject,
 } from 'react';
-import TrackInfoCard from './TrackInfoCard';
-import ArtistsInfoCard from './ArtistsInfoCard';
+import TrackInfoCard from '../components/TrackInfoCard';
+import ArtistsInfoCard from '../components/ArtistsInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -26,11 +26,11 @@ export default function HomeExploreBar() {
   const navigate = useNavigate();
   const {
     loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
-  } = useFindTracks({ query });
+  } = useFindTracks(query);
 
   const {
     artistData, artistError, artistIsLoading, setArtistSize, loadMoreArtists,
-  } = useFindArtists({ query });
+  } = useFindArtists(query);
 
   if (trackData?.flat()[0]) {
     target.current = trackData.flat()[0] as TrackWithArtistResponse;

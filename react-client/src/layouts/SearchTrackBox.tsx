@@ -2,8 +2,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState, useRef, useEffect } from 'react';
-import TrackInfoCard from './TrackInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
+import TrackInfoCard from '@components/TrackInfoCard';
 import ErrorAlert from '@components/ErrorAlert'; // Error 컴포넌트
 import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴포넌트
 import { useModal } from '@hooks/useModal';
@@ -42,7 +42,7 @@ export default function SearchTrackBox({
   const width = 'w-full';
   const {
     loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
-  } = useFindTracks({ query });
+  } = useFindTracks(query);
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);
