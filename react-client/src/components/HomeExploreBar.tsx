@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable consistent-return */
-import { tracksApi, artistsApi } from '@utils/axios';
 import React, {
   useState, useRef, useEffect, MutableRefObject,
 } from 'react';
@@ -10,38 +9,20 @@ import ArtistsInfoCard from './ArtistsInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert';
 import LoadingSpinner from '@components/LoadingSpinner';
-import { ArtistResponse, ArtistWithTracksResponse } from '@typings/artist';
+import { ArtistResponse } from '@typings/artist';
 import { useModal } from '@hooks/useModal';
 import { Link, useNavigate } from 'react-router-dom';
 import useSWRInfinite from 'swr/infinite';
 import useDebounce from '@hooks/useDebounce';
+import { findArtists, findTracks } from '@utils/\bswrFetcher';
 
 type Size = 100 | 80 | 70;
-
-async function fetchTracks(query: string, offset: number) {
-  return await tracksApi.getTracks({
-    sort: 'desc',
-    offset,
-    limit: 5,
-    query: query.replace(/\s+/g, ''),
-    withArtists: true,
-  }) as TrackWithArtistResponse[];
-}
-
-async function fetchArtists(query: string, offset: number) {
-  return await artistsApi.getArtists({
-    sort: 'desc',
-    offset,
-    limit: 5,
-    query: query.replace(/\s+/g, ''),
-  }) as ArtistResponse[];
-}
 
 export default function HomeExploreBar() {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 200);
-  const target = useRef<TrackWithArtistResponse|ArtistWithTracksResponse| null>(null) as MutableRefObject<TrackWithArtistResponse|ArtistWithTracksResponse | null>;
+  const target = useRef<TrackWithArtistResponse|ArtistResponse| null>(null) as MutableRefObject<TrackWithArtistResponse|ArtistResponse | null>;
   const containerRef = useRef<HTMLInputElement>(null);
   const [size, setSize] = useState<Size>(100);
   const navigate = useNavigate();
@@ -59,7 +40,7 @@ export default function HomeExploreBar() {
       const offset = pageIndex * 5; // offset 계산
       return debouncedQuery ? ['tracks', debouncedQuery, offset] : null;
     },
-    ([, query, offset]) => fetchTracks(query, offset),
+    ([, query, offset]) => findTracks(query, offset),
     { revalidateOnFocus: false },
   );
 
@@ -76,14 +57,14 @@ export default function HomeExploreBar() {
       const offset = pageIndex * 5; // offset 계산
       return debouncedQuery ? ['artists', debouncedQuery, offset] : null;
     },
-    ([, query, offset]) => fetchArtists(query, offset),
+    ([, query, offset]) => findArtists(query, offset),
     { revalidateOnFocus: false },
   );
   if (trackData?.flat()[0]) {
     target.current = trackData.flat()[0] as TrackWithArtistResponse;
   }
   if (!target.current && artistData?.flat()[0]) {
-    target.current = artistData.flat()[0] as ArtistWithTracksResponse;
+    target.current = artistData.flat()[0] as ArtistResponse;
   }
 
   const handleButtonClick = () => {
@@ -94,24 +75,24 @@ export default function HomeExploreBar() {
     }
   };
 
-  const loadMoreTracks = async () => {
+  async function loadMoreTracks() {
     const newSize = trackSize + 1;
     setTrackSize(newSize);
-  };
+  }
 
-  const loadMoreArtists = async () => {
+  async function loadMoreArtists() {
     const newSize = artistSize + 1;
     setArtistSize(newSize);
-  };
+  }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);
     if (e.target.value.length > 0) {
       setIsModalOpen(true);
     } else {
       setIsModalOpen(false);
     }
-  };
+  }
 
   function render() {
     if (!isModalOpen) return null;
@@ -120,7 +101,7 @@ export default function HomeExploreBar() {
     let noResultContent:React.ReactNode;
 
     // 초기 로딩 상태는 data가 없을 때로 판단
-    const isInitialLoading = trackIsLoading && !trackData && artistIsLoading && !artistData;
+    const isInitialLoading = trackIsLoading && artistIsLoading;
 
     if (isInitialLoading) {
       return (
