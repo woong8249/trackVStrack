@@ -12,7 +12,8 @@ import LoadingSpinner from '@components/LoadingSpinner';
 import { ArtistResponse } from '@typings/artist';
 import { useModal } from '@hooks/useModal';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFindArtists, useFindTrack } from '@hooks/useFindTrack';
+import { useFindTracks } from '@hooks/useFindTracks';
+import { useFindArtists } from '@hooks/useFindArtists';
 
 type Size = 100 | 80 | 70;
 
@@ -25,7 +26,7 @@ export default function HomeExploreBar() {
   const navigate = useNavigate();
   const {
     loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
-  } = useFindTrack({ query });
+  } = useFindTracks({ query });
 
   const {
     artistData, artistError, artistIsLoading, setArtistSize, loadMoreArtists,

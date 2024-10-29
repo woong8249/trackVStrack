@@ -9,7 +9,7 @@ import LoadingSpinner from '@components/LoadingSpinner'; // 로딩 스피너 컴
 import { useModal } from '@hooks/useModal';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { FaPen } from 'react-icons/fa6';
-import { useFindTrack } from '@hooks/useFindTrack';
+import { useFindTracks } from '@hooks/useFindTracks';
 
 type ImageSize = 100 | 80 | 70;
 
@@ -42,7 +42,7 @@ export default function SearchTrackBox({
   const width = 'w-full';
   const {
     loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
-  } = useFindTrack({ query });
+  } = useFindTracks({ query });
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);
