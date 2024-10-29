@@ -34,14 +34,15 @@ export default function SearchTrackBox({
     setIsModalOpen: setIsModifyModalOpen,
     modalRef: modifyModalRef,
   } = useModal();
+  const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [imageSize, setImageSize] = useState<ImageSize>(100);
   const height = imageSize === 100 ? 'h-[120px]' : imageSize === 80 ? 'h-[100px]' : 'h-[90px]';
   const width = 'w-full';
   const {
-    setQuery, loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize, query,
-  } = useFindTrack();
+    loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
+  } = useFindTrack({ query });
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);

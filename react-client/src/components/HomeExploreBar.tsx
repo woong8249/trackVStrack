@@ -12,54 +12,25 @@ import LoadingSpinner from '@components/LoadingSpinner';
 import { ArtistResponse } from '@typings/artist';
 import { useModal } from '@hooks/useModal';
 import { Link, useNavigate } from 'react-router-dom';
-import useSWRInfinite from 'swr/infinite';
-import useDebounce from '@hooks/useDebounce';
-import { findArtists, findTracks } from '@utils/\bswrFetcher';
+import { useFindArtists, useFindTrack } from '@hooks/useFindTrack';
 
 type Size = 100 | 80 | 70;
 
 export default function HomeExploreBar() {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 200);
   const target = useRef<TrackWithArtistResponse|ArtistResponse| null>(null) as MutableRefObject<TrackWithArtistResponse|ArtistResponse | null>;
   const containerRef = useRef<HTMLInputElement>(null);
   const [size, setSize] = useState<Size>(100);
   const navigate = useNavigate();
-
-  // 트랙 데이터 관리
   const {
-    data: trackData,
-    error: trackError,
-    isLoading: trackIsLoading,
-    size: trackSize,
-    setSize: setTrackSize,
-  } = useSWRInfinite(
-    (pageIndex, previousPageData) => {
-      if (previousPageData && previousPageData.length === 0) return null; // 마지막 페이지에 도달 시 요청 중지
-      const offset = pageIndex * 5; // offset 계산
-      return debouncedQuery ? ['tracks', debouncedQuery, offset] : null;
-    },
-    ([, query, offset]) => findTracks(query, offset),
-    { revalidateOnFocus: false },
-  );
+    loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
+  } = useFindTrack({ query });
 
-  // 아티스트 데이터 관리
   const {
-    data: artistData,
-    error: artistError,
-    isLoading: artistIsLoading,
-    size: artistSize,
-    setSize: setArtistSize,
-  } = useSWRInfinite(
-    (pageIndex, previousPageData) => {
-      if (previousPageData && previousPageData.length === 0) return null; // 마지막 페이지에 도달 시 요청 중지
-      const offset = pageIndex * 5; // offset 계산
-      return debouncedQuery ? ['artists', debouncedQuery, offset] : null;
-    },
-    ([, query, offset]) => findArtists(query, offset),
-    { revalidateOnFocus: false },
-  );
+    artistData, artistError, artistIsLoading, setArtistSize, loadMoreArtists,
+  } = useFindArtists({ query });
+
   if (trackData?.flat()[0]) {
     target.current = trackData.flat()[0] as TrackWithArtistResponse;
   }
@@ -74,16 +45,6 @@ export default function HomeExploreBar() {
       navigate('/explore');
     }
   };
-
-  async function loadMoreTracks() {
-    const newSize = trackSize + 1;
-    setTrackSize(newSize);
-  }
-
-  async function loadMoreArtists() {
-    const newSize = artistSize + 1;
-    setArtistSize(newSize);
-  }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);
