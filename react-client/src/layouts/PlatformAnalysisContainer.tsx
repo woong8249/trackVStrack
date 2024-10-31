@@ -73,8 +73,8 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
           {cachedTrack.artists.length > 1 ? (
             <div className="w-full">
               <Slider {...settings} className="w-[31rem] ">
-                {cachedTrack.artists.map((artist) => (
-                  <div className="border border-gray-300">
+                {cachedTrack.artists.map((artist, index) => (
+                  <div key={index} className="border border-gray-300">
                     <ArtistsInfoCard artist={artist} size={100} />
                   </div>
                 ))}
