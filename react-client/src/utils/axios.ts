@@ -1,4 +1,5 @@
 import axios from 'axios';
+import config from '@config/config';
 
 interface FindDTO {
   limit?: number;
@@ -14,7 +15,7 @@ export interface FindWithChartDurationDTO extends FindDTO {
 }
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.baseURL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
