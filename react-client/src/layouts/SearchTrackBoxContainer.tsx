@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 
 import { Color, SelectedTrack } from '@pages/ExplorePage';
@@ -7,26 +6,23 @@ import { Updater } from 'use-immer';
 import SearchTrackBox from './SearchTrackBox';
 
 interface Prob{
-  selectedTracks: SelectedTrack[]; // 상태 값
   setSelectedTracks: Updater<SelectedTrack[]>;
-  updateUrl : (tracks:SelectedTrack[]) => void
-  containerWidth: number,
+  calculateBoxWidth: ()=>string,
+  selectedTrackLength:number
+  selectedTrack:SelectedTrack
+  additionalBoxRenderCondition:boolean
+  index:number
 }
 
-export function SearchTrackContainer({
+export function SearchTrackBoxContainer({
   setSelectedTracks,
-  selectedTracks,
-  updateUrl,
-  containerWidth,
+  selectedTrack,
+  calculateBoxWidth,
+  additionalBoxRenderCondition,
+  selectedTrackLength,
+  index,
 }:Prob) {
-  const additionalBoxRenderCondition = !!(
-    selectedTracks[selectedTracks.length - 1]?.track && selectedTracks.length < 6);
-  const additionalBoxRenderCondition2 = selectedTracks.length === 0;
-
-  const totalBoxes = selectedTracks.length + ((additionalBoxRenderCondition
-    || additionalBoxRenderCondition2) ? 1 : 0);
   const colorArray = Object.values(Color);
-
   function selectTrack(id: number, selectedTrack: TrackWithArtistResponse) {
     setSelectedTracks((draft) => {
       const isSameTrack = draft.some((item) => selectedTrack.id === item?.track?.id);
@@ -37,7 +33,6 @@ export function SearchTrackContainer({
       const trackIndex = draft.findIndex((item) => item.id === id);
       if (trackIndex !== -1) {
         draft[trackIndex].track = selectedTrack;
-        updateUrl(draft);
       }
     });
   }
@@ -69,25 +64,26 @@ export function SearchTrackContainer({
     });
   }
 
-  function calculateBoxWidth() {
-    const gap = 2 * (totalBoxes - 1);
-    if (containerWidth < 640) {
-      return '100%';
-    }
-    if (totalBoxes <= 3) {
-      return (containerWidth - gap * 8) / totalBoxes;
-    }
-    return (containerWidth - gap * 8) / 3;
-  }
-
-  if ((additionalBoxRenderCondition || additionalBoxRenderCondition2)) {
-    return (
+  return (
+    <>
       <div style={{ width: calculateBoxWidth() }}>
         <SearchTrackBox
+          selectedTrack={selectedTrack}
+          selectTrack={selectTrack}
+          addSelectBox={addSelectBox}
+          deleteSelectBox={deleteSelectBox}
+          deleteTrack={deleteTrack}
+        />
+      </div>
+
+      {/* 마지막 인덱스에서 추가 박스 렌더링 */}
+      { (index === selectedTrackLength - 1 && additionalBoxRenderCondition) && (
+      <div key="additional-box" style={{ width: calculateBoxWidth() }}>
+        <SearchTrackBox
           selectedTrack={{
-            id: selectedTracks.length,
+            id: selectedTrackLength,
             activate: false,
-            color: colorArray[selectedTracks.length],
+            color: colorArray[selectedTrackLength],
             track: null,
           }}
           selectTrack={selectTrack}
@@ -96,18 +92,7 @@ export function SearchTrackContainer({
           deleteTrack={deleteTrack}
         />
       </div>
-    );
-  }
-
-  return (
-    <div style={{ width: calculateBoxWidth() }}>
-      <SearchTrackBox
-            selectedTrack={selectedTrack}
-            selectTrack={selectTrack}
-            addSelectBox={addSelectBox}
-            deleteSelectBox={deleteSelectBox}
-            deleteTrack={deleteTrack}
-          />
-    </div>
+      )}
+    </>
   );
 }
