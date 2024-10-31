@@ -52,12 +52,12 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
     cachedTrack && (
 
     <div className="mb-8 w-full">
-      <div className="text-lg mb-4">{cachedTrack.titleName}</div>
+      <div className="text-lg mb-4 px-6">{cachedTrack.titleName}</div>
 
       {/* 부모 */}
-      <div className="flex gap-2 w-full">
+      <div className="w-full flex flex-col gap-2 items-center md:items-stretch  md:flex-row md:justify-center">
         {/* 자식1 */}
-        <div className="bg-white p-6 rounded-lg w-[50%] lg:w-[60%] ">
+        <div className="bg-white p-6 rounded-md w-[100%]  md:w-[60%] ">
           <div className="flex items-center mb-8">
             <div className="text-base px-2">플랫폼별 차트순위</div>
             <RxQuestionMarkCircled size={20} />
@@ -67,12 +67,12 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
         </div>
 
         {/* 자식2 */}
-        <div className="bg-white p-6 rounded-lg w-[50%] lg:w-[40%] ">
+        <div className="bg-white p-6 rounded-md w-[100%]  md:w-[40%] ">
           <div className="px-2 mb-8">아티스트</div>
 
           {cachedTrack.artists.length > 1 ? (
-            <div className="w-full">
-              <Slider {...settings} className="w-[31rem] ">
+            <div className="w-full flex justify-center">
+              <Slider {...settings} className="w-[90%] z-[3] ">
                 {cachedTrack.artists.map((artist, index) => (
                   <div key={index} className="border border-gray-300">
                     <ArtistsInfoCard artist={artist} size={100} />

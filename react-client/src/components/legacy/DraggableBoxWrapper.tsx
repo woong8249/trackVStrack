@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import DraggableBox from '@components/DraggableBox';
+import DraggableBox from '@components/legacy/DraggableBox';
 import { ReactNode, useState } from 'react';
 import { DraggableData } from 'react-draggable';
 

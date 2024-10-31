@@ -15,7 +15,7 @@ export function useFindArtists(query :string) {
       if (!debouncedQuery || previousPageData?.length === 0) return null;
       const offset = pageIndex * 5;
       const [url, params] = artistEndpoints.getArtists({
-        sort: 'desc', offset, limit: 5, query: debouncedQuery, withTracks: false,
+        sort: 'desc', offset, limit: 5, query: debouncedQuery.replace(/\s+/g, ''), withTracks: false,
       });
       return [url, params];
     },

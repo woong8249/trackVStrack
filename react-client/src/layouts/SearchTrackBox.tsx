@@ -116,7 +116,7 @@ export default function SearchTrackBox({
       );
     }
     return (
-      <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[500px] overflow-y-auto rounded-b-[40px]">
+      <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px]  overflow-y-auto rounded-b-[40px]">
         {tracksContent}
         {noResultContent}
       </div>

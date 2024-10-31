@@ -4,6 +4,7 @@ import useSWRInfinite from 'swr/infinite';
 
 export function useFindTracks(query:string) {
   const debouncedQuery = useDebounce(query, 100);
+
   const {
     data: trackData,
     error: trackError,
@@ -15,7 +16,7 @@ export function useFindTracks(query:string) {
       if (!debouncedQuery || previousPageData?.length === 0) return null;
       const offset = pageIndex * 5;
       const [url, params] = trackEndpoints.getTracks({
-        sort: 'desc', offset, limit: 5, query: debouncedQuery, withArtists: true,
+        sort: 'desc', offset, limit: 5, query: debouncedQuery.replace(/\s+/g, ''), withArtists: true,
       });
       return [url, params];
     },

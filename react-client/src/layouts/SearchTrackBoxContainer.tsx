@@ -78,7 +78,7 @@ export function SearchTrackBoxContainer({
 
       {/* 마지막 인덱스에서 추가 박스 렌더링 */}
       { (index === selectedTrackLength - 1 && additionalBoxRenderCondition) && (
-      <div key="additional-box" style={{ width: calculateBoxWidth() }}>
+      <div style={{ width: calculateBoxWidth() }}>
         <SearchTrackBox
           selectedTrack={{
             id: selectedTrackLength,

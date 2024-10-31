@@ -56,6 +56,7 @@ export default function PlatformAnalysis({
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -100,7 +101,7 @@ export default function PlatformAnalysis({
 
   // 차트 컴포넌트 렌더링
   return (
-    <div className="w-full">
+    <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px]" >
       <Bar data={chartData} options={chartOptions} />
     </div>
   );
