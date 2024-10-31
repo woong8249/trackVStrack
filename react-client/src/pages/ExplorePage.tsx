@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import TopNavbar from '@layouts/TopNavBar';
 
 import ExploreSection1 from '@sections/ExploreSection1';
-// import ExploreSection2 from '@sections/ExploreSection2';
+import ExploreSection2 from '@sections/ExploreSection2';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useEffect } from 'react';
 
@@ -42,32 +42,32 @@ export default function ExplorePage() {
       track: track ? { id: track.id } : null,
     }));
     const queryParams = new URLSearchParams({ selectedTracks: JSON.stringify(urlTracks) });
-
     navigate(`?${queryParams.toString()}`, { replace: true });
   }
 
   async function syncTracks() {
-    const queryParams = new URLSearchParams(location.search);
-    const selectedTracksParam = queryParams.get('selectedTracks');
-    const trackData = location.state?.track ? location.state?.track : null;
-    if (selectedTracksParam) {
-      try {
+    try {
+      const queryParams = new URLSearchParams(location.search);
+      const selectedTracksParam = queryParams.get('selectedTracks');
+      const trackData = location.state?.track ? location.state?.track : null;
+      if (selectedTracksParam) {
         const parsedSelectedTracks = JSON.parse(selectedTracksParam) as SelectedTrack[];
         setSelectedTracks(parsedSelectedTracks);
-      } catch (error) {
-        console.error('Failed to parse selectedTracks from URL:', error);
+      } else if (trackData) {
+        const initialSelectTracks = [{
+          id: 0, activate: true, color: colorArray[0], track: trackData,
+        }];
+        updateUrl(initialSelectTracks);
+        setSelectedTracks(initialSelectTracks);
+      } else {
+        const initialSelectTracks = [{
+          id: 0, activate: true, color: colorArray[0], track: null,
+        }];
+        setSelectedTracks(initialSelectTracks);
       }
-    } else if (trackData) {
-      const initialSelectTracks = [{
-        id: 0, activate: true, color: colorArray[0], track: trackData,
-      }];
-      updateUrl(initialSelectTracks);
-      setSelectedTracks(initialSelectTracks);
-    } else {
-      const initialSelectTracks = [{
-        id: 0, activate: true, color: colorArray[0], track: null,
-      }];
-      setSelectedTracks(initialSelectTracks);
+    } catch (error) {
+      console.warn('Failed to parse selectedTracks from URL:', error);
+      navigate('/explore', { replace: true });
     }
   }
 
@@ -85,7 +85,7 @@ export default function ExplorePage() {
         updateUrl={updateUrl}
        />
 
-      {/* <ExploreSection2 selectedTracks={selectedTracks} /> */}
+      <ExploreSection2 selectedTracks={selectedTracks} />
     </div>
   );
 }
