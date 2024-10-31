@@ -27,12 +27,14 @@ export interface SelectedTrack {
 
 export default function ExplorePage() {
   const location = useLocation();
-  const initialSelectTracks: SelectedTrack[] = [];
-  const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
   const colorArray = Object.values(Color);
+  const initialSelectTracks = [{
+    id: 0, activate: true, color: colorArray[0], track: null,
+  }];
+  const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
   const navigate = useNavigate();
 
-  function updateUrl(selectedTracks: SelectedTrack[]) {
+  function updateUrl() {
     const urlTracks = selectedTracks.map(({
       id, activate, color, track,
     }) => ({
@@ -45,7 +47,7 @@ export default function ExplorePage() {
     navigate(`?${queryParams.toString()}`, { replace: true });
   }
 
-  async function syncTracks() {
+  async function checkURL() {
     try {
       const queryParams = new URLSearchParams(location.search);
       const selectedTracksParam = queryParams.get('selectedTracks');
@@ -57,12 +59,6 @@ export default function ExplorePage() {
         const initialSelectTracks = [{
           id: 0, activate: true, color: colorArray[0], track: trackData,
         }];
-        updateUrl(initialSelectTracks);
-        setSelectedTracks(initialSelectTracks);
-      } else {
-        const initialSelectTracks = [{
-          id: 0, activate: true, color: colorArray[0], track: null,
-        }];
         setSelectedTracks(initialSelectTracks);
       }
     } catch (error) {
@@ -72,8 +68,12 @@ export default function ExplorePage() {
   }
 
   useEffect(() => {
-    syncTracks();
+    checkURL();
   }, []);
+
+  useEffect(() => {
+    updateUrl();
+  }, [selectedTracks]);
 
   return (
     <div className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">
@@ -82,7 +82,6 @@ export default function ExplorePage() {
       <ExploreSection1
         selectedTracks={selectedTracks}
         setSelectedTracks={setSelectedTracks}
-        updateUrl={updateUrl}
        />
 
       <ExploreSection2 selectedTracks={selectedTracks} />

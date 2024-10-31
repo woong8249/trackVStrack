@@ -19,9 +19,9 @@ const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
 export default function PlatformAnalysisBox({ platforms }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const platformIcons = {
-    melon: 'public/logo/logo_melon.png',
-    genie: 'public/logo/logo_genie.png',
-    bugs: 'public/logo/logo_bugs.png',
+    melon: 'logo/logo_melon.png',
+    genie: 'logo/logo_genie.png',
+    bugs: 'logo/logo_bugs.png',
   };
 
   const availablePlatformNames = platformNames.filter((key) => platforms[key]) as PlatformName[];

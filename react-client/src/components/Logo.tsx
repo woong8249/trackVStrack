@@ -7,7 +7,7 @@ export default function Logo() {
         {/* Logo Image */}
         <img
           alt="logo"
-          src={'public/logo/logo.png'}
+          src={'logo/logo.png'}
           className="w-[3rem] h-[3rem]"
         />
 

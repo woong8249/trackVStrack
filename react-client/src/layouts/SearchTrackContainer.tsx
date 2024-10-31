@@ -1,28 +1,31 @@
-/* eslint-disable consistent-return */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
-import SearchTrackBox from '@layouts/SearchTrackBox';
+
 import { Color, SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
-import { useEffect, useRef, useState } from 'react';
 import { Updater } from 'use-immer';
+import SearchTrackBox from './SearchTrackBox';
 
 interface Prob{
-    selectedTracks: SelectedTrack[]; // 상태 값
-    setSelectedTracks: Updater<SelectedTrack[]>;
+  selectedTracks: SelectedTrack[]; // 상태 값
+  setSelectedTracks: Updater<SelectedTrack[]>;
+  updateUrl : (tracks:SelectedTrack[]) => void
+  containerWidth: number,
 }
 
-export default function ExploreSection1({
+export function SearchTrackContainer({
   setSelectedTracks,
   selectedTracks,
+  updateUrl,
+  containerWidth,
 }:Prob) {
   const additionalBoxRenderCondition = !!(
     selectedTracks[selectedTracks.length - 1]?.track && selectedTracks.length < 6);
   const additionalBoxRenderCondition2 = selectedTracks.length === 0;
+
   const totalBoxes = selectedTracks.length + ((additionalBoxRenderCondition
-     || additionalBoxRenderCondition2) ? 1 : 0);
+    || additionalBoxRenderCondition2) ? 1 : 0);
   const colorArray = Object.values(Color);
-  const [containerWidth, setContainerWidth] = useState<number>(0); // 뷰포트
-  const containerRef = useRef<HTMLInputElement>(null);
 
   function selectTrack(id: number, selectedTrack: TrackWithArtistResponse) {
     setSelectedTracks((draft) => {
@@ -34,6 +37,7 @@ export default function ExploreSection1({
       const trackIndex = draft.findIndex((item) => item.id === id);
       if (trackIndex !== -1) {
         draft[trackIndex].track = selectedTrack;
+        updateUrl(draft);
       }
     });
   }
@@ -64,6 +68,7 @@ export default function ExploreSection1({
       }
     });
   }
+
   function calculateBoxWidth() {
     const gap = 2 * (totalBoxes - 1);
     if (containerWidth < 640) {
@@ -75,54 +80,34 @@ export default function ExploreSection1({
     return (containerWidth - gap * 8) / 3;
   }
 
-  // 브라우저 리사이즈 감지
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const { width } = entry.contentRect;
-      setContainerWidth(width);
-    });
-
-    resizeObserver.observe(container);
-    return () => {
-      resizeObserver.unobserve(container);
-    };
-  }, [containerRef]);
+  if ((additionalBoxRenderCondition || additionalBoxRenderCondition2)) {
+    return (
+      <div style={{ width: calculateBoxWidth() }}>
+        <SearchTrackBox
+          selectedTrack={{
+            id: selectedTracks.length,
+            activate: false,
+            color: colorArray[selectedTracks.length],
+            track: null,
+          }}
+          selectTrack={selectTrack}
+          addSelectBox={addSelectBox}
+          deleteSelectBox={deleteSelectBox}
+          deleteTrack={deleteTrack}
+        />
+      </div>
+    );
+  }
 
   return (
-    <section ref={containerRef} className="flex flex-wrap gap-2 items-center justify-center mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%]">
-      {selectedTracks.map((selectedTrack, index) => (
-        <div key={index} style={{ width: calculateBoxWidth() }}>
-          <SearchTrackBox
+    <div style={{ width: calculateBoxWidth() }}>
+      <SearchTrackBox
             selectedTrack={selectedTrack}
             selectTrack={selectTrack}
             addSelectBox={addSelectBox}
             deleteSelectBox={deleteSelectBox}
             deleteTrack={deleteTrack}
           />
-        </div>
-      ))}
-
-      {/* 마지막 인덱스에 추가 박스 렌더링 */}
-      {(additionalBoxRenderCondition || additionalBoxRenderCondition2) && (
-        <div style={{ width: calculateBoxWidth() }}>
-          <SearchTrackBox
-            selectedTrack={{
-              id: selectedTracks.length,
-              activate: false,
-              color: colorArray[selectedTracks.length],
-              track: null,
-            }}
-            selectTrack={selectTrack}
-            addSelectBox={addSelectBox}
-            deleteSelectBox={deleteSelectBox}
-            deleteTrack={deleteTrack}
-          />
-        </div>
-      )}
-    </section>
+    </div>
   );
 }
