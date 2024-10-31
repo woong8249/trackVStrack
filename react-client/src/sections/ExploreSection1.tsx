@@ -53,7 +53,9 @@ export default function ExploreSection1({
 
   function addSelectBox(id:number) {
     setSelectedTracks((draft) => {
-      draft.push({ id, activate: true, color: colorArray[id] });
+      draft.push({
+        id, activate: true, color: colorArray[id], track: null,
+      });
     });
   }
 
@@ -116,6 +118,7 @@ export default function ExploreSection1({
               id: selectedTracks.length,
               activate: false,
               color: colorArray[selectedTracks.length],
+              track: null,
             }}
             selectTrack={selectTrack}
             addSelectBox={addSelectBox}

@@ -1,6 +1,6 @@
 import TrackOverview from '@components/legacy/TrackOverview';
 import { useEffect, useRef, useState } from 'react';
-import { tracksApi } from '@utils/axios';
+import { trackEndpoints } from '@utils/axios';
 
 import TopNavBar from '@components/legacy/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -21,7 +21,7 @@ function MainPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await tracksApi.getTracks({
+      const response = await trackEndpoints.getTracks({
         minWeeksOnChart: 30,
         withArtists: true,
         sort: 'random',

@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { ArtistResponse, ArtistWithTracksResponse } from '@typings/artist';
-import { TrackResponse, TrackWithArtistResponse } from '@typings/track';
 
 interface FindDTO {
   limit?: number;
@@ -23,25 +21,18 @@ const apiClient = axios.create({
   },
 });
 
-export const tracksApi = {
-  async getTrackById(id: number, params?:{withArtists: boolean;}):
-   Promise<TrackResponse |TrackWithArtistResponse > {
-    return (await apiClient.get(`/tracks/${id}`, { params })).data;
-  },
-
-  async getTracks(params: FindWithChartDurationDTO):
-   Promise<TrackResponse[] |TrackWithArtistResponse[]| []> {
-    return (await apiClient.get('/tracks', { params })).data;
-  },
+export const fetcher = async <T>
+(url: string, params?: FindDTO | FindWithChartDurationDTO): Promise<T> => {
+  const response = await apiClient.get(url, { params });
+  return response.data;
 };
 
-export const artistsApi = {
-  async getArtistById(id: number, params?:{withTracks: boolean;}):
-   Promise<ArtistResponse|ArtistWithTracksResponse> {
-    return (await apiClient.get(`/artists/${id}`, { params })).data;
-  },
+export const trackEndpoints = {
+  getTracks: (params: FindWithChartDurationDTO) => ['/tracks', params] as [string, FindWithChartDurationDTO],
+  getTrackById: (id: number, params?: { withArtists: boolean }) => [`/tracks/${id}`, params] as [string, { withArtists: boolean }],
+};
 
-  async getArtists(params: FindDTO): Promise<ArtistResponse[] |ArtistWithTracksResponse[]| []> {
-    return (await apiClient.get('/artists', { params })).data;
-  },
+export const artistEndpoints = {
+  getArtists: (params: FindDTO) => ['/artists', params] as [string, FindDTO],
+  getArtistById: (id: number, params?: { withTracks: boolean }) => [`/artists/${id}`, params] as [string, { withTracks: boolean }],
 };

@@ -10,6 +10,7 @@ import { useModal } from '@hooks/useModal';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { FaPen } from 'react-icons/fa6';
 import { useFindTracks } from '@hooks/useFindTracks';
+import { useCachedTrack } from '@hooks/useStoredTrack';
 
 type ImageSize = 100 | 80 | 70;
 
@@ -29,6 +30,7 @@ export default function SearchTrackBox({
   deleteTrack,
 }:Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
+  const storedTrack = useCachedTrack(selectedTrack.track);
   const {
     isModalOpen: isModifyModalOpen,
     setIsModalOpen: setIsModifyModalOpen,
@@ -67,7 +69,7 @@ export default function SearchTrackBox({
 
     if (trackError) {
       return (
-        <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[250px] overflow-y-auto rounded-b-[40px]">
+        <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[500px] overflow-y-auto rounded-b-[40px]">
           <ErrorAlert
           error={trackError}
           retryFunc={() => {
@@ -82,7 +84,7 @@ export default function SearchTrackBox({
 
     if (trackData?.flat().length) {
       tracksContent = (
-        <>
+        <div>
           <div className="py-2 px-3 text-base text-[14px] font-semibold bg-gradient-to-b from-gray-200 to-gray-50">
             트랙
           </div>
@@ -102,7 +104,7 @@ export default function SearchTrackBox({
             Load more tracks
           </button>
           )}
-        </>
+        </div>
       );
     }
 
@@ -114,7 +116,7 @@ export default function SearchTrackBox({
       );
     }
     return (
-      <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[250px] overflow-y-auto rounded-b-[40px]">
+      <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[500px] overflow-y-auto rounded-b-[40px]">
         {tracksContent}
         {noResultContent}
       </div>
@@ -176,14 +178,14 @@ export default function SearchTrackBox({
           + 추가
         </div>
       )
-        : selectedTrack.track ? (
+        : storedTrack ? (
           <div
             className={`bg-white ${width} ${height} flex items-center rounded-xl hover:bg-gray-300`}
             onClick={ (e) => { e.stopPropagation(); setIsModifyModalOpen((pre) => !pre); }}
             role='button'
             tabIndex={0}>
             <div className={`w-2.5 h-2.5 ${selectedTrack.color} rounded-full ml-4  mr-2`}></div>
-            <TrackInfoCard track={selectedTrack.track} size={imageSize}></TrackInfoCard>
+            <TrackInfoCard track={storedTrack} size={imageSize}></TrackInfoCard>
 
             {isModifyModalOpen && (
             <div ref={modifyModalRef} className={'text-gray-500 absolute top-0 right-0  mt-2 bg-white border border-gray-300 shadow-md rounded-md p-2 w-40'}>

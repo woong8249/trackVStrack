@@ -2,7 +2,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { tracksApi } from '@utils/axios';
+import { fetcher, trackEndpoints } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
 import TrackInfoCard from '@components/TrackInfoCard';
@@ -74,11 +74,13 @@ export default function HomeSection2() {
     setLoading(true);
     setError(null);
     try {
-      const response = await tracksApi.getTracks({
+      const [endpoint, params] = trackEndpoints.getTracks({
         minWeeksOnChart: 30,
         withArtists: true,
-        sort: 'random',
-      }) as TrackWithArtistResponse[];
+        sort: 'random' as const,
+      });
+      const response = await fetcher<TrackWithArtistResponse[]>(endpoint, params);
+
       setTracks(response);
     } catch (err) {
       setError(err as unknown as Error);

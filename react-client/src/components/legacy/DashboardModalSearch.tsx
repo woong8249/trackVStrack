@@ -1,6 +1,6 @@
 import { ArtistResponse } from '@typings/artist';
 
-import { tracksApi, artistsApi } from '@utils/axios';
+import { trackEndpoints, artistEndpoints } from '@utils/axios';
 import React, { useState, useRef, useEffect } from 'react';
 import TrackInfoCard from '../TrackInfoCard';
 import ArtistsInfoCard from '../ArtistsInfoCard';
@@ -20,7 +20,7 @@ export default function DashboardModalSearch() {
   // 모달 내 검색 요청 함수
   async function search(query: string) {
     try {
-      const trackSearchResult = await tracksApi.getTracks({
+      const trackSearchResult = await trackEndpoints.getTracks({
         sort: 'desc',
         offset: 0,
         limit: 5,
@@ -28,7 +28,7 @@ export default function DashboardModalSearch() {
         withArtists: true,
       }) as TrackWithArtistResponse[];
 
-      const artistSearchResult = await artistsApi.getArtists({
+      const artistSearchResult = await artistEndpoints.getArtists({
         sort: 'desc',
         offset: 0,
         limit: 5,
@@ -43,7 +43,7 @@ export default function DashboardModalSearch() {
 
   async function loadMoreTracks() {
     try {
-      const trackSearchResult = await tracksApi.getTracks({
+      const trackSearchResult = await trackEndpoints.getTracks({
         sort: 'desc',
         offset: trackOffset + 5, // offset 증가
         limit: 5,
@@ -64,7 +64,7 @@ export default function DashboardModalSearch() {
 
   async function loadMoreArtists() {
     try {
-      const artistSearchResult = await artistsApi.getArtists({
+      const artistSearchResult = await artistEndpoints.getArtists({
         sort: 'desc',
         offset: artistOffset + 5, // offset 증가
         limit: 5,

@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useEffect, useRef, useState } from 'react';
-import { tracksApi } from '@utils/axios';
+import { trackEndpoints } from '@utils/axios';
 
 import TopNavBar from '@components/legacy/TopNavBar';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -33,7 +33,7 @@ function TestMainPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await tracksApi.getTracks({
+      const response = await trackEndpoints.getTracks({
         minWeeksOnChart: 30,
         withArtists: true,
         sort: 'random',
