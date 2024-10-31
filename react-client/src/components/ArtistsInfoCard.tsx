@@ -12,7 +12,7 @@ export default function ArtistsInfoCard({ artist, size = 100 }: Props) {
     <div className="flex justify-between items-center px-[0.5rem] overflow-x-auto">
       <div className="flex flex-grow items-center">
         {artist.artistImage === 'missing'
-          ? <RxAvatar className={`w-[${size}px] h-[${size}px]  mr-[2rem] sm:mr-[3rem]`} />
+          ? <RxAvatar className={' mr-[2rem] sm:mr-[3rem]'} style={{ width: `${size}px`, height: `${size}px` }} />
           : (
             <img
               src={artist.artistImage}

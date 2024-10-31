@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import homeMessages from '../constants/homeMessages';
-import HomeExploreBar from '@components/HomeExploreBar';
+import homeMessages from '@constants/homeMessages';
+import HomeExploreBar from '@layouts/HomeExploreBar';
 
 export default function HomeSection1() {
   const intervalTime = 3000;

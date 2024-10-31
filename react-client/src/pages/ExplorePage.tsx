@@ -1,16 +1,13 @@
 /* eslint-disable no-unused-vars */
 
 import { useImmer } from 'use-immer';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TopNavbar from '@layouts/TopNavBar';
 
-import ExploreSection1 from '@layouts/ExploreSection1';
+import ExploreSection1 from '@sections/ExploreSection1';
+import ExploreSection2 from '@sections/ExploreSection2';
 import { TrackWithArtistResponse } from '@typings/track';
-import ExploreSection2 from '@layouts/ExploreSection2';
-
-// ideal1 :추가될때마다 url을 수정해 state가 유지되는 척 만들기 => 단점 fetch를 다시해야함
-// 캐시되는 방식이 더 좋을 수 있음
-// 이슈파서 하기
+import { useEffect } from 'react';
 
 export enum Color {
   Blue = 'bg-blue-500',
@@ -24,22 +21,59 @@ export enum Color {
 export interface SelectedTrack {
   id: number;
   activate: boolean;
-  track?: TrackWithArtistResponse | null;
+  track: TrackWithArtistResponse |{id:number} | null;
   color: Color;
 }
 
 export default function ExplorePage() {
   const location = useLocation();
-  const trackData: TrackWithArtistResponse | undefined = location.state?.track;
   const colorArray = Object.values(Color);
-  const initialSelectTrackBoxes = [{
-    id: 0, activate: true, color: colorArray[0], track: trackData,
+  const initialSelectTracks = [{
+    id: 0, activate: true, color: colorArray[0], track: null,
   }];
+  const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
+  const navigate = useNavigate();
 
-  const [
-    selectedTracks,
-    setSelectedTracks,
-  ] = useImmer<SelectedTrack[]>(initialSelectTrackBoxes);
+  function updateUrl() {
+    const urlTracks = selectedTracks.map(({
+      id, activate, color, track,
+    }) => ({
+      id,
+      activate,
+      color,
+      track: track ? { id: track.id } : null,
+    }));
+    const queryParams = new URLSearchParams({ selectedTracks: JSON.stringify(urlTracks) });
+    navigate(`?${queryParams.toString()}`, { replace: true });
+  }
+
+  async function checkURL() {
+    try {
+      const queryParams = new URLSearchParams(location.search);
+      const selectedTracksParam = queryParams.get('selectedTracks');
+      const trackData = location.state?.track ? location.state?.track : null;
+      if (selectedTracksParam) {
+        const parsedSelectedTracks = JSON.parse(selectedTracksParam) as SelectedTrack[];
+        setSelectedTracks(parsedSelectedTracks);
+      } else if (trackData) {
+        const initialSelectTracks = [{
+          id: 0, activate: true, color: colorArray[0], track: trackData,
+        }];
+        setSelectedTracks(initialSelectTracks);
+      }
+    } catch (error) {
+      console.warn('Failed to parse selectedTracks from URL:', error);
+      navigate('/explore', { replace: true });
+    }
+  }
+
+  useEffect(() => {
+    checkURL();
+  }, []);
+
+  useEffect(() => {
+    updateUrl();
+  }, [selectedTracks]);
 
   return (
     <div className="bg-[#eaeff8] min-h-screen flex flex-col items-center min-w-[350px]">

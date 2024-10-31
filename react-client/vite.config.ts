@@ -30,6 +30,7 @@ const plugins = [
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+
   return {
     plugins,
     resolve: {
@@ -41,6 +42,9 @@ export default defineConfig(({ mode }) => {
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@typings': path.resolve(__dirname, 'src/typings'),
         '@assets': path.resolve(__dirname, 'src/assets'),
+        '@constants': path.resolve(__dirname, 'src/constants'),
+        '@sections': path.resolve(__dirname, 'src/sections'),
+        '@config': path.resolve(__dirname, 'src/config'),
       },
     },
   };
