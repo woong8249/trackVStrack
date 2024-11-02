@@ -1,7 +1,8 @@
 /* eslint-disable consistent-return */
+/* eslint-disable no-param-reassign */
 
 import { SearchTrackBoxContainer } from '@layouts/SearchTrackBoxContainer';
-import { SelectedTrack } from '@pages/ExplorePage';
+import { Color, SelectedTrack } from '@pages/ExplorePage';
 
 import { useEffect, useRef, useState } from 'react';
 import { Updater } from 'use-immer';
@@ -15,10 +16,8 @@ export default function ExploreSection1({
   setSelectedTracks,
   selectedTracks,
 }:Prob) {
-  const additionalBoxRenderCondition = !!(
-    selectedTracks[selectedTracks.length - 1]?.track && selectedTracks.length < 6);
-  const totalBoxes = selectedTracks.length
-    + ((additionalBoxRenderCondition || selectedTracks.length === 0) ? 1 : 0);
+  const colorArray = Object.values(Color);
+  const totalBoxes = selectedTracks.length;
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const containerRef = useRef<HTMLInputElement>(null);
 
@@ -32,6 +31,27 @@ export default function ExploreSection1({
     }
     return `${(containerWidth - gap * 8) / 3}px`;
   }
+
+  useEffect(() => {
+    if (selectedTracks.length === 1) {
+      setSelectedTracks((draft) => {
+        draft.forEach((box) => { box.activate = true; });
+      });
+    }
+    const additionalBoxRenderCondition = !!(
+      selectedTracks[selectedTracks.length - 1]?.track && selectedTracks.length < 6);
+
+    if (additionalBoxRenderCondition) {
+      setSelectedTracks((draft) => {
+        draft.push({
+          id: draft.length,
+          activate: false,
+          color: colorArray[draft.length],
+          track: null,
+        });
+      });
+    }
+  }, [selectedTracks]);
 
   // 브라우저 리사이즈 감지
   useEffect(() => {
@@ -58,12 +78,9 @@ export default function ExploreSection1({
       {selectedTracks.map((selectedTrack, index) => (
         <SearchTrackBoxContainer
           key={index}
-          index={index}
-          selectedTrackLength={selectedTracks.length}
           setSelectedTracks={setSelectedTracks}
           selectedTrack={selectedTrack}
-          calculateBoxWidth={calculateBoxWidth}
-          additionalBoxRenderCondition={additionalBoxRenderCondition} />
+          calculateBoxWidth={calculateBoxWidth} />
       ))}
 
     </section>

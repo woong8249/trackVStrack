@@ -17,7 +17,7 @@ type ImageSize = 100 | 80 | 70;
 interface Prob {
   selectedTrack:SelectedTrack
   selectTrack :(id: number, selectedTrack: TrackWithArtistResponse) => void;
-  addSelectBox:(id:number)=> void
+  changeBoxActivateToTrue:(id:number)=> void
   deleteSelectBox:(id:number) => void
   deleteTrack:(id:number) => void
 }
@@ -25,7 +25,7 @@ interface Prob {
 export default function SearchTrackBox({
   selectedTrack,
   selectTrack,
-  addSelectBox,
+  changeBoxActivateToTrue,
   deleteSelectBox,
   deleteTrack,
 }:Prob) {
@@ -173,7 +173,7 @@ export default function SearchTrackBox({
         className={`bg-white ${width} flex items-center rounded-xl bg-[#0b57d11c] hover:bg-gray-400 responsive-text text-gray-500 px-10 ${height}`}
         role='button'
         tabIndex={0}
-        onClick={(e) => { e.stopPropagation(); addSelectBox(selectedTrack.id); }}
+        onClick={(e) => { e.stopPropagation(); changeBoxActivateToTrue(selectedTrack.id); }}
         >
           + 추가
         </div>

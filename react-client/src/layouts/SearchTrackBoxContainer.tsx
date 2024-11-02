@@ -8,19 +8,13 @@ import SearchTrackBox from './SearchTrackBox';
 interface Prob{
   setSelectedTracks: Updater<SelectedTrack[]>;
   calculateBoxWidth: ()=>string,
-  selectedTrackLength:number
   selectedTrack:SelectedTrack
-  additionalBoxRenderCondition:boolean
-  index:number
 }
 
 export function SearchTrackBoxContainer({
   setSelectedTracks,
   selectedTrack,
   calculateBoxWidth,
-  additionalBoxRenderCondition,
-  selectedTrackLength,
-  index,
 }:Prob) {
   const colorArray = Object.values(Color);
   function selectTrack(id: number, selectedTrack: TrackWithArtistResponse) {
@@ -46,53 +40,40 @@ export function SearchTrackBoxContainer({
     });
   }
 
-  function addSelectBox(id:number) {
+  function changeBoxActivateToTrue(id:number) {
     setSelectedTracks((draft) => {
-      draft.push({
-        id, activate: true, color: colorArray[id], track: null,
+      draft.forEach((item) => {
+        if (item.id === id) {
+          item.activate = true;
+        }
       });
     });
   }
 
   function deleteSelectBox(id: number) {
     setSelectedTracks((draft) => {
-      // 해당 id를 가진 박스를 배열에서 삭제
       const index = draft.findIndex((box) => box.id === id);
       if (index !== -1) {
-        draft.splice(index, 1); // 배열에서 해당 인덱스의 요소를 제거
+        draft.splice(index, 1); // 해당 요소 제거
+
+        // 모든 요소의 id 재할당
+        draft.forEach((box, i) => {
+          box.id = i;
+          box.color = colorArray[i];
+        });
       }
     });
   }
 
   return (
-    <>
-      <div style={{ width: calculateBoxWidth() }}>
-        <SearchTrackBox
-          selectedTrack={selectedTrack}
-          selectTrack={selectTrack}
-          addSelectBox={addSelectBox}
-          deleteSelectBox={deleteSelectBox}
-          deleteTrack={deleteTrack}
-        />
-      </div>
-
-      {/* 마지막 인덱스에서 추가 박스 렌더링 */}
-      { (index === selectedTrackLength - 1 && additionalBoxRenderCondition) && (
-      <div style={{ width: calculateBoxWidth() }}>
-        <SearchTrackBox
-          selectedTrack={{
-            id: selectedTrackLength,
-            activate: false,
-            color: colorArray[selectedTrackLength],
-            track: null,
-          }}
-          selectTrack={selectTrack}
-          addSelectBox={addSelectBox}
-          deleteSelectBox={deleteSelectBox}
-          deleteTrack={deleteTrack}
-        />
-      </div>
-      )}
-    </>
+    <div style={{ width: calculateBoxWidth() }}>
+      <SearchTrackBox
+        selectedTrack={selectedTrack}
+        selectTrack={selectTrack}
+        changeBoxActivateToTrue={changeBoxActivateToTrue}
+        deleteSelectBox={deleteSelectBox}
+        deleteTrack={deleteTrack}
+      />
+    </div>
   );
 }
