@@ -1,17 +1,13 @@
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import { useEffect, useState } from 'react';
 import { fetcher, trackEndpoints } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
-import TrackInfoCard from '@components/TrackInfoCard';
-import ChartGraph from '@components/ChartGraph';
-import { useModal } from '@hooks/useModal';
-import { FaExpandAlt } from 'react-icons/fa';
 import { TrackWithArtistResponse } from '@typings/track';
 import Slider, { CustomArrowProps } from 'react-slick';
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
+import TrackOverview from '@components/TrackOverview';
 
 function SamplePrevArrow(props: CustomArrowProps) {
   const { className, onClick } = props;
@@ -31,9 +27,6 @@ export default function HomeSection2() {
   const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [activeModalTrack, setActiveModalTrack] = useState<TrackWithArtistResponse | null>(null);
-  const { isModalOpen, setIsModalOpen, modalRef } = useModal();
-
   const settings = {
     dots: true,
     infinite: true,
@@ -64,12 +57,6 @@ export default function HomeSection2() {
     ],
   };
 
-  const handleModalOpen = (track: TrackWithArtistResponse, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveModalTrack(track); // 클릭한 트랙의 모달을 활성화
-    setIsModalOpen(true); // 모달을 열기
-  };
-
   const fetchTracks = async () => {
     setLoading(true);
     setError(null);
@@ -88,48 +75,6 @@ export default function HomeSection2() {
       setLoading(false);
     }
   };
-
-  const renderModal = (track: TrackWithArtistResponse) => {
-    if (!activeModalTrack || activeModalTrack.id !== track.id) return null;
-    return ReactDOM.createPortal(
-      <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white z-30 rounded-lg p-4 relative max-h-[auto] w-[auto] overflow-auto" ref={modalRef}>
-          <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
-            <TrackInfoCard track={track} />
-            <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-            <ChartGraph track={track} />
-          </div>
-        </div>
-      </div>,
-      document.body,
-    );
-  };
-
-  const renderSlides = () => tracks.map((track) => (
-    <div key={track.id.toString()} className="w-[600px] p-2">
-      <div className="relative">
-        <div className="border-[1px] bg-[white] border-gray-300 rounded-md relative">
-          <TrackInfoCard track={track} />
-          <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-          <ChartGraph track={track} />
-        </div>
-
-        <div className="absolute top-2 right-2">
-          <button
-            onClick={(e) => handleModalOpen(track, e)}
-            className="bg-transparent text-green-600 p-2 rounded-full hover:text-green-800"
-          >
-            <FaExpandAlt size={20} />
-          </button>
-        </div>
-
-        {/* 모달 렌더링 */}
-        {isModalOpen && renderModal(track)}
-      </div>
-    </div>
-  ));
-
-  const contents = renderSlides();
 
   useEffect(() => {
     fetchTracks();
@@ -151,7 +96,11 @@ export default function HomeSection2() {
         <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
 
         <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
-          {contents}
+          {tracks.map((track) => (
+            <div className='p-2'>
+              <TrackOverview track={track}></TrackOverview>
+            </div>
+          ))}
         </Slider>
       </div>
     </div>
