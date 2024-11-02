@@ -59,7 +59,7 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
         {/* 자식1 */}
         <div className="bg-white p-6 rounded-md w-[100%]  md:w-[60%] ">
           <div className="flex items-center mb-8">
-            <div className="text-base px-2">플랫폼별 차트순위</div>
+            <div className="text-base px-2">📈 플랫폼별 차트순위</div>
             <RxQuestionMarkCircled size={20} />
           </div>
 
@@ -67,26 +67,34 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
         </div>
 
         {/* 자식2 */}
-        <div className="bg-white p-6 rounded-md w-[100%]  md:w-[40%] ">
-          <div className="px-2 mb-8">아티스트</div>
+        <div className=" w-[100%]  md:w-[40%] ">
+          {/* 자식2 -자식1 */}
+          <div className='bg-white px-6 pb-6 rounded-md '>
+            <div className="px-2 py-7">🎤 아티스트</div>
 
-          {cachedTrack.artists.length > 1 ? (
-            <div className="w-full flex justify-center">
-              <Slider {...settings} className="w-[90%] z-[3] ">
-                {cachedTrack.artists.map((artist, index) => (
-                  <div key={index} className="border border-gray-300">
-                    <ArtistsInfoCard artist={artist} size={100} />
-                  </div>
-                ))}
-              </Slider>
-            </div>
-          ) : (
-            <div className="border border-gray-300">
-              <ArtistsInfoCard artist={cachedTrack.artists[0]} size={100} />
-            </div>
-          )}
+            {cachedTrack.artists.length > 1 ? (
+              <div className="w-full flex justify-center">
+                <Slider {...settings} className="w-[90%] z-[3] ">
+                  {cachedTrack.artists.map((artist, index) => (
+                    <div key={index} className="border border-gray-300 rounded-md">
+                      <ArtistsInfoCard artist={artist} size={100} />
+                    </div>
+                  ))}
+                </Slider>
+              </div>
+            ) : (
+              <div className="border border-gray-300 rounded-md">
+                <ArtistsInfoCard artist={cachedTrack.artists[0]} size={100} />
+              </div>
+            )}
 
-          <PlatformAnalysisBox platforms={cachedTrack.platforms} />
+          </div>
+
+          {/* 자식2 -자식2 */}
+          <div className='mt-2'>
+            <PlatformAnalysisBox platforms={cachedTrack.platforms} />
+          </div>
+
         </div>
       </div>
 

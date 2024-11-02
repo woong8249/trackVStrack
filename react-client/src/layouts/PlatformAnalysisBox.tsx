@@ -41,7 +41,7 @@ export default function PlatformAnalysisBox({ platforms }: Prob) {
 
   return (
     <div className="relative bg-white p-8 rounded-lg">
-      <div className='px-2 mb-8'>플랫폼 차트 성과</div>
+      <div className='px-2 mb-4'> 📊 플랫폼 차트 성과</div>
 
       <div className="absolute top-4 right-4">
         <button onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }} className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg">
@@ -49,8 +49,6 @@ export default function PlatformAnalysisBox({ platforms }: Prob) {
           <FaChevronDown size={10} />
         </button>
       </div>
-
-      <PlatformAnalysis {...platformProps} />
 
       {isModalOpen && (
       <div
@@ -75,6 +73,7 @@ export default function PlatformAnalysisBox({ platforms }: Prob) {
       </div>
       )}
 
+      <PlatformAnalysis {...platformProps} />
     </div>
   );
 }
