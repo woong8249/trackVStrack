@@ -47,7 +47,7 @@ export default function ExplorePage() {
     navigate(`?${queryParams.toString()}`, { replace: true });
   }
 
-  async function checkURL() {
+  async function syncSelectedTracksWithURL() {
     try {
       const queryParams = new URLSearchParams(location.search);
       const selectedTracksParam = queryParams.get('selectedTracks');
@@ -68,7 +68,7 @@ export default function ExplorePage() {
   }
 
   useEffect(() => {
-    checkURL();
+    syncSelectedTracksWithURL();
   }, []);
 
   useEffect(() => {
