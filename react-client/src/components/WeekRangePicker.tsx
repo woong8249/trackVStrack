@@ -3,17 +3,14 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
 import { Calendar } from 'react-date-range';
-import ReactDOM from 'react-dom'; // ReactDOM import
 import {
   format, startOfWeek, endOfWeek, isWithinInterval, isAfter, isBefore,
 } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { useModal } from '@hooks/useModal';
-
-let zIndexCounter = 1000; // 전역적으로 사용할 z-index 관리 변수
+import React, { useEffect, useState } from 'react';
 
 interface WeekRangePickerProps {
   startDate: Date;
@@ -25,16 +22,14 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
   const {
     isModalOpen, setIsModalOpen, modalRef,
   } = useModal();
-  const [selectedStartWeek, setSelectedStartWeek] = useState<Date | null>(startDate);
-  const [selectedEndWeek, setSelectedEndWeek] = useState<Date | null>(endDate);
-  const [currentZIndex, setCurrentZIndex] = useState(0); // 현재 모달의 z-index 관리
 
-  // 모달 열릴 때 z-index 설정
+  const [selectedStartWeek, setSelectedStartWeek] = useState<Date | null>(null);
+  const [selectedEndWeek, setSelectedEndWeek] = useState<Date | null>(null);
+
   useEffect(() => {
-    if (isModalOpen) {
-      setCurrentZIndex(zIndexCounter += 1);
-    }
-  }, [isModalOpen]);
+    setSelectedStartWeek(startDate);
+    setSelectedEndWeek(endDate);
+  }, [startDate, endDate]);
 
   // 시작 주 선택 핸들러
   const handleSelectStartWeek = (date: Date) => {
@@ -47,8 +42,7 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
     const endOfSelectedWeek = endOfWeek(date, { weekStartsOn: 1 });
     setSelectedEndWeek(endOfSelectedWeek);
   };
-
-  // 적용 버튼 핸들러
+    // 적용 버튼 핸들러
   const handleApply = (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -57,7 +51,6 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
     }
     setIsModalOpen(false);
   };
-
   const isDateInSelectedStartWeek = (date: Date) => selectedStartWeek
     && isWithinInterval(date, {
       start: startOfWeek(selectedStartWeek, { weekStartsOn: 1 }),
@@ -74,8 +67,7 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
 
   const modalContent = (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-      style={{ zIndex: currentZIndex }} // 모달이 열릴 때마다 z-index를 동적으로 설정
+      className="fixed inset-0 z-[10] flex items-center justify-center bg-black bg-opacity-50"
       >
       <div className="bg-white p-4 rounded shadow-lg relative overflow-x-auto " ref={modalRef}>
         <div>
@@ -85,13 +77,13 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
               <h3 className="text-gray-600 font-bold responsive-text">시작 주</h3>
 
               <Calendar
-              date={selectedStartWeek || new Date()}
-              onChange={handleSelectStartWeek}
-              minDate={startDate}
-              maxDate={endDate}
-              className="border border-gray-200 h-[330px]" // 반응형 크기 설정
-              dayContentRenderer={(date) => (
-                <div
+                date={selectedStartWeek || new Date()}
+                onChange={handleSelectStartWeek}
+                minDate={startDate}
+                maxDate={endDate}
+                className="border border-gray-200 h-[330px]" // 반응형 크기 설정
+                dayContentRenderer={(date) => (
+                  <div
                   className={`px-2 py-1 text-center rounded-full ${
                     isDateInSelectedStartWeek(date)
                       ? 'bg-blue-500 text-white'
@@ -100,9 +92,9 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
                         : ''
                   }`}
                 >
-                  {format(date, 'd')}
-                </div>
-              )}
+                    {format(date, 'd')}
+                  </div>
+                )}
               disabledDay={isDateDisabled}
             />
             </div>
@@ -116,7 +108,7 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
               onChange={handleSelectEndWeek}
               minDate={startDate}
               maxDate={endDate}
-              className="border border-gray-200 h-[330px]" // 반응형 크기 설정
+              className="border border-gray-200 h-[330px]"
               dayContentRenderer={(date) => (
                 <div
                   className={`px-2 py-1 text-center rounded-full ${
@@ -147,11 +139,11 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
   );
 
   return (
-    <div className="relative">
+    <div className="relative"style={{ display: 'inline-block' }}>
       <div
         role="button"
         tabIndex={0}
-        className="border p-2 flex items-center cursor-pointer gap-3 hover:underline"
+        className="py-2 px-1 flex items-center cursor-pointer gap-3 hover:underline"
         onClick={(e) => { setIsModalOpen(!isModalOpen); e.stopPropagation(); }}
       >
         <span>📅</span>
@@ -161,7 +153,7 @@ export default function WeekRangePicker({ startDate, endDate, onDateRangeChange 
         </span>
       </div>
 
-      {isModalOpen && ReactDOM.createPortal(modalContent, document.body)}
+      {isModalOpen && modalContent}
     </div>
   );
 }

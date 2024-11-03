@@ -9,9 +9,11 @@ import React, { useState } from 'react';
 
 interface Prob {
   track: TrackWithArtistResponse;
+  startDate:Date
+  endDate:Date
 }
 
-export default function TrackOverview({ track }: Prob) {
+export default function TrackOverview({ track, startDate, endDate }: Prob) {
   const [activeModalTrack, setActiveModalTrack] = useState<TrackWithArtistResponse | null>(null);
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 
@@ -28,7 +30,8 @@ export default function TrackOverview({ track }: Prob) {
         <div className="bg-white rounded-lg p-4 relative" ref={modalRef}>
           <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
             <TrackInfoCard track={track} />
-            <ChartGraph track={track} />
+            <div className='border-b mt-1`'></div>
+            <ChartGraph track={track} startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>,
@@ -41,8 +44,8 @@ export default function TrackOverview({ track }: Prob) {
       <div className="relative">
         <div className="border-[1px] bg-[white] border-gray-300 rounded-md relative">
           <TrackInfoCard track={track} />
-          <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-          <ChartGraph track={track} />
+          <div className='border-b mt-1`'></div>
+          <ChartGraph track={track} startDate={startDate} endDate={endDate} />
         </div>
 
         <div className="absolute top-2 right-2">
