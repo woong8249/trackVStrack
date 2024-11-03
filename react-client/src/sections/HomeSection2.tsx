@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { fetcher, trackEndpoints } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
-import { TrackWithArtistResponse } from '@typings/track';
+import { Platform, TrackWithArtistResponse } from '@typings/track';
 import Slider, { CustomArrowProps } from 'react-slick';
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
-import TrackOverview from '@components/TrackOverview';
+import TrackOverview from '@layouts/TrackOverview';
 
 function SamplePrevArrow(props: CustomArrowProps) {
   const { className, onClick } = props;
@@ -57,7 +57,7 @@ export default function HomeSection2() {
     ],
   };
 
-  const fetchTracks = async () => {
+  async function fetchTracks() {
     setLoading(true);
     setError(null);
     try {
@@ -74,7 +74,30 @@ export default function HomeSection2() {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  function TrackOverviewWrapper(track:TrackWithArtistResponse) {
+    const { platforms } = track;
+    const availablePlatforms = [
+      platforms?.bugs,
+      platforms?.genie,
+      platforms?.melon,
+    ].filter(Boolean) as Platform[];
+    const startDates: string[] = availablePlatforms.map(
+      (platform) => platform.weeklyChartScope[0].startDate,
+    ).filter(Boolean) as string[];
+
+    const endDates: string[] = availablePlatforms.map(
+      (platform) => platform.weeklyChartScope[platform.weeklyChartScope.length - 1]?.endDate,
+    ).filter(Boolean) as string[];
+
+    const startDate = new Date(Math.min(...startDates.map((date) => new Date(date).getTime())));
+    const endDate = new Date(Math.max(...endDates.map((date) => new Date(date).getTime())));
+
+    return (
+      <TrackOverview track={track} startDate={startDate} endDate={endDate} />
+    );
+  }
 
   useEffect(() => {
     fetchTracks();
@@ -98,7 +121,7 @@ export default function HomeSection2() {
         <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
           {tracks.map((track) => (
             <div className='p-2'>
-              <TrackOverview track={track}></TrackOverview>
+              {TrackOverviewWrapper(track)}
             </div>
           ))}
         </Slider>

@@ -1,11 +1,11 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable max-len */
+
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
   TooltipItem,
 } from 'chart.js';
-import { Platform } from '@typings/track';
+import { Platform, WeeklyChartScope } from '@typings/track';
 import { PlatformName } from '@layouts/PlatformAnalysisBox';
 import { useModal } from '@hooks/useModal';
 import { useState } from 'react';
@@ -15,13 +15,15 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface Prob {
   platformName:PlatformName
-    melon?:Platform
-    genie?:Platform
-    bugs?:Platform
+  melon?:Platform
+  genie?:Platform
+  bugs?:Platform
+  startDate:Date
+  endDate:Date
 }
 
 export default function PlatformAnalysis({
-  melon, genie, bugs, platformName,
+  melon, genie, bugs, platformName, startDate, endDate,
 }: Prob) {
   const targetPlatform = melon || genie || bugs as Platform;
   const { isModalOpen, setIsModalOpen } = useModal();
@@ -37,13 +39,19 @@ export default function PlatformAnalysis({
       ? '#3498DB'
       : '#E44C29';
 
-  // 차트 데이터 계산 함수
-  const totalChartWeeks = targetPlatform.weeklyChartScope.length;
-  const countRange = (minRank: number, maxRank: number) => targetPlatform.weeklyChartScope.filter((scope) => {
+  const isWithinDateRange = (scope: WeeklyChartScope) => {
+    const scopeStartDate = new Date(scope.startDate);
+    const scopeEndDate = new Date(scope.endDate);
+    return scopeStartDate >= startDate && scopeEndDate <= endDate;
+  };
+
+  const filteredChartWeeks = targetPlatform.weeklyChartScope.filter(isWithinDateRange);
+  const totalChartWeeks = filteredChartWeeks.length;
+
+  const countRange = (minRank: number, maxRank: number) => filteredChartWeeks.filter((scope) => {
     const rank = parseInt(scope.rank, 10);
     return rank >= minRank && rank <= maxRank;
   }).length;
-
   const chartData = {
     labels: ['차트인 기간', ...ranges.map((range) => `${range[0]}~${range[1]}위`)],
     datasets: [
@@ -119,7 +127,7 @@ export default function PlatformAnalysis({
             <div key={index} className="flex gap-2">
               <div className="w-full max-w-sm m-w-[150px]">
                 <label className="px-2 block mb-1 text-xs text-slate-600">
-                  {'시작'}
+                  {'최소 순위'}
                 </label>
 
                 <div className="relative">
@@ -155,7 +163,7 @@ export default function PlatformAnalysis({
 
               <div className="w-full max-w-sm m-w-[150px]">
                 <label className="px-2 block mb-1 text-xs text-slate-600">
-                  {'종료'}
+                  {'최대 순위'}
                 </label>
 
                 <div className="relative">
@@ -192,7 +200,7 @@ export default function PlatformAnalysis({
       </div>
       )}
 
-      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px]">
+      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px] border px-2 py-2 rounded-md">
         <Bar data={chartData} options={chartOptions} />
       </div>
     </>

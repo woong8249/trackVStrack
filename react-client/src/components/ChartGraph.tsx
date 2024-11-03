@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -12,9 +11,8 @@ import {
   ChartDataset,
   ChartOptions,
 } from 'chart.js';
-import { Platform, TrackResponse } from '@typings/track';
-import WeekRangePicker from '@components/WeekRangePicker';
-import { useState } from 'react';
+import { TrackResponse } from '@typings/track';
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,26 +25,13 @@ ChartJS.register(
 
 interface Props {
     track: TrackResponse;
+    startDate:Date
+    endDate:Date
   }
 
-export default function ChartGraph({ track }: Props) {
-  const { platforms } = track;
-  const availablePlatforms = [platforms?.bugs, platforms?.genie, platforms?.melon].filter(Boolean) as Platform[];
-  const startDates: string[] = availablePlatforms.map(
-    (platform) => platform.weeklyChartScope[0].startDate,
-  ).filter(Boolean) as string[];
-
-  const endDates: string[] = availablePlatforms.map(
-    (platform) => platform.weeklyChartScope[platform.weeklyChartScope.length - 1]?.endDate,
-  ).filter(Boolean) as string[];
-
-  const [startDate, setStartDate] = useState<Date>(new Date(Math.min(...startDates.map((date) => new Date(date).getTime()))));
-  const [endDate, setEndDate] = useState<Date>(new Date(Math.max(...endDates.map((date) => new Date(date).getTime()))));
-  const handleDateRangeChange = (startDate: Date, endDate: Date) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
-  };
-
+export default function ChartGraph({
+  track, startDate, endDate,
+}: Props) {
   const labels = Array.from(
     new Set(
       Object.values(track.platforms)
@@ -154,12 +139,6 @@ export default function ChartGraph({ track }: Props) {
   return (
 
     <div className="chart-container">
-      <WeekRangePicker
-        startDate={startDate}
-        endDate={endDate}
-        onDateRangeChange={handleDateRangeChange}
-      />
-
       <Line data={chartData} options={options} />
     </div>
   );

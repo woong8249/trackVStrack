@@ -11,12 +11,14 @@ interface Prob {
     genie?: Platform;
     bugs?: Platform;
   };
+  startDate:Date
+  endDate:Date
 }
 
 export type PlatformName = 'melon' | 'genie' | 'bugs';
 const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
 
-export default function PlatformAnalysisBox({ platforms }: Prob) {
+export default function PlatformAnalysisBox({ platforms, startDate, endDate }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const platformIcons = {
     melon: 'logo/logo_melon.png',
@@ -32,16 +34,20 @@ export default function PlatformAnalysisBox({ platforms }: Prob) {
 
   const [platformName, setPlatformName] = useState(availablePlatformName);
 
-  const platformProps = { [platformName]: platforms[platformName], platformName } as {
+  const platformProps = {
+    [platformName]: platforms[platformName], platformName, startDate, endDate,
+  } as {
     platformName:PlatformName
-      melon?:Platform
-      genie?:Platform
-      bugs?:Platform
+    melon?:Platform
+    genie?:Platform
+    bugs?:Platform
+    startDate:Date
+    endDate:Date
   };
 
   return (
     <div className="relative bg-white p-8 rounded-lg">
-      <div className='px-2 mb-4'> 📊 플랫폼 차트 성과</div>
+      <div className='mb-4'> 📊 플랫폼 차트 성과</div>
 
       <div className="absolute top-4 right-4">
         <button onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }} className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg">
