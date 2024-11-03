@@ -4,6 +4,7 @@ import PlatformAnalysis from '@components/PlatformAnalysis';
 import { useState } from 'react';
 import { useModal } from '@hooks/useModal';
 import { FaChevronDown } from 'react-icons/fa';
+import { RxQuestionMarkCircled } from 'react-icons/rx';
 
 interface Prob {
   platforms: {
@@ -20,6 +21,12 @@ const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
 
 export default function PlatformAnalysisBox({ platforms, startDate, endDate }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
+
+  const {
+    isModalOpen: questionIsModalOpen,
+    setIsModalOpen: questionSetIsModalOpen,
+    modalRef: questionModalRef,
+  } = useModal();
   const platformIcons = {
     melon: 'logo/logo_melon.png',
     genie: 'logo/logo_genie.png',
@@ -47,9 +54,37 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
 
   return (
     <div className="relative bg-white p-8 rounded-lg">
-      <div className='mb-4'> 📊 플랫폼 차트 성과</div>
 
-      <div className="absolute top-4 right-4">
+      <div className="flex items-center mb-8">
+        <div className="text-base px-2">📊 플랫폼 차트 성과</div>
+
+        <button onClick ={(e) => { e.stopPropagation(); questionSetIsModalOpen((pre) => !pre); }}>
+          <RxQuestionMarkCircled size={20} />
+        </button>
+
+        { questionIsModalOpen && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
+          <div ref={questionModalRef} className="px-4 py-4 flex flex-col justify-start items-start bg-white rounded-lg max-w-md">
+            <div className='mb-4 text-lg text-gray-600'>📊 플랫폼 차트 성과</div>
+
+            <p className="mb-2 text-gray-400">
+              플랫폼별 주간 차트에서 차트인 기간과 순위권 진입 횟수를 확인해보세요.
+            </p>
+
+            <p className="text-gray-400">
+              타이틀 옆 달력 버튼을 통해 특정 기간을 필터할 수 있습니다.
+            </p>
+
+            <p className="text-gray-400">
+              우측 상단의 "범위 설정" 버튼을 통해 원하는 순위 범위를 지정하여 확인이 가능합니다.
+            </p>
+          </div>
+        </div>
+
+        )}
+      </div>
+
+      <div className="absolute top-6 right-6">
         <button onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }} className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg">
           <img src={platformIcons[platformName]} alt={platformName} className="w-12 h-7" />
           <FaChevronDown size={10} />
