@@ -8,10 +8,13 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartDataset,
   ChartOptions,
 } from 'chart.js';
 import { TrackResponse } from '@typings/track';
+import platform, { PlatformName } from '@constants/platform';
+import {
+  pickLabelRangeFromMultiplePlatform, pickXAxis, pickYAxis, verticalLinePlugin,
+} from '@utils/lineChart';
 
 ChartJS.register(
   CategoryScale,
@@ -32,79 +35,37 @@ interface Props {
 export default function ChartGraph({
   track, startDate, endDate,
 }: Props) {
-  const labels = Array.from(
-    new Set(
-      Object.values(track.platforms)
-        .flatMap((platform) => platform.weeklyChartScope.filter((scope) => {
-          const { startDate: _startDate, endDate: _endDate } = scope;
-          return new Date(_startDate) >= startDate && new Date(_endDate) <= endDate;
-        }).map((info) => `${info.weekOfMonth.year}-${info.weekOfMonth.month}-${info.weekOfMonth.week}`)),
-    ),
-  ).sort((a, b) => {
-    const [aYear, aMonth, aWeek] = a.split('-').map(Number);
-    const [bYear, bMonth, bWeek] = b.split('-').map(Number);
-
-    if (aYear !== bYear) return aYear - bYear;
-    if (aMonth !== bMonth) return aMonth - bMonth;
-    return aWeek - bWeek;
-  });
-
-  const chartData: { labels: string[], datasets: ChartDataset<'line'>[] } = {
+  const labels = pickLabelRangeFromMultiplePlatform(track, startDate, endDate);
+  const chartData = {
     labels,
-    datasets: [],
+    datasets: Object.entries(track.platforms).map(([key, value]) => {
+      const xAxis = pickXAxis(value, startDate, endDate);
+      const yAxis = pickYAxis(value, startDate, endDate);
+      return {
+        label: key,
+        data: xAxis.map((x, index) => ({
+          x,
+          y: yAxis[index],
+        })),
+        borderColor: platform[key as PlatformName].color,
+        backgroundColor: platform[key as PlatformName].color,
+      };
+    }),
   };
 
-  if (track.platforms?.melon) {
-    chartData.datasets.push({
-      label: 'Melon',
-      data: track.platforms.melon.weeklyChartScope
-        .filter((scope) => {
-          const { startDate: _startDate, endDate: _endDate } = scope;
-          return new Date(_startDate) >= startDate && new Date(_endDate) <= endDate;
-        })
-        .map((info) => Number(info.rank)),
-      borderColor: '#00C73C',
-      backgroundColor: '#00C73C',
-    });
-  }
-
-  if (track.platforms?.genie) {
-    chartData.datasets.push({
-      label: 'Genie',
-      data: track.platforms.genie.weeklyChartScope
-        .filter((scope) => {
-          const { startDate: _startDate, endDate: _endDate } = scope;
-          return new Date(_startDate) >= startDate && new Date(_endDate) <= endDate;
-        })
-        .map((info) => Number(info.rank)),
-      borderColor: '#3498DB',
-      backgroundColor: '#3498DB',
-    });
-  }
-
-  if (track.platforms?.bugs) {
-    chartData.datasets.push({
-      label: 'Bugs',
-      data: track.platforms.bugs.weeklyChartScope
-        .filter((scope) => {
-          const { startDate: _startDate, endDate: _endDate } = scope;
-          return new Date(_startDate) >= startDate && new Date(_endDate) <= endDate;
-        })
-        .map((info) => Number(info.rank)),
-      borderColor: '#E44C29',
-      backgroundColor: '#E44C29',
-    });
-  }
-  const options :ChartOptions<'line'> = {
+  const options: ChartOptions<'line'> = {
+    responsive: true,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
     plugins: {
       legend: {
         position: 'top' as const,
       },
-      title: {
-        display: true,
-        text: `${track.titleName} Weekly Chart Performance`,
-      },
       tooltip: {
+        mode: 'index' as const,
+        intersect: false,
         callbacks: {
           title: (tooltipItems) => {
             const item = tooltipItems[0];
@@ -113,33 +74,39 @@ export default function ChartGraph({
           },
           label: (tooltipItem) => {
             const datasetLabel = tooltipItem.dataset.label || '';
-            const rank = tooltipItem.raw as number;
-            return `${datasetLabel}: rank ${rank}`;
+            const rank = tooltipItem.formattedValue;
+            return `${datasetLabel}: ${rank}위`;
           },
         },
       },
     },
     scales: {
-      y: {
-        reverse: true, // 순위를 낮은 값이 더 높게 표시되도록 (1위가 가장 위)
-        title: {
-          display: true,
-          text: 'Rank' as const,
-        },
-      },
       x: {
         title: {
           display: true,
           text: 'Week' as const,
         },
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        reverse: true,
+        min: 1,
+        max: 100,
+        title: {
+          display: true,
+          text: 'Rank' as const,
+        },
+
       },
     },
   };
 
   return (
 
-    <div className="chart-container">
-      <Line data={chartData} options={options} />
+    <div>
+      <Line data={chartData} options={options} plugins={[verticalLinePlugin]} />
     </div>
   );
 }
