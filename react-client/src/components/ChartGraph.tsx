@@ -38,19 +38,22 @@ export default function ChartGraph({
   const labels = pickLabelRangeFromMultiplePlatform(track, startDate, endDate);
   const chartData = {
     labels,
-    datasets: Object.entries(track.platforms).map(([key, value]) => {
-      const xAxis = pickXAxis(value, startDate, endDate);
-      const yAxis = pickYAxis(value, startDate, endDate);
-      return {
-        label: key,
-        data: xAxis.map((x, index) => ({
-          x,
-          y: yAxis[index],
-        })),
-        borderColor: platform[key as PlatformName].color,
-        backgroundColor: platform[key as PlatformName].color,
-      };
-    }),
+    datasets: (['melon', 'genie', 'bugs'] as PlatformName[])
+      .filter((key) => !!track.platforms[key]) // 플랫폼이 존재하는 경우에만 포함
+      .map((key) => {
+        const value = track.platforms[key]!;
+        const xAxis = pickXAxis(value, startDate, endDate);
+        const yAxis = pickYAxis(value, startDate, endDate);
+        return {
+          label: key,
+          data: xAxis.map((x, index) => ({
+            x,
+            y: yAxis[index],
+          })),
+          borderColor: platform[key].color,
+          backgroundColor: platform[key].color,
+        };
+      }),
   };
 
   const options: ChartOptions<'line'> = {
@@ -99,6 +102,11 @@ export default function ChartGraph({
           text: 'Rank' as const,
         },
 
+      },
+    },
+    elements: {
+      point: {
+        radius: 0, // 데이터 포인트의 점을 숨깁니다.
       },
     },
   };
