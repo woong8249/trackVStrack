@@ -2,7 +2,7 @@
 import ReactDOM from 'react-dom';
 import { useModal } from '@hooks/useModal';
 import TrackInfoCard from '@components/TrackInfoCard';
-import ChartGraph from '@components/ChartGraph';
+import PlatformCompareLineChart from '@components/PlatformCompareLineChart';
 import { TrackWithArtistResponse } from '@typings/track';
 import { FaExpandAlt } from 'react-icons/fa';
 import React, { useState } from 'react';
@@ -31,7 +31,7 @@ export default function TrackOverview({ track, startDate, endDate }: Prob) {
           <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
             <TrackInfoCard track={track} />
             <div className='border-b mt-1`'></div>
-            <ChartGraph track={track} startDate={startDate} endDate={endDate} />
+            <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
           </div>
         </div>
       </div>,
@@ -45,7 +45,7 @@ export default function TrackOverview({ track, startDate, endDate }: Prob) {
         <div className="border-[1px] bg-[white] border-gray-300 rounded-md relative">
           <TrackInfoCard track={track} />
           <div className='border-b mt-1`'></div>
-          <ChartGraph track={track} startDate={startDate} endDate={endDate} />
+          <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
         </div>
 
         <div className="absolute top-2 right-2">

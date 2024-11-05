@@ -184,7 +184,7 @@ export default function SearchTrackBox({
             onClick={ (e) => { e.stopPropagation(); setIsModifyModalOpen((pre) => !pre); }}
             role='button'
             tabIndex={0}>
-            <div className={`w-2.5 h-2.5 ${selectedTrack.color} rounded-full ml-4  mr-2`}></div>
+            <div style={{ backgroundColor: selectedTrack.color }} className={'w-2.5 h-2.5 rounded-full ml-4  mr-2'}></div>
             <TrackInfoCard track={storedTrack} size={imageSize}></TrackInfoCard>
 
             {isModifyModalOpen && (

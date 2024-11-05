@@ -119,8 +119,8 @@ export default function HomeSection2() {
         <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
 
         <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
-          {tracks.map((track) => (
-            <div className='p-2'>
+          {tracks.map((track, index) => (
+            <div key={index} className='p-2'>
               {TrackOverviewWrapper(track)}
             </div>
           ))}

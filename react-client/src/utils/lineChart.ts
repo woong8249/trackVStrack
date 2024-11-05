@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { PlatformName } from '@constants/platform';
-import { Platform, TrackResponse, TrackWithArtistResponse } from '@typings/track';
-import { Chart, TooltipModel } from 'chart.js';
+import { Platform, TrackResponse } from '@typings/track';
+import { Chart, ChartOptions, TooltipModel } from 'chart.js';
 
 export type Dataset ={
   label: string;
@@ -98,19 +98,6 @@ export function pickYAxis(
     .map((info) => parseInt(info.rank, 10)); // 랭킹 정보만 추출
 }
 
-export function sortTracksByStartDate(
-  tracks: TrackResponse[]|TrackWithArtistResponse[],
-  platformName: PlatformName,
-  startDate: Date,
-  endDate: Date,
-): TrackResponse[] {
-  return tracks.slice().sort((a, b) => {
-    const aStartDate = new Date(pickXAxis(a.platforms[platformName], startDate, endDate)[0]);
-    const bStartDate = new Date(pickXAxis(b.platforms[platformName], startDate, endDate)[0]);
-    return aStartDate.getTime() - bStartDate.getTime();
-  });
-}
-
 export const verticalLinePlugin = {
   id: 'verticalLine',
   afterDraw: (chart: Chart<'line'>) => {
@@ -131,5 +118,60 @@ export const verticalLinePlugin = {
       ctx.stroke();
       ctx.restore();
     }
+  },
+};
+
+export const lineChartOption: ChartOptions<'line'> = {
+  responsive: true,
+  interaction: {
+    mode: 'index',
+    intersect: false,
+  },
+  plugins: {
+    legend: {
+      position: 'top' as const,
+    },
+    tooltip: {
+      mode: 'index' as const,
+      intersect: false,
+      callbacks: {
+        title: (tooltipItems) => {
+          const item = tooltipItems[0];
+          const [year, month, week] = item.label.split('-');
+          return `${year}년 ${month}월 ${week}주차`;
+        },
+        label: (tooltipItem) => {
+          const datasetLabel = tooltipItem.dataset.label || '';
+          const rank = tooltipItem.formattedValue;
+          return `${datasetLabel}: ${rank}위`;
+        },
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Week' as const,
+      },
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      reverse: true,
+      min: 1,
+      max: 100,
+      title: {
+        display: true,
+        text: 'Rank' as const,
+      },
+
+    },
+  },
+  elements: {
+    point: {
+      radius: 0, // 데이터 포인트의 점을 숨깁니다.
+    },
   },
 };

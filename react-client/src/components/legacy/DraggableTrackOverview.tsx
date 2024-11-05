@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import { useModal } from '@hooks/useModal';
-import ChartGraph from '../ChartGraph';
+import PlatformCompareLineChart from '../PlatformCompareLineChart';
 import TrackInfoCard from '../TrackInfoCard';
 
 import 'react-resizable/css/styles.css';
@@ -28,6 +28,9 @@ export default function TrackOverview({ track, viewportType }: Props) {
   const [focused, setFocused] = useState(false); // 포커스 상태 관리
   const zIndex = (isResizing || focused || isModalOpen) ? 10 : 1; // 포커스 시 z-index 증가
   const position: 'relative' | 'absolute' = isResizing ? 'absolute' : 'relative';
+
+  const startDate = new Date('2000-01-01');
+  const endDate = new Date();
 
   useEffect(() => {
     const handleFocusIn = () => setFocused(true);
@@ -95,7 +98,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
             <div className="w-[50rem] sm:w-[70rem] overflow-auto">
               <TrackInfoCard track={track} />
               <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-              <ChartGraph track={track} />
+              <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
             </div>
           </div>
         </div>
@@ -146,7 +149,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
                 { isLargeContainer && (
                 <>
                   <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-                  <ChartGraph track={track} />
+                  <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
                 </>
                 )}
               </div>
@@ -171,7 +174,7 @@ export default function TrackOverview({ track, viewportType }: Props) {
                 <div className="w-[50rem] sm:w-[70rem] overflow-auto">
                   <TrackInfoCard track={track} />
                   <div className="border-b-[1px] border-gray-300 mb-[1rem]"></div>
-                  <ChartGraph track={track} />
+                  <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
                 </div>
               </div>
             </div>

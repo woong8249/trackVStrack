@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useModal } from '@hooks/useModal';
 import { FaChevronDown } from 'react-icons/fa';
 import { RxQuestionMarkCircled } from 'react-icons/rx';
+import platform, { PlatformName } from '@constants/platform';
 
 interface Prob {
   platforms: {
@@ -16,8 +17,7 @@ interface Prob {
   endDate:Date
 }
 
-export type PlatformName = 'melon' | 'genie' | 'bugs';
-const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
+const platformNames = Object.keys(platform) as PlatformName[];
 
 export default function PlatformAnalysisBox({ platforms, startDate, endDate }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
@@ -27,11 +27,6 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
     setIsModalOpen: questionSetIsModalOpen,
     modalRef: questionModalRef,
   } = useModal();
-  const platformIcons = {
-    melon: 'logo/logo_melon.png',
-    genie: 'logo/logo_genie.png',
-    bugs: 'logo/logo_bugs.png',
-  };
 
   const availablePlatformNames = platformNames.filter((key) => platforms[key]) as PlatformName[];
 
@@ -86,7 +81,7 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
 
       <div className="absolute top-6 right-6">
         <button onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }} className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg">
-          <img src={platformIcons[platformName]} alt={platformName} className="w-12 h-7" />
+          <img src={platform[platformName].Icon} alt={platformName} className="w-12 h-7" />
           <FaChevronDown size={10} />
         </button>
       </div>

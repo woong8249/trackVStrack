@@ -6,18 +6,18 @@ import TopNavbar from '@layouts/TopNavBar';
 
 import ExploreSection1 from '@sections/ExploreSection1';
 import ExploreSection2 from '@sections/ExploreSection2';
+import ExploreSection3 from '@sections/ExploreSection3';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useEffect } from 'react';
 
 export enum Color {
-  Blue = 'bg-blue-500',
-  Red = 'bg-red-500',
-  Green = 'bg-green-500',
-  Yellow = 'bg-yellow-500',
-  Purple = 'bg-purple-500',
-  Black = 'bg-black',
+  Blue = '#3b82f6', // Equivalent of bg-blue-500
+  Red = '#ef4444', // Equivalent of bg-red-500
+  Green = '#10b981', // Equivalent of bg-green-500
+  Yellow = '#f59e0b', // Equivalent of bg-yellow-500
+  Purple = '#8b5cf6', // Equivalent of bg-purple-500
+  Black = '#000000', // Equivalent of bg-black
 }
-
 export interface SelectedTrack {
   id: number;
   activate: boolean;
@@ -33,7 +33,6 @@ export default function ExplorePage() {
   }];
   const [selectedTracks, setSelectedTracks] = useImmer<SelectedTrack[]>(initialSelectTracks);
   const navigate = useNavigate();
-
   function updateUrl() {
     const urlTracks = selectedTracks.map(({
       id, activate, color, track,
@@ -84,7 +83,8 @@ export default function ExplorePage() {
         setSelectedTracks={setSelectedTracks}
        />
 
-      <ExploreSection2 selectedTracks={selectedTracks} />
+      <ExploreSection2></ExploreSection2>
+      <ExploreSection3 selectedTracks={selectedTracks} />
     </div>
   );
 }
