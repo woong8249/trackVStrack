@@ -1,6 +1,5 @@
-/* eslint-disable max-len */
 import ArtistsInfoCard from '@components/ArtistsInfoCard';
-import TrackOverview from '@layouts/TrackOverview';
+import PlatformComparisonOfTrackWithLineChart from '@layouts/PlatformComparisonOfTrackWithLineChart';
 import { useCachedTrack } from '@hooks/useStoredTrack';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
@@ -117,7 +116,7 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
             )}
           </div>
 
-          <TrackOverview
+          <PlatformComparisonOfTrackWithLineChart
             track={cachedTrack}
             startDate={startDate}
             endDate={endDate}

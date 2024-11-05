@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable consistent-return */
 import React, {
