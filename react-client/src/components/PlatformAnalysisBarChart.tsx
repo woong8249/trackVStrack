@@ -67,7 +67,7 @@ export default function PlatformAnalysisBarChart({
     },
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'bottom' as const,
       },
       title: {
         display: false,
@@ -193,7 +193,7 @@ export default function PlatformAnalysisBarChart({
       </div>
       )}
 
-      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px] border px-2 py-2 rounded-md">
+      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px] border px-2 pt-6 rounded-md">
         <Bar data={chartData} options={chartOptions} />
       </div>
     </>

@@ -129,7 +129,7 @@ export const lineChartOption: ChartOptions<'line'> = {
   },
   plugins: {
     legend: {
-      position: 'top' as const,
+      position: 'bottom' as const,
     },
     tooltip: {
       mode: 'index' as const,
