@@ -11,7 +11,7 @@ interface Prob{
   selectedTrack:SelectedTrack
 }
 
-export function SearchTrackBoxContainer({
+export function SearchTrackContainer({
   setSelectedTracks,
   selectedTrack,
   calculateBoxWidth,

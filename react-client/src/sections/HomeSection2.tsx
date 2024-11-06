@@ -5,23 +5,10 @@ import { fetcher, trackEndpoints } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
 import { Platform, TrackWithArtistResponse } from '@typings/track';
-import Slider, { CustomArrowProps } from 'react-slick';
-import { IoIosArrowRoundBack, IoIosArrowRoundForward } from 'react-icons/io';
-import TrackOverview from '@layouts/TrackOverview';
+import Slider from 'react-slick';
 
-function SamplePrevArrow(props: CustomArrowProps) {
-  const { className, onClick } = props;
-  return (
-    <IoIosArrowRoundBack onClick={onClick} className={`arrow ${className} z-10 `} style={{ color: 'white' }} />
-  );
-}
-
-function SampleNextArrow(props: CustomArrowProps) {
-  const { className, onClick } = props;
-  return (
-    <IoIosArrowRoundForward onClick={onClick} className={`arrow ${className}`} style={{ color: 'white' }} />
-  );
-}
+import PlatformComparisonOfTrackBox from '@layouts/PlatformComparisonOfTrackBox';
+import { NextArrow, PrevArrow } from '@components/SliderArrows';
 
 export default function HomeSection2() {
   const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
@@ -34,8 +21,8 @@ export default function HomeSection2() {
     speed: 800,
     slidesToScroll: 1,
     slidesToShow: 2,
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
 
     draggable: false,
     responsive: [
@@ -76,7 +63,7 @@ export default function HomeSection2() {
     }
   }
 
-  function TrackOverviewWrapper(track:TrackWithArtistResponse) {
+  function PlatformComparisonOfTrackWithLineChartWrapper(track:TrackWithArtistResponse) {
     const { platforms } = track;
     const availablePlatforms = [
       platforms?.bugs,
@@ -95,7 +82,7 @@ export default function HomeSection2() {
     const endDate = new Date(Math.max(...endDates.map((date) => new Date(date).getTime())));
 
     return (
-      <TrackOverview track={track} startDate={startDate} endDate={endDate} />
+      <PlatformComparisonOfTrackBox track={track} startDate={startDate} endDate={endDate} />
     );
   }
 
@@ -121,7 +108,7 @@ export default function HomeSection2() {
         <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
           {tracks.map((track, index) => (
             <div key={index} className='p-2'>
-              {TrackOverviewWrapper(track)}
+              {PlatformComparisonOfTrackWithLineChartWrapper(track)}
             </div>
           ))}
         </Slider>

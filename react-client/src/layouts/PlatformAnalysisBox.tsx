@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Platform } from '@typings/track';
-import PlatformAnalysis from '@components/PlatformAnalysis';
+import PlatformAnalysisBarChart from '@components/PlatformAnalysisBarChart';
 import { useState } from 'react';
 import { useModal } from '@hooks/useModal';
 import { FaChevronDown } from 'react-icons/fa';
@@ -109,7 +109,7 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
       </div>
       )}
 
-      <PlatformAnalysis {...platformProps} />
+      <PlatformAnalysisBarChart {...platformProps} />
     </div>
   );
 }
