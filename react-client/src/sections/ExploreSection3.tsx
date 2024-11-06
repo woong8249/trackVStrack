@@ -7,7 +7,7 @@ interface Prob{
 
 export default function ExploreSection3({ selectedTracks }:Prob) {
   return (
-    <section className="flex flex-wrap gap-2 items-center justify-center mt-[5rem] text-gray-700 w-[100%] md:w-[90%] lg:w-[80%]">
+    <section className=" mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%] text-gray-700">
       {selectedTracks.map((selectedTrack) => {
         if (selectedTrack.track) {
           return (

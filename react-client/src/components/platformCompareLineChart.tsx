@@ -62,7 +62,7 @@ export default function PlatformCompareLineChart({
   };
 
   return (
-    <div>
+    <div className='mt-2 p-4 '>
       <Line data={chartData} options={lineChartOption} plugins={[verticalLinePlugin]} />
     </div>
   );
