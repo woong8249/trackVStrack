@@ -15,10 +15,10 @@ export function useFindTracks(query:string) {
     (pageIndex, previousPageData) => {
       if (!debouncedQuery || previousPageData?.length === 0) return null;
       const offset = pageIndex * 5;
-      const [url, params] = trackEndpoints.getTracks({
+      const url = trackEndpoints.getTracks({
         sort: 'desc', offset, limit: 5, query: debouncedQuery.replace(/\s+/g, ''), withArtists: true,
       });
-      return [url, params];
+      return url;
     },
   );
 

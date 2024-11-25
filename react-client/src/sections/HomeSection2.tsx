@@ -48,12 +48,12 @@ export default function HomeSection2() {
     setLoading(true);
     setError(null);
     try {
-      const [endpoint, params] = trackEndpoints.getTracks({
+      const url = trackEndpoints.getTracks({
         minWeeksOnChart: 30,
         withArtists: true,
         sort: 'random' as const,
       });
-      const response = await fetcher<TrackWithArtistResponse[]>(endpoint, params);
+      const response = await fetcher<TrackWithArtistResponse[]>(url);
 
       setTracks(response);
     } catch (err) {

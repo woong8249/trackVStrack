@@ -14,10 +14,10 @@ export function useFindArtists(query :string) {
     (pageIndex, previousPageData) => {
       if (!debouncedQuery || previousPageData?.length === 0) return null;
       const offset = pageIndex * 5;
-      const [url, params] = artistEndpoints.getArtists({
+      const url = artistEndpoints.getArtists({
         sort: 'desc', offset, limit: 5, query: debouncedQuery.replace(/\s+/g, ''), withTracks: false,
       });
-      return [url, params];
+      return url;
     },
   );
 

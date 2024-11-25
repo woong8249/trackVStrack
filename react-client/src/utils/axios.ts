@@ -14,7 +14,7 @@ export interface FindWithChartDurationDTO extends FindDTO {
   minWeeksOnChart?: number;
 }
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: config.baseURL,
   withCredentials: true,
   headers: {
@@ -22,18 +22,33 @@ const apiClient = axios.create({
   },
 });
 
-export const fetcher = async <T>
-(url: string, params?: FindDTO | FindWithChartDurationDTO): Promise<T> => {
-  const response = await apiClient.get(url, { params });
+export const fetcher = async <T>(url: string): Promise<T> => {
+  const response = await apiClient.get(encodeURI(url));
   return response.data;
 };
 
 export const trackEndpoints = {
-  getTracks: (params: FindWithChartDurationDTO) => ['/tracks', params] as [string, FindWithChartDurationDTO],
-  getTrackById: (id: number, params?: { withArtists: boolean }) => [`/tracks/${id}`, params] as [string, { withArtists: boolean }],
+  getTracks: (params: FindWithChartDurationDTO) => {
+    const queryString = new URLSearchParams(params as Record<string, string>).toString();
+    return `/tracks?${queryString}`;
+  },
+  getTrackById: (id: number, params?: { withArtists: boolean }) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return `/tracks/${id}${queryString}`;
+  },
 };
 
 export const artistEndpoints = {
-  getArtists: (params: FindDTO) => ['/artists', params] as [string, FindDTO],
-  getArtistById: (id: number, params?: { withTracks: boolean }) => [`/artists/${id}`, params] as [string, { withTracks: boolean }],
+  getArtists: (params: FindDTO) => {
+    const queryString = new URLSearchParams(params as Record<string, string>).toString();
+    return `/artists?${queryString}`;
+  },
+  getArtistById: (id: number, params?: { withTracks: boolean }) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
+    return `/artists/${id}${queryString}`;
+  },
 };
