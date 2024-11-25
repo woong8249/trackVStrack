@@ -1,5 +1,5 @@
 import PlatformComparisonOfTrackBox from '@layouts/PlatformComparisonOfTrackBox';
-import { useCachedTrack } from '@hooks/useStoredTrack';
+import { useCachedTrack } from '@hooks/useCachedTrack';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { RxQuestionMarkCircled } from 'react-icons/rx';
 import PlatformAnalysisBox from './PlatformAnalysisBox';

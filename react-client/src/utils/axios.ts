@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '@config/config';
 
-interface FindDTO {
+export interface FindDTO {
   limit?: number;
   offset?: number;
   sort?: 'asc' | 'desc'| 'random';

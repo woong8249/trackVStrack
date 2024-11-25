@@ -9,7 +9,6 @@ export function useCachedTrack(track: TrackWithArtistResponse |{id:number} | nul
       if (!trackId) return null;
       return trackEndpoints.getTrackById(trackId, { withArtists: true });
     },
-
   );
   if (isLoading && (track as TrackWithArtistResponse).titleName) {
     return track as TrackWithArtistResponse;
