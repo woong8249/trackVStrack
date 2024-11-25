@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import 'chart.js/auto';
 import { useModal } from '@hooks/useModal';
@@ -11,6 +11,9 @@ import { TrackComparisonBoxWithLineChartWrapper } from './TrackComparisonBoxWith
 import { SelectedTrack } from '@pages/ExplorePage';
 import { useCachedTracks } from '@hooks/useCachedTracks';
 import LoadingSpinner from '@components/LoadingSpinner';
+import WeekRangePicker from '@components/WeekRangePicker';
+import { mergeTracksDateRange } from '@utils/time';
+import { TrackWithArtistResponse } from '@typings/track';
 
 export interface Prob {
   selectedTracks:SelectedTrack[]
@@ -21,9 +24,29 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
   const platformNames = Object.keys(platform) as PlatformName[];
   const { selectedTracks: cachedTracks, isLoading, error } = useCachedTracks(selectedTracks);
   const [selectedPlatformName, setSelectedPlatformName] = useState<PlatformName>(platformNames[0]);
-  // 임의코드
-  const startDate = new Date('2021-01-01');
-  const endDate = new Date();
+  const [startDate, setStartDate] = useState<Date>(new Date('2012-01-01'));
+  const [endDate, setEndDate] = useState<Date>(new Date());
+  const handleDateRangeChange = (startDate: Date, endDate: Date) => {
+    setStartDate(startDate);
+    setEndDate(endDate);
+  };
+
+  useEffect(() => {
+    const args = cachedTracks
+      .filter((track) => (track.track as TrackWithArtistResponse)?.titleName)
+      .map((item) => item.track) as TrackWithArtistResponse[];
+
+    if (args.length > 0) {
+      const { startDate: newStartDate, endDate: newEndDate } = mergeTracksDateRange(args);
+
+      // 이전 상태와 비교하여 업데이트
+      if (newStartDate.getTime() !== startDate.getTime() || newEndDate.getTime() !== endDate.getTime()) {
+        setStartDate(newStartDate);
+        setEndDate(newEndDate);
+      }
+    }
+  }, [cachedTracks, startDate, endDate]);
+
   if (error) {
     return <LoadingSpinner />;
   }
@@ -34,11 +57,13 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
     return (
       <div className='w-full'>
         {/* header */}
-        <div className='flex items-center relative p-2 mb-4'>
-          {/* 헤더자식1- 헤더 h1  */}
+        <div className='flex items-center relative p-2 mb-4 gap-2'>
+          {/* 헤더자식1- h1  */}
           <h1 className='text-xl'>Track VS Track</h1>
+          {/* 헤더자식2- 달력  */}
+          <WeekRangePicker startDate={startDate} endDate={endDate} onDateRangeChange={handleDateRangeChange} />
 
-          {/* 헤더자식2- 플랫폼선택모달 */}
+          {/* 헤더자식3- 플랫폼선택모달 */}
           <div className="absolute right-3 ">
             <button
                 onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }}
@@ -77,24 +102,16 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
         </div>
 
-        {/* contents */}
-        <div className="w-full flex flex-col gap-2 items-center md:flex-row  md:items-stretch md:justify-center">
-          {/*  content1  */}
-          <div className='bg-white p-2 rounded-md w-[100%] md:w-[70%]'>
-            <TrackComparisonBoxWithLineChartWrapper
+        {/*  content1  */}
+        <div className='bg-white p-2 rounded-md w-[100%] '>
+          <TrackComparisonBoxWithLineChartWrapper
               selectedTracks={cachedTracks}
               selectedPlatformName={selectedPlatformName}
               startDate={startDate}
               endDate={endDate} />
 
-          </div>
-
-          {/*  content2  */}
-          <div className="bg-white p-2 rounded-md w-[100%]  md:w-[30%] ">
-            11
-          </div>
-
         </div>
+
       </div>
     );
   }

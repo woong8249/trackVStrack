@@ -3,11 +3,11 @@ import { useCachedTrack } from '@hooks/useCachedTrack';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { RxQuestionMarkCircled } from 'react-icons/rx';
 import PlatformAnalysisBox from './PlatformAnalysisBox';
-import { Platform } from '@typings/track';
 import { useEffect, useState } from 'react';
 import WeekRangePicker from '@components/WeekRangePicker';
 import { useModal } from '@hooks/useModal';
 import { ArtistsBox } from './ArtistsBox';
+import { getTrackDateRange } from '@utils/time';
 
 interface Prob {
     selectedTrack:SelectedTrack
@@ -25,18 +25,7 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
 
   useEffect(() => {
     if (cachedTrack) {
-      const { platforms } = cachedTrack;
-      const availablePlatforms = [platforms?.bugs, platforms?.genie, platforms?.melon].filter(Boolean) as Platform[];
-      const startDates: string[] = availablePlatforms.map(
-        (platform) => platform.weeklyChartScope[0].startDate,
-      ).filter(Boolean) as string[];
-
-      const endDates: string[] = availablePlatforms.map(
-        (platform) => platform.weeklyChartScope[platform.weeklyChartScope.length - 1]?.endDate,
-      ).filter(Boolean) as string[];
-      const startDate = new Date(Math.min(...startDates.map((date) => new Date(date).getTime())));
-      const endDate = new Date(new Date(Math.max(...endDates.map((date) => new Date(date).getTime()))));
-
+      const { startDate, endDate } = getTrackDateRange(cachedTrack);
       setStartDate(startDate);
       setEndDate(endDate);
     }
