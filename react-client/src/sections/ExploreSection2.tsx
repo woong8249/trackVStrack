@@ -1,16 +1,13 @@
 import { TrackComparisonContainer } from '@layouts/TrackComparisonContainer';
-import { TrackWithArtistResponse } from '@typings/track';
-import sampleTracks from '@constants/sample.json';
+import { SelectedTrack } from '@pages/ExplorePage';
 
-export interface SelectedTrack {
-  id: number;
-  activate: boolean;
-  track: TrackWithArtistResponse;
-  color: string;
+interface Prob{
+  selectedTracks: SelectedTrack[]; // 상태 값
 }
 
-export default function ExploreSection2() {
-  const selectedTracks = sampleTracks as SelectedTrack[];
+export default function ExploreSection2({
+  selectedTracks,
+}:Prob) {
   return (
     <section className="mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%] text-gray-700">
       <TrackComparisonContainer selectedTracks ={selectedTracks} />

@@ -18,7 +18,8 @@ import {
 } from '@utils/lineChart';
 
 import { PlatformName } from '@constants/platform';
-import { SelectedTrack } from '@sections/ExploreSection2';
+import { SelectedTrack } from '@pages/ExplorePage';
+import { TrackWithArtistResponse } from '@typings/track';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -32,10 +33,14 @@ interface Prob {
 export function TrackComparisonBoxWithLineChart({
   selectedTracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
-  // const platformNames = Object.keys(platform) as PlatformName[];
+  const isTrackWithArtistResponse = (
+    selectedTrack: SelectedTrack,
+  ): selectedTrack is SelectedTrack & { track: TrackWithArtistResponse } => (selectedTrack.track as TrackWithArtistResponse)?.titleName !== undefined;
+
+  const fSelectedTracks = selectedTracks.filter(isTrackWithArtistResponse);
 
   const commonLabels = pickLabelRangeLabelMultipleTrack(
-    selectedTracks.map((selectedTrack) => selectedTrack.track),
+    fSelectedTracks.map((selectedTrack) => selectedTrack.track),
     selectedPlatformName,
     startDate,
     endDate,
@@ -43,7 +48,7 @@ export function TrackComparisonBoxWithLineChart({
 
   const chartData = {
     labels: commonLabels,
-    datasets: selectedTracks.map((selectedTrack) => {
+    datasets: fSelectedTracks.map((selectedTrack) => {
       const { color, track } = selectedTrack;
       const { platforms } = track;
 

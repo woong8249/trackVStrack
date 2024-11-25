@@ -18,10 +18,12 @@ export enum Color {
   Purple = '#8b5cf6', // Equivalent of bg-purple-500
   Black = '#000000', // Equivalent of bg-black
 }
+export type Track =TrackWithArtistResponse |{ id:number } | null;
+
 export interface SelectedTrack {
   id: number;
   activate: boolean;
-  track: TrackWithArtistResponse |{id:number} | null;
+  track: Track
   color: Color;
 }
 
@@ -83,7 +85,7 @@ export default function ExplorePage() {
         setSelectedTracks={setSelectedTracks}
        />
 
-      <ExploreSection2></ExploreSection2>
+      <ExploreSection2 selectedTracks={selectedTracks} />
       <ExploreSection3 selectedTracks={selectedTracks} />
     </div>
   );

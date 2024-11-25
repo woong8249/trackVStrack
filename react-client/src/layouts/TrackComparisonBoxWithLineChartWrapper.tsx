@@ -2,7 +2,7 @@ import { useModal } from '@hooks/useModal';
 import { RxQuestionMarkCircled } from 'react-icons/rx';
 import { TrackComparisonBoxWithLineChart } from './TrackComparisonBoxWithLineChart';
 import { PlatformName } from '@constants/platform';
-import { SelectedTrack } from '@sections/ExploreSection2';
+import { SelectedTrack } from '@pages/ExplorePage';
 
 interface Prob {
     selectedTracks:SelectedTrack[]
