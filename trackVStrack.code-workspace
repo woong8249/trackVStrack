@@ -4,15 +4,6 @@
             "path": "./"
         },
         {
-            "path": "./crawling"
-        },
-        {
-            "path": "./apiServer"
-        },
-        {
-            "path": "./client"
-        },
-        {
             "path": "./react-client"
         },
         {
