@@ -9,6 +9,7 @@ import ExploreSection2 from '@sections/ExploreSection2';
 import ExploreSection3 from '@sections/ExploreSection3';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useEffect } from 'react';
+import { Footer } from '@layouts/Footer';
 
 export enum Color {
   Blue = '#3b82f6', // Equivalent of bg-blue-500
@@ -87,6 +88,7 @@ export default function ExplorePage() {
 
       <ExploreSection2 selectedTracks={selectedTracks} />
       <ExploreSection3 selectedTracks={selectedTracks} />
+      <Footer />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Footer } from '@layouts/Footer';
 import TopNavBar from '@layouts/TopNavBar';
 import HomeSection1 from '@sections/HomeSection1';
 import { HomeSection2 } from '@sections/HomeSection2';
@@ -11,6 +12,7 @@ export default function HomePage() {
         <HomeSection1></HomeSection1>
         <HomeSection2></HomeSection2>
         <HomeSection3></HomeSection3>
+        <Footer />
       </div>
     </>
   );
