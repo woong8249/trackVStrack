@@ -7,7 +7,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import platform, { PlatformName } from '@constants/platform';
 
 import 'chart.js/auto';
-import { TrackComparisonBoxWithLineChartWrapper } from './TrackComparisonBoxWithLineChartWrapper';
+import { TrackComparisonLineChartWrapper } from '@layouts/TrackComparisonBoxWithLineChartWrapper';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { useCachedTracks } from '@hooks/useCachedTracks';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -22,30 +22,38 @@ export interface Prob {
 export function TrackComparisonContainer({ selectedTracks }:Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const platformNames = Object.keys(platform) as PlatformName[];
-  const { selectedTracks: cachedTracks, isLoading, error } = useCachedTracks(selectedTracks);
+  const { data: cachedTracks, isLoading, error } = useCachedTracks(selectedTracks);
   const [selectedPlatformName, setSelectedPlatformName] = useState<PlatformName>(platformNames[0]);
-  const [startDate, setStartDate] = useState<Date>(new Date('2012-01-01'));
+  const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const handleDateRangeChange = (startDate: Date, endDate: Date) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
+
+  const handleDateRangeChange = (newStartDate: Date, newEndDate: Date) => {
+    setStartDate((prevStartDate) => {
+      if (prevStartDate.getTime() !== newStartDate.getTime()) {
+        return newStartDate;
+      }
+      return prevStartDate; // 기존 값 유지
+    });
+
+    setEndDate((prevEndDate) => {
+      if (prevEndDate.getTime() !== newEndDate.getTime()) {
+        return newEndDate;
+      }
+      return prevEndDate; // 기존 값 유지
+    });
   };
 
   useEffect(() => {
-    const args = cachedTracks
-      .filter((track) => (track.track as TrackWithArtistResponse)?.titleName)
-      .map((item) => item.track) as TrackWithArtistResponse[];
+    if (cachedTracks) {
+      const availableTracks = cachedTracks
+        .filter((track) => track?.titleName) as TrackWithArtistResponse[];
 
-    if (args.length > 0) {
-      const { startDate: newStartDate, endDate: newEndDate } = mergeTracksDateRange(args);
-
-      // 이전 상태와 비교하여 업데이트
-      if (newStartDate.getTime() !== startDate.getTime() || newEndDate.getTime() !== endDate.getTime()) {
-        setStartDate(newStartDate);
-        setEndDate(newEndDate);
+      if (availableTracks.length > 0) {
+        const result = mergeTracksDateRange(availableTracks);
+        handleDateRangeChange(result.startDate, result.endDate);
       }
     }
-  }, [cachedTracks, startDate, endDate]);
+  }, [cachedTracks]);
 
   if (error) {
     return <LoadingSpinner />;
@@ -53,7 +61,9 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  if (cachedTracks.length > 1) {
+
+  if (cachedTracks && cachedTracks.some((track) => track?.titleName)) {
+    const mappedSelectedTracks = selectedTracks.map((item, index) => ({ ...item, track: cachedTracks[index] }));
     return (
       <div className='w-full'>
         {/* header */}
@@ -102,14 +112,12 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
         </div>
 
-        {/*  content1  */}
-        <div className='bg-white p-2 rounded-md w-[100%] '>
-          <TrackComparisonBoxWithLineChartWrapper
-              selectedTracks={cachedTracks}
+        <div className='p-2 '>
+          <TrackComparisonLineChartWrapper
+              selectedTracks={mappedSelectedTracks}
               selectedPlatformName={selectedPlatformName}
               startDate={startDate}
               endDate={endDate} />
-
         </div>
 
       </div>

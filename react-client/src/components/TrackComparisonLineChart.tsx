@@ -24,23 +24,17 @@ import { TrackWithArtistResponse } from '@typings/track';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Prob {
-  selectedTracks:SelectedTrack[]
+  tracks:Omit<SelectedTrack&{track:TrackWithArtistResponse}, 'activate'>[]
   selectedPlatformName:PlatformName
   startDate:Date
   endDate:Date
 }
 
-export function TrackComparisonBoxWithLineChart({
-  selectedTracks, startDate, endDate, selectedPlatformName,
+export function TrackComparisonLineChart({
+  tracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
-  const isTrackWithArtistResponse = (
-    selectedTrack: SelectedTrack,
-  ): selectedTrack is SelectedTrack & { track: TrackWithArtistResponse } => (selectedTrack.track as TrackWithArtistResponse)?.titleName !== undefined;
-
-  const fSelectedTracks = selectedTracks.filter(isTrackWithArtistResponse);
-
   const commonLabels = pickLabelRangeLabelMultipleTrack(
-    fSelectedTracks.map((selectedTrack) => selectedTrack.track),
+    tracks.map((selectedTrack) => selectedTrack.track),
     selectedPlatformName,
     startDate,
     endDate,
@@ -48,7 +42,7 @@ export function TrackComparisonBoxWithLineChart({
 
   const chartData = {
     labels: commonLabels,
-    datasets: fSelectedTracks.map((selectedTrack) => {
+    datasets: tracks.map((selectedTrack) => {
       const { color, track } = selectedTrack;
       const { platforms } = track;
 

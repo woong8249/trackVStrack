@@ -1,8 +1,9 @@
-import { TrackWithArtistResponse } from '@typings/track';
+import { TrackResponse, TrackWithArtistResponse } from '@typings/track';
 import { trackEndpoints, fetcher } from '@utils/axios';
 import useSWR from 'swr';
+
+import { SelectedTrack } from '@pages/ExplorePage';
 import { AxiosError } from 'axios';
-import { SelectedTrack, Track } from '@pages/ExplorePage';
 
 export function useCachedTracks(selectedTracks: SelectedTrack[]) {
   // URLs 생성
@@ -12,24 +13,22 @@ export function useCachedTracks(selectedTracks: SelectedTrack[]) {
   });
 
   // SWR 호출
+
+  const arg = urls.length > 0 ? urls : null;
   const { data, error, isLoading } = useSWR(
-    urls.length > 0 ? urls : null,
-    async (urls: (string | null)[]) => Promise.all(
-      urls.map((url) => (url ? fetcher<TrackWithArtistResponse>(url) : Promise.resolve(null))),
-    ),
+    arg,
+    async (urls: (string | null)[]) => {
+      const result = await Promise.all(
+        urls.map((url) => (url ? fetcher<TrackWithArtistResponse>(url) : Promise.resolve(null))),
+      );
+
+      return result;
+    },
   );
 
-  // 결과 매핑
-  const result = data
-    ? selectedTracks.map((item, index) => ({
-      ...item,
-      track: data[index] as Track,
-    }))
-    : [];
-
   return {
-    selectedTracks: result,
+    data,
     isLoading,
     error,
-  } as { selectedTracks: SelectedTrack[]; error: AxiosError | undefined; isLoading: boolean };
+  } as {data:(TrackResponse|null)[], isLoading:boolean, error:AxiosError};
 }
