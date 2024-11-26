@@ -15,6 +15,7 @@ import {
   lineChartOption,
   pickLabelRangeFromMultiplePlatform, pickXAxis, pickYAxis, verticalLinePlugin,
 } from '@utils/lineChart';
+import { useResponsiveChart } from '@hooks/useResponsiveChart';
 
 ChartJS.register(
   CategoryScale,
@@ -36,6 +37,7 @@ export default function PlatformCompareLineChart({
   track, startDate, endDate,
 }: Props) {
   const commonLabels = pickLabelRangeFromMultiplePlatform(track, startDate, endDate);
+  const { chartRef } = useResponsiveChart();
 
   const chartData = {
     labels: commonLabels,
@@ -63,7 +65,11 @@ export default function PlatformCompareLineChart({
 
   return (
     <div className='mt-2 p-4 '>
-      <Line data={chartData} options={lineChartOption} plugins={[verticalLinePlugin]} />
+      <Line
+        ref={chartRef}
+        data={chartData}
+        options={lineChartOption}
+        plugins={[verticalLinePlugin]} />
     </div>
   );
 }

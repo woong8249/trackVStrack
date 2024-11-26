@@ -20,7 +20,7 @@ import {
 import { PlatformName } from '@constants/platform';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
-
+import { useResponsiveChart } from '@hooks/useResponsiveChart';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Prob {
@@ -33,6 +33,7 @@ interface Prob {
 export function TrackComparisonLineChart({
   tracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
+  const { chartRef } = useResponsiveChart();
   const commonLabels = pickLabelRangeLabelMultipleTrack(
     tracks.map((selectedTrack) => selectedTrack.track),
     selectedPlatformName,
@@ -73,6 +74,7 @@ export function TrackComparisonLineChart({
   return (
     <div className=' p-4'>
       <Line
+        ref={chartRef}
         data={chartData}
         options={lineChartOption}
         plugins={[verticalLinePlugin]}
