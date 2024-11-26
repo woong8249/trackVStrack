@@ -45,26 +45,42 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
         {/* 자식1 */}
         <div className="bg-white p-6 rounded-md w-[100%]  md:w-[60%] ">
           <div className="flex items-center mb-8">
-            <div className="text-base px-2">📈 플랫폼별 차트순위</div>
+            <div className="text-base px-2">📈 플랫폼별 차트순위 비교</div>
 
             <button onClick ={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }}>
               <RxQuestionMarkCircled size={20} />
             </button>
 
             { isModalOpen && (
-              <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-                <div ref={modalRef} className="px-4 py-4 flex flex-col justify-start items-start bg-white rounded-lg max-w-md">
-                  <div className='mb-4 text-lg text-gray-600'>📈 플랫폼별 차트순위 </div>
+            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
+              <div
+               ref={modalRef}
+               className="px-6 py-6 flex flex-col bg-white rounded-lg max-w-md shadow-lg"
+               role="dialog"
+               aria-labelledby="platform-comparison-title"
+               aria-describedby="platform-comparison-description"
+             >
+                <h2 id="platform-comparison-title" className="mb-4 text-lg font-semibold text-gray-700">
+                  📈 플랫폼별 차트 순위 비교
+                </h2>
 
-                  <p className="mb-2 text-gray-400">
-                    각 플랫폼에서의 주간 차트 순위 변동을 한번에 확인해 보세요.
+                <section id="platform-comparison-description" className="text-gray-500 space-y-3">
+                  <p>
+                    해당 트랙의 플랫폼별
+                    {' '}
+                    <strong className="text-gray-800">주간 차트 순위</strong>
+                    {' '}
+                    변동을 한눈에 확인해 보세요.
                   </p>
 
-                  <p className="text-gray-400">
-                    타이틀 옆 달력 버튼을 통해 특정 기간을 필터할 수 있습니다.
+                  <p>
+                    <strong className="text-gray-800">좌측 상단</strong>
+                    {' '}
+                    달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
                   </p>
-                </div>
+                </section>
               </div>
+            </div>
 
             )}
           </div>

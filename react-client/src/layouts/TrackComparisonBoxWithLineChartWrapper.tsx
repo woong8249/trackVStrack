@@ -34,7 +34,7 @@ export function TrackComparisonLineChartWrapper({
         <div className="flex  my-4 py-4 px-6">
           {/* 헤더자식1- 박스의 타이틀명 */}
           <div className='flex'>
-            <div className="text-base px-2">📉 트랙간 차트 비교</div>
+            <div className="text-base px-2">📉 트랙간 차트 성적비교</div>
 
             <button onClick ={(e) => { e.stopPropagation(); setChartComparisonHelpModalOpen((pre) => !pre); }}>
               <RxQuestionMarkCircled size={20} />
@@ -45,16 +45,38 @@ export function TrackComparisonLineChartWrapper({
 
         { isChartComparisonHelpModalOpen && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-          <div ref={chartComparisonHelpModalRef} className="px-4 py-4 flex flex-col justify-start items-start bg-white rounded-lg max-w-md">
-            <div className='mb-4 text-lg text-gray-600'>📉 트랙간 플랫폼별 차트 비교 </div>
+          <div
+          ref={chartComparisonHelpModalRef}
+          className="px-6 py-6 flex flex-col bg-white rounded-lg max-w-md shadow-lg"
+          role="dialog"
+          aria-labelledby="chart-comparison-title"
+          aria-describedby="chart-comparison-description"
+        >
+            <h2 id="chart-comparison-title" className="mb-4 text-lg font-semibold text-gray-700">
+              📉 트랙 간 차트 성적 비교
+            </h2>
 
-            <p className="mb-2 text-gray-400">
-              각 트랙의 플랫폼별 성적을 비교해 보세요.
-            </p>
+            <section id="chart-comparison-description" className="text-gray-500 space-y-3">
+              <p>
+                여러 트랙의
+                {' '}
+                <strong className="text-gray-800">주간 차트 순위</strong>
+                {' '}
+                변동을 한눈에 확인해 보세요.
+              </p>
 
-            <p className="text-gray-400">
-              타이틀 옆 달력 버튼을 통해 특정 기간을 필터할 수 있습니다.
-            </p>
+              <p>
+                <strong className="text-gray-800">좌측 상단</strong>
+                {' '}
+                달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
+              </p>
+
+              <p>
+                <strong className="text-gray-800">우측 상단</strong>
+                {' '}
+                플랫폼 버튼을 통해 플랫폼을 선택할 수 있습니다.
+              </p>
+            </section>
           </div>
         </div>
 

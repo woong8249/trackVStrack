@@ -59,20 +59,43 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
 
         { questionIsModalOpen && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-          <div ref={questionModalRef} className="px-4 py-4 flex flex-col justify-start items-start bg-white rounded-lg max-w-md">
-            <div className='mb-4 text-lg text-gray-600'>📊 플랫폼 차트 성과</div>
+          <div
+         ref={questionModalRef}
+         className="px-6 py-6 flex flex-col bg-white rounded-lg max-w-md shadow-lg"
+         role="dialog"
+         aria-labelledby="chart-performance-title"
+         aria-describedby="chart-performance-description"
+       >
+            <h2 id="chart-performance-title" className="mb-4 text-lg font-semibold text-gray-700">
+              📊 플랫폼 차트 성과
+            </h2>
 
-            <p className="mb-2 text-gray-400">
-              플랫폼별 주간 차트에서 차트인 기간과 순위권 진입 횟수를 확인해보세요.
-            </p>
+            <section id="chart-performance-description" className="text-gray-500 space-y-2">
+              <p>
+                플랫폼별 주간 차트에서
+                {' '}
+                <strong className="text-gray-800">차트인 기간</strong>
+                과
+                {' '}
+                <strong className="text-gray-800">순위권 진입 횟수</strong>
+                를 확인해보세요.
+              </p>
 
-            <p className="text-gray-400">
-              타이틀 옆 달력 버튼을 통해 특정 기간을 필터할 수 있습니다.
-            </p>
+              <p>
+                <strong className="text-gray-800">타이틀 옆 달력 버튼</strong>
+                을 사용해 특정 기간을 필터링할 수 있습니다.
+              </p>
 
-            <p className="text-gray-400">
-              우측 상단의 "범위 설정" 버튼을 통해 원하는 순위 범위를 지정하여 확인이 가능합니다.
-            </p>
+              <p>
+                <strong className="text-gray-800">플랫폼 선택 버튼</strong>
+                을 통해 특정 플랫폼을 선택할 수 있습니다.
+              </p>
+
+              <p>
+                <strong className="text-gray-800">범위 설정 버튼</strong>
+                으로 원하는 순위 범위를 지정하여 세부적인 데이터를 확인해보세요.
+              </p>
+            </section>
           </div>
         </div>
 

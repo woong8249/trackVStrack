@@ -14,6 +14,7 @@
     - [x] contents
     - [x] responsive
 3. Common
+- [] footer
 - [x] chart: 뷰포트크기가 바뀔때 그래프가 다시그려지도록 바꾸기
 
 4. 의견 보내기
