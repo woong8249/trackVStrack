@@ -67,11 +67,17 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
     return (
       <div className='w-full'>
         {/* header */}
-        <div className='flex items-center relative p-2 mb-4 gap-2'>
+        <div className='flex items-center relative p-2 mb-4 gap-2 w-full'>
+
           {/* 헤더자식1- h1  */}
-          <h1 className='text-xl'>Track VS Track</h1>
-          {/* 헤더자식2- 달력  */}
-          <WeekRangePicker startDate={startDate} endDate={endDate} onDateRangeChange={handleDateRangeChange} />
+          <div className='flex sm:flex-row sm:items-center sm:gap-2  flex-col'>
+            <h1 className='text-xl '>Track VS Track</h1>
+
+            <WeekRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onDateRangeChange={handleDateRangeChange} />
+          </div>
 
           {/* 헤더자식3- 플랫폼선택모달 */}
           <div className="absolute right-3 ">

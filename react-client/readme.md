@@ -9,17 +9,14 @@
     - [x] responsive
 
 2. HomePage
-- [] 설명버튼
 - /Section2
     - [x] contents
     - [x] responsive
 3. Common
-- [] footer
+- [x] footer
 - [x] chart: 뷰포트크기가 바뀔때 그래프가 다시그려지도록 바꾸기
 
-4. 의견 보내기
-
-5. RealTime
+4. RealTime
 
 5. 나중에
  - 추천 검색키워드

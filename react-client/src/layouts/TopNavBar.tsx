@@ -1,9 +1,11 @@
 import Logo from '@components/Logo';
 import { useModal } from '@hooks/useModal';
-import React from 'react';
+import React, { useState } from 'react';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {
-  FiHome, FiSearch, FiTrendingUp, FiMessageSquare, FiMenu,
+  FiHome, FiSearch, FiTrendingUp, FiMenu,
 } from 'react-icons/fi';
+import { MdInfoOutline } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 type TopNavbarProps = {
@@ -16,6 +18,7 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
     setIsModalOpen,
     modalRef,
   } = useModal();
+  const [isServiceInfoOpen, setIsServiceInfoOpen] = useState(false); // 서비스 소개 아코디언 상태
 
   function handleToggleButton(e: React.MouseEvent<HTMLButtonElement>) {
     e.stopPropagation();
@@ -94,11 +97,69 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
 
           <hr className="border-gray-300 my-4" />
 
-          {/* 의견 보내기 */}
-          <Link to="/feedback" className="flex items-center p-5 rounded-full hover:bg-gray-100">
-            <FiMessageSquare className="mr-4 w-5 h-5" />
-            의견 보내기
-          </Link>
+          {/* 서비스 소개 */}
+          <div
+            className="flex flex-col"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsServiceInfoOpen((prev) => !prev); }}
+              className="flex items-center p-5 rounded-full hover:bg-gray-100 cursor-pointer">
+              <MdInfoOutline className="mr-4 w-5 h-5" />
+              서비스 소개
+
+              {isServiceInfoOpen ? (
+                <FaChevronUp className="ml-auto w-4 h-4" />
+              ) : (
+                <FaChevronDown className="ml-auto w-4 h-4" />
+              )}
+            </button>
+
+            {/* 아코디언 내용 */}
+            {isServiceInfoOpen && (
+            <div className="ml-9 mt-2 text-gray-500 text-sm">
+              <p className="mb-2">
+                이 서비스는 플랫폼 차트 성과를 쉽게 비교하고 분석할 수 있도록 도와줍니다.
+              </p>
+
+              <p className="mb-2">
+                <span className="font-semibold text-gray-800">2013년부터의 주간 차트</span>
+                를 대상으로 하며, 현재는
+                <span className="font-semibold text-gray-800">멜론, 지니, 벅스</span>
+                {' '}
+                플랫폼을 지원합니다.
+              </p>
+
+              <p className="mb-2">
+                차후
+                <span className="font-semibold text-gray-800">YouTube Music, Spotify, VIBE</span>
+                {' '}
+                플랫폼이 추가될 예정입니다.
+              </p>
+
+              <p className="mb-2">
+                모든 플랫폼이 공통적으로
+                {' '}
+                <span className="font-semibold text-gray-800">주간 차트</span>
+                를 제공하기에, 일관된 비교를 위해 주간차트를 대상으로 합니다.
+              </p>
+
+              <p className="mt-4">
+                추가적인 요구사항이나 문의사항이 있으시면 언제든지
+                {' '}
+
+                <span
+                className="font-bold text-blue-600 hover:underline"
+                >
+                  woong8249@gmail.com
+                </span>
+
+                {' '}
+                으로 연락해주세요.
+              </p>
+            </div>
+            )}
+          </div>
+
         </div>
       </nav>
     </div>
