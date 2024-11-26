@@ -112,6 +112,7 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
         </div>
 
+        {/* contents */}
         <div className='p-2 '>
           <TrackComparisonLineChartWrapper
               selectedTracks={mappedSelectedTracks}

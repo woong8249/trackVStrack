@@ -28,8 +28,9 @@ export function TrackComparisonLineChartWrapper({
 
   const fSelectedTracks = selectedTracks.filter(isTrackWithArtistResponse);
   return (
-    <div className='flex w-full gap-2'>
-      <div className='w-[70%] bg-white rounded-md'>
+    <div className='flex w-full gap-2 flex-col  lg:flex-row'>
+      {/* contents1 */}
+      <div className='w-full lg:w-[70%] bg-white rounded-md '>
         <div className="flex  my-4 py-4 px-6">
           {/* 헤더자식1- 박스의 타이틀명 */}
           <div className='flex'>
@@ -67,11 +68,15 @@ export function TrackComparisonLineChartWrapper({
 
       </div>
 
-      <div className='w-[30%] space-y-2'>
+      {/* contents2 */}
+      <div className='w-full lg:w-[30%] space-y-2'>
         {fSelectedTracks.map((track) => (
           <div className={'bg-white  flex items-center rounded-md'}key={track.id}>
             <div style={{ backgroundColor: track.color }} className={'w-2.5 h-2.5 rounded-full ml-4  mr-2'}></div>
-            <TrackInfoCard track={track.track} ></TrackInfoCard>
+
+            <TrackInfoCard
+              track={track.track}
+              size={100} />
           </div>
         ))}
       </div>

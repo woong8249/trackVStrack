@@ -6,6 +6,7 @@
     - [x]  레이아웃 잡기
     - [x]startDate,endDate => timePicker
     - [x] cache
+    - [x] responsive
 
 2. HomePage
 - [] 설명버튼
@@ -13,7 +14,7 @@
     - [x] contents
     - [x] responsive
 3. Common
-- chart: 뷰포트크기가 바뀔때 그래프가 다시그려지도록 바꾸기
+- [x] chart: 뷰포트크기가 바뀔때 그래프가 다시그려지도록 바꾸기
 
 4. 의견 보내기
 
