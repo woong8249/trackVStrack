@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 
-import { SearchTrackBoxContainer } from '@layouts/SearchTrackBoxContainer';
+import { SearchTrackContainer } from '@layouts/SearchTrackContainer';
 import { Color, SelectedTrack } from '@pages/ExplorePage';
 
 import { useEffect, useRef, useState } from 'react';
@@ -76,7 +76,7 @@ export default function ExploreSection1({
       className="flex flex-wrap gap-2 items-center justify-center mt-[5rem] w-[100%] md:w-[90%] lg:w-[80%]"
     >
       {selectedTracks.map((selectedTrack, index) => (
-        <SearchTrackBoxContainer
+        <SearchTrackContainer
           key={index}
           setSelectedTracks={setSelectedTracks}
           selectedTrack={selectedTrack}

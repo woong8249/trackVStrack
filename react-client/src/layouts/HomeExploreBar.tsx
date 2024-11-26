@@ -1,11 +1,10 @@
-/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable consistent-return */
 import React, {
   useState, useRef, useEffect, MutableRefObject,
 } from 'react';
 import TrackInfoCard from '../components/TrackInfoCard';
-import ArtistsInfoCard from '../components/ArtistsInfoCard';
+// import ArtistsInfoCard from '../components/ArtistsInfoCard';
 import { TrackWithArtistResponse } from '@typings/track';
 import ErrorAlert from '@components/ErrorAlert';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -13,7 +12,7 @@ import { ArtistResponse } from '@typings/artist';
 import { useModal } from '@hooks/useModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFindTracks } from '@hooks/useFindTracks';
-import { useFindArtists } from '@hooks/useFindArtists';
+// import { useFindArtists } from '@hooks/useFindArtists';
 
 type Size = 100 | 80 | 70;
 
@@ -28,16 +27,16 @@ export default function HomeExploreBar() {
     loadMoreTracks, trackData, trackError, trackIsLoading, setTrackSize,
   } = useFindTracks(query);
 
-  const {
-    artistData, artistError, artistIsLoading, setArtistSize, loadMoreArtists,
-  } = useFindArtists(query);
+  // const {
+  //   artistData, artistError, artistIsLoading, setArtistSize, loadMoreArtists,
+  // } = useFindArtists(query);
 
   if (trackData?.flat()[0]) {
     target.current = trackData.flat()[0] as TrackWithArtistResponse;
   }
-  if (!target.current && artistData?.flat()[0]) {
-    target.current = artistData.flat()[0] as ArtistResponse;
-  }
+  // if (!target.current && artistData?.flat()[0]) {
+  //   target.current = artistData.flat()[0] as ArtistResponse;
+  // }
 
   const handleButtonClick = () => {
     if (target.current) {
@@ -63,7 +62,7 @@ export default function HomeExploreBar() {
     let noResultContent:React.ReactNode;
 
     // 초기 로딩 상태는 data가 없을 때로 판단
-    const isInitialLoading = trackIsLoading && artistIsLoading;
+    const isInitialLoading = trackIsLoading;
 
     if (isInitialLoading) {
       return (
@@ -73,14 +72,13 @@ export default function HomeExploreBar() {
       );
     }
 
-    if (trackError || artistError) {
+    if (trackError) {
       return (
         <div ref={modalRef} className="absolute top-full left-0 right-0 z-10 bg-gray-50 shadow-lg max-h-[600px] h-[500px] overflow-y-auto rounded-b-[40px]">
           <ErrorAlert
-          error={trackError || artistError}
+          error={trackError }
           retryFunc={() => {
             setTrackSize((size) => size);
-            setArtistSize((size) => size);
           }}
         />
         </div>
@@ -111,29 +109,29 @@ export default function HomeExploreBar() {
       );
     }
 
-    if (artistData?.flat().length) {
-      artistsContent = (
-        <>
-          <div className="py-2 px-3 text-base text-[14px] font-semibold bg-gradient-to-b from-[#0B57D41C] to-slate-50">아티스트</div>
+    // if (artistData?.flat().length) {
+    //   artistsContent = (
+    //     <>
+    //       <div className="py-2 px-3 text-base text-[14px] font-semibold bg-gradient-to-b from-[#0B57D41C] to-slate-50">아티스트</div>
 
-          <ul>
-            {artistData.flat().map((artist, index) => (
-              <li key={artist.id} className={ `py-2 px-2 hover:bg-[#0B57D41C] rounded-md border-b last:border-b-0 ${(!tracksContent && index === 0) && 'bg-[#0B57D41C]'}`}>
-                <ArtistsInfoCard artist={artist} size={size} />
-              </li>
-            ))}
-          </ul>
+    //       <ul>
+    //         {artistData.flat().map((artist, index) => (
+    //           <li key={artist.id} className={ `py-2 px-2 hover:bg-[#0B57D41C] rounded-md border-b last:border-b-0 ${(!tracksContent && index === 0) && 'bg-[#0B57D41C]'}`}>
+    //             <ArtistsInfoCard artist={artist} size={size} />
+    //           </li>
+    //         ))}
+    //       </ul>
 
-          {artistData[artistData.length - 1].length > 0 && (
-            <button className="w-full py-2 px-4 text-blue-500 text-sm font-semibold rounded-md hover:bg-[#0B57D41C] transition-colors" onClick={loadMoreArtists}>
-              Load more artists
-            </button>
-          )}
-        </>
-      );
-    }
+    //       {artistData[artistData.length - 1].length > 0 && (
+    //         <button className="w-full py-2 px-4 text-blue-500 text-sm font-semibold rounded-md hover:bg-[#0B57D41C] transition-colors" onClick={loadMoreArtists}>
+    //           Load more artists
+    //         </button>
+    //       )}
+    //     </>
+    //   );
+    // }
 
-    if (!trackData?.flat().length && !artistData?.flat().length) {
+    if (!trackData?.flat().length) {
       noResultContent = (
         <div className="flex text-gray-500 justify-center items-center h-[8rem]">검색결과가 없습니다</div>
       );

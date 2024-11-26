@@ -10,7 +10,7 @@ import { useModal } from '@hooks/useModal';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { FaPen } from 'react-icons/fa6';
 import { useFindTracks } from '@hooks/useFindTracks';
-import { useCachedTrack } from '@hooks/useStoredTrack';
+import { useCachedTrack } from '@hooks/useCachedTrack';
 
 type ImageSize = 100 | 80 | 70;
 
@@ -30,7 +30,7 @@ export default function SearchTrackBox({
   deleteTrack,
 }:Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
-  const storedTrack = useCachedTrack(selectedTrack.track);
+  const cachedTrack = useCachedTrack(selectedTrack.track);
   const {
     isModalOpen: isModifyModalOpen,
     setIsModalOpen: setIsModifyModalOpen,
@@ -178,14 +178,14 @@ export default function SearchTrackBox({
           + 추가
         </div>
       )
-        : storedTrack ? (
+        : cachedTrack ? (
           <div
             className={`bg-white ${width} ${height} flex items-center rounded-xl hover:bg-gray-300`}
             onClick={ (e) => { e.stopPropagation(); setIsModifyModalOpen((pre) => !pre); }}
             role='button'
             tabIndex={0}>
-            <div className={`w-2.5 h-2.5 ${selectedTrack.color} rounded-full ml-4  mr-2`}></div>
-            <TrackInfoCard track={storedTrack} size={imageSize}></TrackInfoCard>
+            <div style={{ backgroundColor: selectedTrack.color }} className={'w-2.5 h-2.5 rounded-full ml-4  mr-2'}></div>
+            <TrackInfoCard track={cachedTrack} size={imageSize}></TrackInfoCard>
 
             {isModifyModalOpen && (
             <div ref={modifyModalRef} className={'text-gray-500 absolute top-0 right-0  mt-2 bg-white border border-gray-300 shadow-md rounded-md p-2 w-40'}>

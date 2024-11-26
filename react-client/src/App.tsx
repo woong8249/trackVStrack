@@ -39,7 +39,7 @@ const persistentProvider = () => {
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <SWRConfig
     value={{
-      fetcher: ([url, parm]) => fetcher(url, parm),
+      fetcher,
       provider: persistentProvider,
       revalidateOnFocus: false, //  창이 포커싱되었을 때 자동 갱신 x
       revalidateIfStale: false, // 오래된 데이터가 있더라도 자동으로 다시 확인 x

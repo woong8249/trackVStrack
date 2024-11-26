@@ -1,10 +1,11 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { Platform } from '@typings/track';
-import PlatformAnalysis from '@components/PlatformAnalysis';
+import PlatformAnalysisBarChart from '@components/PlatformAnalysisBarChart';
 import { useState } from 'react';
 import { useModal } from '@hooks/useModal';
 import { FaChevronDown } from 'react-icons/fa';
 import { RxQuestionMarkCircled } from 'react-icons/rx';
+import platform, { PlatformName } from '@constants/platform';
 
 interface Prob {
   platforms: {
@@ -16,8 +17,7 @@ interface Prob {
   endDate:Date
 }
 
-export type PlatformName = 'melon' | 'genie' | 'bugs';
-const platformNames = ['melon', 'genie', 'bugs'] as PlatformName[];
+const platformNames = Object.keys(platform) as PlatformName[];
 
 export default function PlatformAnalysisBox({ platforms, startDate, endDate }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
@@ -27,11 +27,6 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
     setIsModalOpen: questionSetIsModalOpen,
     modalRef: questionModalRef,
   } = useModal();
-  const platformIcons = {
-    melon: 'logo/logo_melon.png',
-    genie: 'logo/logo_genie.png',
-    bugs: 'logo/logo_bugs.png',
-  };
 
   const availablePlatformNames = platformNames.filter((key) => platforms[key]) as PlatformName[];
 
@@ -64,20 +59,43 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
 
         { questionIsModalOpen && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-          <div ref={questionModalRef} className="px-4 py-4 flex flex-col justify-start items-start bg-white rounded-lg max-w-md">
-            <div className='mb-4 text-lg text-gray-600'>📊 플랫폼 차트 성과</div>
+          <div
+         ref={questionModalRef}
+         className="px-6 py-6 flex flex-col bg-white rounded-lg max-w-md shadow-lg"
+         role="dialog"
+         aria-labelledby="chart-performance-title"
+         aria-describedby="chart-performance-description"
+       >
+            <h2 id="chart-performance-title" className="mb-4 text-lg font-semibold text-gray-700">
+              📊 플랫폼 차트 성과
+            </h2>
 
-            <p className="mb-2 text-gray-400">
-              플랫폼별 주간 차트에서 차트인 기간과 순위권 진입 횟수를 확인해보세요.
-            </p>
+            <section id="chart-performance-description" className="text-gray-500 space-y-2">
+              <p>
+                플랫폼별 주간 차트에서
+                {' '}
+                <strong className="text-gray-800">차트인 기간</strong>
+                과
+                {' '}
+                <strong className="text-gray-800">순위권 진입 횟수</strong>
+                를 확인해보세요.
+              </p>
 
-            <p className="text-gray-400">
-              타이틀 옆 달력 버튼을 통해 특정 기간을 필터할 수 있습니다.
-            </p>
+              <p>
+                <strong className="text-gray-800">타이틀 옆 달력 버튼</strong>
+                을 사용해 특정 기간을 필터링할 수 있습니다.
+              </p>
 
-            <p className="text-gray-400">
-              우측 상단의 "범위 설정" 버튼을 통해 원하는 순위 범위를 지정하여 확인이 가능합니다.
-            </p>
+              <p>
+                <strong className="text-gray-800">플랫폼 선택 버튼</strong>
+                을 통해 특정 플랫폼을 선택할 수 있습니다.
+              </p>
+
+              <p>
+                <strong className="text-gray-800">범위 설정 버튼</strong>
+                으로 원하는 순위 범위를 지정하여 세부적인 데이터를 확인해보세요.
+              </p>
+            </section>
           </div>
         </div>
 
@@ -86,7 +104,7 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
 
       <div className="absolute top-6 right-6">
         <button onClick={(e) => { e.stopPropagation(); setIsModalOpen((pre) => !pre); }} className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg">
-          <img src={platformIcons[platformName]} alt={platformName} className="w-12 h-7" />
+          <img src={platform[platformName].Icon} alt={platformName} className="w-12 h-7" />
           <FaChevronDown size={10} />
         </button>
       </div>
@@ -114,7 +132,7 @@ export default function PlatformAnalysisBox({ platforms, startDate, endDate }: P
       </div>
       )}
 
-      <PlatformAnalysis {...platformProps} />
+      <PlatformAnalysisBarChart {...platformProps} />
     </div>
   );
 }

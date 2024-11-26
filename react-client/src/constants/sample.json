@@ -1,0 +1,42 @@
+[
+    {
+        "id": 0,
+        "activate": true,
+        "color": "#3b82f6",
+        "track": {
+            "id": 10109
+        }
+    },
+    {
+        "id": 1,
+        "activate": true,
+        "color": "#ef4444",
+        "track": {
+            "id": 10120
+        }
+    },
+    {
+        "id": 2,
+        "activate": true,
+        "color": "#10b981",
+        "track": {
+            "id": 10119
+        }
+    },
+    {
+        "id": 3,
+        "activate": true,
+        "color": "#f59e0b",
+        "track": {
+            "id": 10108
+        }
+    },
+    {
+        "id": 4,
+        "activate": true,
+        "color": "#8b5cf6",
+        "track": {
+            "id": 10122
+        }
+    }
+]

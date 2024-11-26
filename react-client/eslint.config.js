@@ -52,6 +52,7 @@ const customConfig = [
     },
     rules: {
       'no-shadow': 'off',
+      'max-len': ['error', { code: 200 }], // 줄 길이를 최대 200자로 설정
       'no-underscore-dangle': ['error', { allow: ['__filename', '__dirname'] }],
       // 여러 줄에 걸쳐 JSX 표현식을 사용할 때, 괄호로 감싸도록 강제합니다.
       // 'parens-new-line': 표현식을 괄호로 감싸고, 각 줄에 개행을 넣습니다.
