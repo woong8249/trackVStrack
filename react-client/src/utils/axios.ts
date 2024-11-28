@@ -14,8 +14,10 @@ export interface FindWithChartDurationDTO extends FindDTO {
   minWeeksOnChart?: number;
 }
 
+const { baseURL } = config;
+
 export const apiClient = axios.create({
-  baseURL: config.baseURL,
+  baseURL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -23,7 +25,7 @@ export const apiClient = axios.create({
 });
 
 export const fetcher = async <T>(url: string): Promise<T> => {
-  const response = await apiClient.get(encodeURI(url));
+  const response = await apiClient.get((url));
   return response.data;
 };
 

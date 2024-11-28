@@ -16,7 +16,11 @@ export function useFindTracks(query:string) {
       if (!debouncedQuery || previousPageData?.length === 0) return null;
       const offset = pageIndex * 5;
       const url = trackEndpoints.getTracks({
-        sort: 'desc', offset, limit: 5, query: debouncedQuery.replace(/\s+/g, ''), withArtists: true,
+        withArtists: true,
+        query: debouncedQuery.replace(/\s+/g, ''),
+        sort: 'desc',
+        offset,
+        limit: 5,
       });
       return url;
     },

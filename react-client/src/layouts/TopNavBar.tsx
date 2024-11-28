@@ -3,7 +3,8 @@ import { useModal } from '@hooks/useModal';
 import React, { useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {
-  FiHome, FiSearch, FiTrendingUp, FiMenu,
+  FiHome, FiSearch, FiMenu,
+  //  FiTrendingUp,
 } from 'react-icons/fi';
 import { MdInfoOutline } from 'react-icons/md';
 import { Link } from 'react-router-dom';
@@ -54,13 +55,13 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
                 <div className={getBorderClass('explore')} />
               </div>
 
-              <div className="relative">
+              {/* <div className="relative">
                 <Link to={'/realtime'}>
                   실시간
                 </Link>
 
                 <div className={getBorderClass('realtime')} />
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -90,10 +91,10 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
             탐색
           </Link>
 
-          <Link to="/realtime" className={`flex items-center p-5 rounded-full ${currentPage === 'realtime' ? 'bg-[#c2e7ff]' : 'hover:bg-gray-100'}`}>
+          {/* <Link to="/realtime" className={`flex items-center p-5 rounded-full ${currentPage === 'realtime' ? 'bg-[#c2e7ff]' : 'hover:bg-gray-100'}`}>
             <FiTrendingUp className="mr-4 w-5 h-5" />
-            실시간 인기
-          </Link>
+            실시간
+          </Link> */}
 
           <hr className="border-gray-300 my-4" />
 
@@ -124,6 +125,7 @@ function TopNavbar({ currentPage }: TopNavbarProps) {
               <p className="mb-2">
                 <span className="font-semibold text-gray-800">2013년부터의 주간 차트</span>
                 를 대상으로 하며, 현재는
+                {' '}
                 <span className="font-semibold text-gray-800">멜론, 지니, 벅스</span>
                 {' '}
                 플랫폼을 지원합니다.
