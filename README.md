@@ -1,23 +1,23 @@
-## **Introduction**
+## Service Introduction
 
 현대 음악 산업에서는 다양한 음원 스트리밍 플랫폼이 존재하며, 각각의 플랫폼은 자체적인 차트와 성적을 제공합니다.  아티스트와 팬들은 특정 음원의 성적을 종합적으로 이해하기 위해 여러 플랫폼을 일일이 확인해야 하는 번거로움이 있습니다. 
 
-이를 해결하기 위해, 다양한 음원 스트리밍 사이트의 차트 정보를 통합하여 시각적으로 트래킹할 수 있는 어플리케이션을 기획하여 개발중에 있습니다.
-- 데이터 수집 : 2018년 12월 31일부터 현재까지의 주간 차트 데이터를 수집완료.
-- 지원 플랫폼 : 현재는 `멜론(Melon)`, `지니(Genie)`, `벅스(Bugs)` 등 국내 플랫폼의 `주간 Top 100 차트`를 대상으로 합니다.
-- 향후 확장 계획 : `YT Music`, `Spotify`, `Apple Music` 등 국제 플랫폼을 포함시킬 계획을 고려 중입니다.
+이 서비스는 플랫폼 차트 성과를 쉽게 비교하고 분석할 수 있도록 도와줍니다.
 
-<img width="1246" alt="Screenshot 2024-05-22 at 15 56 59" src="https://github.com/woong8249/music-chart-chart/assets/77775371/8ac82533-ef7d-4308-87be-114fad55852e">
+2013년부터의 주간 차트를 대상으로 하며, 현재는 멜론, 지니, 벅스 플랫폼을 지원합니다.
 
+차후 YouTube Music, Spotify, VIBE 플랫폼과 실시간 차트 성적에 대한 기능이 추가될 예정입니다.
 
+모든 플랫폼이 공통적으로 주간 차트를 제공하기에, 일관된 비교를 위해 주간차트를 대상으로 합니다.
 
-## Service Features
-
-1. 검색을 통해 차트에 진입한 트랙과 아티스트를 확인하고, 해당 아티스트의 음원 차트 성적을 한눈에 볼 수 있는 기능을 제공합니다.
-
-https://github.com/woong8249/music-chart-chart/assets/77775371/b3313049-314d-49a3-9193-6e7323cffaf0
+추가적인 요구사항이나 문의사항이 있으시면 언제든지 woong8249@gmail.com 으로 연락해주세요.
 
 
 
+## Home Page
 
 
+![track-vs-track-home](https://github.com/user-attachments/assets/d6a01fc4-e0fa-4a02-847a-99d64679d259)
+
+## Explore Page
+![track-vs-track-explore](https://github.com/user-attachments/assets/976667eb-7a0d-456d-a8ef-23ea7893f937)
