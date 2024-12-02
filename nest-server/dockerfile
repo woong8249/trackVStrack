@@ -1,0 +1,19 @@
+FROM  node:21-alpine
+# 1. pnpm 설치 및 환경 설정
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV SHELL=/bin/bash
+
+RUN npm install -g pnpm \
+    && mkdir -p $PNPM_HOME \
+    && ln -s /usr/local/bin/pnpm $PNPM_HOME
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install
+
+COPY . .
+RUN pnpm run build
+EXPOSE 80
+CMD ["node", "dist/main"]

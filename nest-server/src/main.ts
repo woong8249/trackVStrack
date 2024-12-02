@@ -10,7 +10,7 @@ const port = process.env.APP_PORT || 3000;
 const env = process.env.APP_ENV;
 const origin =
   env === 'production'
-    ? 'not yet'
+    ? process.env.CLIENT_ORIGIN // 모든 도메인 허용 ,client 배포 후 바꿔야함
     : ['http://localhost:4173', 'http://localhost:5173'];
 
 async function bootstrap() {
