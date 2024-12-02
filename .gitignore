@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 dataCollectedBeforeIntegration
+.env
 .env.*
 crawling/src/**/*.json
 !package.json
@@ -8,3 +9,4 @@ crawling/src/**/*.json
 data
 dist
 log
+*.sql

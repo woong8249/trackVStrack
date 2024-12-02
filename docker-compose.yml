@@ -1,11 +1,34 @@
-version: '3'
-
-name: chart
+version: '3.8'
 
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: redis
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql # 덤프 파일 직접 매핑
     ports:
-      - 6379:6379
+      - "3306:3306"
+
+  api-server:
+    build:
+      context: ./nest-server
+      dockerfile: Dockerfile
+    container_name: apiServer
+    depends_on:
+      - mysql
+    ports:
+      - "80:80"
+
+  # crawlingServer:
+  #   build:
+  #     context: ./ts-crawling
+  #     dockerfile: Dockerfile
+  #   container_name: crawlingServer
+  #   depends_on:
+  #    - mysql
+  #   ports:
+  #     - "4000:4000"
 
