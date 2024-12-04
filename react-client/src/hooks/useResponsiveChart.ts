@@ -13,7 +13,9 @@ export function useResponsiveChart(): UseResponsiveChartReturn {
   useEffect(() => {
     const handleResize = () => {
       if (chartRef.current) {
-        chartRef.current.resize(); // Chart.js 강제 업데이트
+        setTimeout(() => {
+          (chartRef.current as ChartJS<'line', { x: string; y: number | null }[], unknown>).resize(); // Chart.js 강제 업데이트
+        }, 100);
       }
     };
 
