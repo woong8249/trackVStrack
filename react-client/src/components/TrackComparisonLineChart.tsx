@@ -9,6 +9,8 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartData,
+  ChartDataset,
 } from 'chart.js';
 import 'chart.js/auto';
 import {
@@ -41,7 +43,7 @@ export function TrackComparisonLineChart({
     endDate,
   );
 
-  const chartData = {
+  const chartData :ChartData<'line'> = {
     labels: commonLabels,
     datasets: tracks.map((selectedTrack) => {
       const { color, track } = selectedTrack;
@@ -54,21 +56,22 @@ export function TrackComparisonLineChart({
 
         // tooltip mode index에서 길이 와 순서를 맞추기위함
         // 2. 공통 라벨과 일치하도록 데이터 정렬 및 빈 값 채우기
-        const data = commonLabels.map((label) => {
-          const index = xAxis.indexOf(label);
-          return index !== -1 ? { x: label, y: yAxis[index] } : { x: label, y: null };
+        const data = commonLabels.map((label, index) => {
+          const xValue = index; // x 값은 숫자 인덱스
+          const yValue = xAxis.includes(label) ? yAxis[xAxis.indexOf(label)] : null;
+          return { x: xValue, y: yValue }; // x와 y를 숫자로 설정
         });
 
         return {
           label: track.titleName,
-          data,
+          data: data as { x: number; y: number | null }[], // 타입 캐스팅
           borderColor: color,
           backgroundColor: color,
           // yAxisID: selectedPlatformName,
         };
       }
       return null; // 선택된 플랫폼이 없는 경우 null을 반환
-    }).filter((dataset) => dataset !== null),
+    }).filter((dataset) => dataset !== null) as ChartDataset<'line'>[],
   };
 
   return (
