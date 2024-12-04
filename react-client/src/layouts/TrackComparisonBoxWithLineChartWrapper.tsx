@@ -32,7 +32,6 @@ export function TrackComparisonLineChartWrapper({
       {/* contents1 */}
       <div className='w-full lg:w-[70%] bg-white rounded-md '>
         <div className="flex  my-4 py-4 px-6">
-          {/* 헤더자식1- 박스의 타이틀명 */}
           <div className='flex'>
             <div className="text-base px-2">📉 트랙간 차트 성적비교</div>
 
