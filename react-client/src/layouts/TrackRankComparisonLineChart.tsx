@@ -96,6 +96,11 @@ export function TrackRankComparisonLineChart({
               </p>
 
               <p>
+                <strong className="text-gray-800">범례 항목</strong>
+                을 클릭하여 원하는 데이터를 숨기거나 다시 표시할 수 있습니다.
+              </p>
+
+              <p>
                 <strong className="text-gray-800">좌측 상단</strong>
                 {' '}
                 달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
