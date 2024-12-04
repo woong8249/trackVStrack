@@ -10,10 +10,10 @@ import { Bar } from 'react-chartjs-2';
 import { Range, getTrackBackground } from 'react-range';
 
 interface Prob {
-  tracks: (SelectedTrack&{track:TrackWithArtistResponse})[];
-  selectedPlatformName: PlatformName;
-  startDate: Date;
-  endDate: Date;
+  tracks:Omit<SelectedTrack&{track:TrackWithArtistResponse}, 'activate'>[]
+  selectedPlatformName:PlatformName
+  startDate:Date
+  endDate:Date
 }
 
 export function TrackChartInDurationComparisonBarChart({
