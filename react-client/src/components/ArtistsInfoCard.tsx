@@ -22,7 +22,7 @@ export default function ArtistsInfoCard({ artist, size = 100 }: Props) {
               />
           )}
 
-        <div className="text-xs max-h-[5rem] flex flex-col gap-1 overflow-x-auto whitespace-nowrap min-w-[150px] sm:min-w-[200px] md:min-w-[300px] lg:min-w-[330px]">
+        <div className="text-xs max-h-[5rem] flex flex-col gap-1 overflow-x-auto whitespace-nowrap w-full">
           <p className="text-[#3D3D3D] whitespace-nowrap responsive-small-text font-bold ">{artist.artistName}</p>
           <p className=' text-[#707070]  responsive-extra-small-text '>{artist.debut !== 'missing' ? artist.debut : ''}</p>
         </div>
