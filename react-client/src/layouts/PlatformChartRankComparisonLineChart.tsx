@@ -13,7 +13,7 @@ interface Prob {
   endDate:Date
 }
 
-export default function PlatformComparisonOfTrackBox({ track, startDate, endDate }: Prob) {
+export default function PlatformChartRankComparisonLineChart({ track, startDate, endDate }: Prob) {
   const [activeModalTrack, setActiveModalTrack] = useState<TrackWithArtistResponse | null>(null);
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 

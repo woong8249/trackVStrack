@@ -33,7 +33,7 @@ interface Prob {
   endDate:Date
 }
 
-export function TrackRankComparisonLineChart({
+export function TrackChartRankComparisonLineChart({
   tracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
   const { chartRef } = useResponsiveChart();

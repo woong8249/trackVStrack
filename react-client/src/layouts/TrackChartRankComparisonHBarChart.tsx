@@ -13,7 +13,7 @@ interface Prob {
   endDate: Date;
 }
 
-export function TrackChartPerformanceRankingHorizontalBarChart({
+export function TrackChartRankComparisonHBarChart({
   tracks, selectedPlatformName, startDate, endDate,
 }: Prob) {
   // 1. 점수 계산 (선택한 기간만 고려)

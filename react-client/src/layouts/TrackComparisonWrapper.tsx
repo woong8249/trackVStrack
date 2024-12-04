@@ -1,9 +1,9 @@
-import { TrackRankComparisonLineChart } from '@layouts/TrackRankComparisonLineChart';
+import { TrackChartRankComparisonLineChart } from '@layouts/TrackChartRankComparisonLineChart';
 import { PlatformName } from '@constants/platform';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
 import { TrackChartInDurationComparisonBarChart } from '@layouts/TrackChartInDurationComparisonBarChart';
-import { TrackChartPerformanceRankingHorizontalBarChart } from '@layouts/TrackChartPerformanceRankingHorizontalBarChart';
+import { TrackChartRankComparisonHBarChart } from '@layouts/TrackChartRankComparisonHBarChart';
 
 interface Prob {
     selectedTracks:SelectedTrack[]
@@ -24,7 +24,7 @@ export function TrackComparisonWrapper({
     <>
       {/* contents1 */}
       <div className='w-full bg-white rounded-md mb-4'>
-        <TrackChartPerformanceRankingHorizontalBarChart
+        <TrackChartRankComparisonHBarChart
             tracks={fSelectedTracks}
             selectedPlatformName={selectedPlatformName}
             startDate={startDate}
@@ -36,7 +36,7 @@ export function TrackComparisonWrapper({
       <div className='flex w-full gap-2 flex-col  lg:flex-row  mb-4'>
         {/* contents2 */}
         <div className='w-full lg:w-[70%] bg-white rounded-md  '>
-          <TrackRankComparisonLineChart
+          <TrackChartRankComparisonLineChart
           tracks={fSelectedTracks}
           selectedPlatformName={selectedPlatformName}
           startDate={startDate}

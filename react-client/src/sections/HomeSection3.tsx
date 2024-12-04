@@ -7,7 +7,7 @@ import ErrorAlert from '@components/ErrorAlert';
 import { Platform, TrackWithArtistResponse } from '@typings/track';
 import Slider from 'react-slick';
 
-import PlatformComparisonOfTrackBox from '@layouts/PlatformComparisonOfTrackBox';
+import PlatformChartRankComparisonLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import { NextArrow, PrevArrow } from '@components/SliderArrows';
 
 export function HomeSection3() {
@@ -82,7 +82,7 @@ export function HomeSection3() {
     const endDate = new Date(Math.max(...endDates.map((date) => new Date(date).getTime())));
 
     return (
-      <PlatformComparisonOfTrackBox track={track} startDate={startDate} endDate={endDate} />
+      <PlatformChartRankComparisonLineChart track={track} startDate={startDate} endDate={endDate} />
     );
   }
 

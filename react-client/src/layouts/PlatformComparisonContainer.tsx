@@ -1,7 +1,7 @@
-import PlatformComparisonOfTrackBox from '@layouts/PlatformComparisonOfTrackBox';
+import PlatformChartRankComparisonLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import { useCachedTrack } from '@hooks/useCachedTrack';
 import { SelectedTrack } from '@pages/ExplorePage';
-import PlatformAnalysisBox from './PlatformAnalysisBox';
+import PlatformChartInDurationComparisonBarChart from './PlatformChartInDurationComparisonBarChart';
 import { useEffect, useState } from 'react';
 import WeekRangePicker from '@components/WeekRangePicker';
 import { ArtistsBox } from './ArtistsBox';
@@ -12,7 +12,7 @@ interface Prob {
     selectedTrack:SelectedTrack
   }
 
-export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
+export function PlatformComparisonContainer({ selectedTrack }:Prob) {
   const cachedTrack = useCachedTrack(selectedTrack.track);
 
   const [startDate, setStartDate] = useState<Date>(new Date());
@@ -35,14 +35,11 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
 
     <div className="mb-8 w-full">
       <div className=' mb-2  flex items-center'>
-
         <div className="text-lg px-2 py-1" style={{ display: 'inline-block' }}>{cachedTrack.titleName}</div>
         <WeekRangePicker startDate={startDate} endDate={endDate} onDateRangeChange={handleDateRangeChange} />
       </div>
 
-      {/* 부모 */}
       <div className="w-full flex flex-col gap-2 items-center md:items-stretch  md:flex-row md:justify-center">
-        {/* 자식1 */}
         <div className="bg-white p-6 rounded-md w-[100%]  md:w-[60%] ">
           <div className="flex items-center mb-8">
             <div className="text-base px-2">📈 플랫폼별 차트순위 비교</div>
@@ -68,10 +65,9 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
                 </p>
               </section>
             </HelpModal>
-
           </div>
 
-          <PlatformComparisonOfTrackBox
+          <PlatformChartRankComparisonLineChart
             track={cachedTrack}
             startDate={startDate}
             endDate={endDate}
@@ -83,7 +79,7 @@ export function PlatformAnalysisContainer({ selectedTrack }:Prob) {
           <ArtistsBox track={cachedTrack} />
 
           <div className='mt-2'>
-            <PlatformAnalysisBox platforms={cachedTrack.platforms} startDate={startDate} endDate={endDate} />
+            <PlatformChartInDurationComparisonBarChart platforms={cachedTrack.platforms} startDate={startDate} endDate={endDate} />
           </div>
 
         </div>

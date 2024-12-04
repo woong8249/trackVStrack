@@ -1,5 +1,5 @@
 import { SelectedTrack } from '@pages/ExplorePage';
-import { PlatformAnalysisContainer } from '@layouts/PlatformAnalysisContainer';
+import { PlatformComparisonContainer } from '@layouts/PlatformComparisonContainer';
 
 interface Prob{
     selectedTracks: SelectedTrack[]; // 상태
@@ -11,7 +11,7 @@ export default function ExploreSection3({ selectedTracks }:Prob) {
       {selectedTracks.map((selectedTrack) => {
         if (selectedTrack.track) {
           return (
-            <PlatformAnalysisContainer key={selectedTrack.id} selectedTrack={selectedTrack} />
+            <PlatformComparisonContainer key={selectedTrack.id} selectedTrack={selectedTrack} />
           );
         }
         return null;

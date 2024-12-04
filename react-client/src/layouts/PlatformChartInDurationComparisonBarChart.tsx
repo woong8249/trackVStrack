@@ -19,7 +19,7 @@ interface Prob {
 
 const platformNames = Object.keys(platform) as PlatformName[];
 
-export default function PlatformAnalysisBox({ platforms, startDate, endDate }: Prob) {
+export default function PlatformChartInDurationComparisonBarChart({ platforms, startDate, endDate }: Prob) {
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
   const availablePlatformNames = platformNames.filter((key) => platforms[key]) as PlatformName[];
 
