@@ -154,6 +154,7 @@ export const lineChartOption: ChartOptions<'line'> = {
       title: {
         display: true,
         text: 'Week' as const,
+        font: { size: 12, weight: 'lighter' },
       },
       grid: {
         display: false,
@@ -166,6 +167,7 @@ export const lineChartOption: ChartOptions<'line'> = {
       title: {
         display: true,
         text: 'Rank' as const,
+        font: { size: 12, weight: 'lighter' },
       },
 
     },
