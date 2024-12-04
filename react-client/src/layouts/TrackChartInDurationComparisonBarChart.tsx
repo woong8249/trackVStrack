@@ -114,7 +114,7 @@ export function TrackChartInDurationComparisonBarChart({
   };
 
   return (
-    <div className='bg-white'>
+    <div className='py-8'>
       <div className='flex px-8 mb-6 gap-1 items-center'>
         <div >
           📊 트랙 간 차트인 기간 비교

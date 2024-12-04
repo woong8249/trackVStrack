@@ -23,6 +23,7 @@ import { PlatformName } from '@constants/platform';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useResponsiveChart } from '@hooks/useResponsiveChart';
+import { HelpModal } from '../components/HelpModal';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Prob {
@@ -32,7 +33,7 @@ interface Prob {
   endDate:Date
 }
 
-export function TrackComparisonLineChart({
+export function TrackRankComparisonLineChart({
   tracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
   const { chartRef } = useResponsiveChart();
@@ -75,14 +76,51 @@ export function TrackComparisonLineChart({
   };
 
   return (
-    <div className=' p-4'>
-      <Line
+    <div className='py-8'>
+      <div className="flex mb-6 px-8 pb-14">
+        <div className='flex items-center px-2 gap-2'>
+          <div>📉 트랙 간의 차트 순위 비교</div>
+
+          <HelpModal >
+            <h2 id="chart-comparison-title" className="mb-4 text-lg font-semibold text-gray-700">
+              📉 트랙 간의 차트 순위 비교
+            </h2>
+
+            <section id="chart-comparison-description" className="text-gray-500 space-y-3">
+              <p>
+                여러 트랙의
+                {' '}
+                <strong className="text-gray-800">주간 차트 순위</strong>
+                {' '}
+                변동을 한눈에 확인해 보세요.
+              </p>
+
+              <p>
+                <strong className="text-gray-800">좌측 상단</strong>
+                {' '}
+                달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
+              </p>
+
+              <p>
+                <strong className="text-gray-800">우측 상단</strong>
+                {' '}
+                플랫폼 버튼을 통해 플랫폼을 선택할 수 있습니다.
+              </p>
+            </section>
+          </HelpModal>
+        </div>
+
+      </div>
+
+      <div className=' p-4'>
+        <Line
         style={{ height: '300px' }}
         ref={chartRef}
         data={chartData}
         options={lineChartOption}
         plugins={[verticalLinePlugin]}
-      />
+        />
+      </div>
     </div>
   );
 }
