@@ -1,64 +1,95 @@
 // TrackOverview.tsx (분리된 파일)
-import ReactDOM from 'react-dom';
-import { useModal } from '@hooks/useModal';
+import { Line } from 'react-chartjs-2';
 import TrackInfoCard from '@components/TrackInfoCard';
-import PlatformCompareLineChart from '@components/PlatformCompareLineChart';
 import { TrackWithArtistResponse } from '@typings/track';
-import { FaExpandAlt } from 'react-icons/fa';
-import React, { useState } from 'react';
+import { MutableRefObject, ReactNode } from 'react';
+import {
+  lineChartOption,
+  pickLabelRangeFromMultiplePlatform,
+  pickXAxis,
+  pickYAxis,
+  verticalLinePlugin,
+} from '@utils/lineChart';
+import { useResponsiveChart } from '@hooks/useResponsiveChart';
+import platform, { PlatformName } from '@constants/platform';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataset,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+);
 
 interface Prob {
+  children?: ReactNode
   track: TrackWithArtistResponse;
   startDate:Date
   endDate:Date
 }
 
-export default function PlatformChartRankComparisonLineChart({ track, startDate, endDate }: Prob) {
-  const [activeModalTrack, setActiveModalTrack] = useState<TrackWithArtistResponse | null>(null);
-  const { isModalOpen, setIsModalOpen, modalRef } = useModal();
+export default function PlatformChartRankComparisonLineChart({
+  children, track, startDate, endDate,
+}: Prob) {
+  const commonLabels = pickLabelRangeFromMultiplePlatform(track, startDate, endDate);
+  const { chartRef } = useResponsiveChart() as {chartRef :MutableRefObject< ChartJS<'line'>>};
 
-  const handleModalOpen = (track: TrackWithArtistResponse, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveModalTrack(track); // 클릭한 트랙의 모달을 활성화
-    setIsModalOpen(true); // 모달을 열기
-  };
+  const chartData = {
+    labels: commonLabels,
+    datasets: (['melon', 'genie', 'bugs'] as PlatformName[])
+      .filter((key) => !!track.platforms[key]) // 플랫폼이 존재하는 경우에만 포함
+      .map((key) => {
+        const value = track.platforms[key]!;
+        const xAxis = pickXAxis(value, startDate, endDate);
+        const yAxis = pickYAxis(value, startDate, endDate);
 
-  const renderModal = (track: TrackWithArtistResponse) => {
-    if (!activeModalTrack || activeModalTrack.id !== track.id) return null;
-    return ReactDOM.createPortal(
-      <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white rounded-lg p-4 relative" ref={modalRef}>
-          <div className="w-[40rem] sm:w-[50rem] h-[30rem] sm:h-[35rem] overflow-auto">
-            <TrackInfoCard track={track} />
-            <div className='border-b mt-1`'></div>
-            <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
-          </div>
-        </div>
-      </div>,
-      document.body,
-    );
+        // 공통 라벨에 맞춰 데이터 정렬 및 빈 값 채우기
+        const data = commonLabels.map((label, index) => {
+          const xValue = index; // x 값은 숫자 인덱스
+          const yValue = xAxis.includes(label) ? yAxis[xAxis.indexOf(label)] : null;
+          return { x: xValue, y: yValue }; // x는 number, y는 number | null로 변환
+        });
+
+        return {
+          label: key,
+          data,
+          borderColor: platform[key].color,
+          backgroundColor: platform[key].color,
+        };
+      }) as ChartDataset<'line'>[],
   };
 
   return (
-    <div key={track.id.toString()} className="w-full">
-      <div className="relative">
-        <div className="border-[1px] bg-[white] border-gray-300 rounded-md relative">
-          <TrackInfoCard track={track} />
-          <div className='border-b mt-1`'></div>
-          <PlatformCompareLineChart track={track} startDate={startDate} endDate={endDate} />
-        </div>
+    <div key={track.id.toString()} className="w-full ">
+      {children}
 
-        <div className="absolute top-2 right-2">
-          <button
-            onClick={(e) => handleModalOpen(track, e)}
-            className="bg-transparent text-green-600 p-2 rounded-full hover:text-green-800"
-          >
-            <FaExpandAlt size={20} />
-          </button>
-        </div>
+      <div className="border-gray-300 rounded-md relative">
+        <TrackInfoCard track={track} size={80} />
+        <hr className="border-gray-300 mb-14" />
 
-        {/* 모달 렌더링 */}
-        {isModalOpen && renderModal(track)}
+        <div>
+          <Line
+            style={{ height: '300px' }}
+            ref={chartRef}
+            data={chartData}
+            options={lineChartOption}
+            plugins={[verticalLinePlugin]}
+          />
+        </div>
       </div>
     </div>
   );

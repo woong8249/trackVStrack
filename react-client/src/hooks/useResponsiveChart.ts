@@ -1,12 +1,17 @@
-import { useEffect, useRef, MutableRefObject } from 'react';
+import { MutableRefObject, useRef, useEffect } from 'react';
 import { Chart as ChartJS } from 'chart.js';
 
-interface UseResponsiveChartReturn {
-  chartRef: MutableRefObject<ChartJS<'line'> | null>;
+type ChartRefType =
+  | ChartJS<'line'>
+  | ChartJS<'line', { x: number; y: number | null }[]>
+  | null;
+
+export interface UseResponsiveChartReturn {
+  chartRef: MutableRefObject<ChartRefType>;
 }
 
 export function useResponsiveChart(): UseResponsiveChartReturn {
-  const chartRef = useRef<ChartJS<'line'> | null>(null);
+  const chartRef = useRef<ChartRefType>(null);
 
   useEffect(() => {
     const handleResize = () => {

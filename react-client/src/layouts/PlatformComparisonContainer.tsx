@@ -34,44 +34,47 @@ export function PlatformComparisonContainer({ selectedTrack }:Prob) {
     cachedTrack && (
 
     <div className="mb-8 w-full">
+      {/* Header */}
       <div className=' mb-2  flex items-center'>
         <div className="text-lg px-2 py-1" style={{ display: 'inline-block' }}>{cachedTrack.titleName}</div>
         <WeekRangePicker startDate={startDate} endDate={endDate} onDateRangeChange={handleDateRangeChange} />
       </div>
 
+      {/* contents */}
       <div className="w-full flex flex-col gap-2 items-center md:items-stretch  md:flex-row md:justify-center">
-        <div className="bg-white p-6 rounded-md w-[100%]  md:w-[60%] ">
-          <div className="flex items-center mb-8">
-            <div className="text-base px-2">📈 플랫폼별 차트순위 비교</div>
-
-            <HelpModal>
-              <h2 id="platform-comparison-title" className="mb-4 text-lg font-semibold text-gray-700">
-                📈 플랫폼별 차트 순위 비교
-              </h2>
-
-              <section id="platform-comparison-description" className="text-gray-500 space-y-3">
-                <p>
-                  해당 트랙의 플랫폼별
-                  {' '}
-                  <strong className="text-gray-800">주간 차트 순위</strong>
-                  {' '}
-                  변동을 한눈에 확인해 보세요.
-                </p>
-
-                <p>
-                  <strong className="text-gray-800">좌측 상단</strong>
-                  {' '}
-                  달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
-                </p>
-              </section>
-            </HelpModal>
-          </div>
-
+        <div className="bg-white p-6   rounded-md w-[100%]  md:w-[60%] ">
           <PlatformChartRankComparisonLineChart
             track={cachedTrack}
             startDate={startDate}
             endDate={endDate}
-            />
+            >
+            <div className="flex items-center mb-8 my-2 ">
+              <div className="text-base px-2">📈 플랫폼별 차트순위 비교</div>
+
+              <HelpModal>
+                <h2 id="platform-comparison-title" className="mb-4 text-lg font-semibold text-gray-700">
+                  📈 플랫폼별 차트 순위 비교
+                </h2>
+
+                <section id="platform-comparison-description" className="text-gray-500 space-y-3">
+                  <p>
+                    해당 트랙의 플랫폼별
+                    {' '}
+                    <strong className="text-gray-800">주간 차트 순위</strong>
+                    {' '}
+                    변동을 한눈에 확인해 보세요.
+                  </p>
+
+                  <p>
+                    <strong className="text-gray-800">좌측 상단</strong>
+                    {' '}
+                    달력 버튼을 통해 특정 기간을 필터링할 수 있습니다.
+                  </p>
+                </section>
+              </HelpModal>
+            </div>
+          </PlatformChartRankComparisonLineChart>
+
         </div>
 
         {/* 자식2 */}

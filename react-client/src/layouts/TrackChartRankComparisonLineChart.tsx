@@ -9,7 +9,6 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartData,
   ChartDataset,
 } from 'chart.js';
 import 'chart.js/auto';
@@ -24,6 +23,7 @@ import { SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
 import { useResponsiveChart } from '@hooks/useResponsiveChart';
 import { HelpModal } from '../components/HelpModal';
+import { MutableRefObject } from 'react';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Prob {
@@ -36,7 +36,7 @@ interface Prob {
 export function TrackChartRankComparisonLineChart({
   tracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
-  const { chartRef } = useResponsiveChart();
+  const { chartRef } = useResponsiveChart() as {chartRef :MutableRefObject<ChartJS<'line', { x: number; y: number | null }[]>> };
   const commonLabels = pickLabelRangeLabelMultipleTrack(
     tracks.map((selectedTrack) => selectedTrack.track),
     selectedPlatformName,
@@ -44,7 +44,7 @@ export function TrackChartRankComparisonLineChart({
     endDate,
   );
 
-  const chartData :ChartData<'line'> = {
+  const chartData = {
     labels: commonLabels,
     datasets: tracks.map((selectedTrack) => {
       const { color, track } = selectedTrack;
@@ -60,7 +60,7 @@ export function TrackChartRankComparisonLineChart({
         const data = commonLabels.map((label, index) => {
           const xValue = index; // x 값은 숫자 인덱스
           const yValue = xAxis.includes(label) ? yAxis[xAxis.indexOf(label)] : null;
-          return { x: xValue, y: yValue }; // x와 y를 숫자로 설정
+          return { x: xValue, y: yValue }; // x는 number, y는 number | null로 변환
         });
 
         return {
@@ -72,7 +72,7 @@ export function TrackChartRankComparisonLineChart({
         };
       }
       return null; // 선택된 플랫폼이 없는 경우 null을 반환
-    }).filter((dataset) => dataset !== null) as ChartDataset<'line'>[],
+    }).filter((dataset) => dataset !== null) as ChartDataset<'line', { x: number; y: number | null }[]>[],
   };
 
   return (

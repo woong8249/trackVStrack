@@ -82,7 +82,9 @@ export function HomeSection3() {
     const endDate = new Date(Math.max(...endDates.map((date) => new Date(date).getTime())));
 
     return (
-      <PlatformChartRankComparisonLineChart track={track} startDate={startDate} endDate={endDate} />
+      <div className='bg-white p-4 rounded-md  border-gray-200 border-[1px]'>
+        <PlatformChartRankComparisonLineChart track={track} startDate={startDate} endDate={endDate} />
+      </div>
     );
   }
 
@@ -107,7 +109,7 @@ export function HomeSection3() {
 
         <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
           {tracks.map((track, index) => (
-            <div key={index} className='p-2'>
+            <div key={index} className='p-4 '>
               {PlatformComparisonOfTrackWithLineChartWrapper(track)}
             </div>
           ))}
