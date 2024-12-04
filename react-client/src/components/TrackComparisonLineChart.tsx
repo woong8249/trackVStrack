@@ -74,6 +74,7 @@ export function TrackComparisonLineChart({
   return (
     <div className=' p-4'>
       <Line
+        style={{ height: '300px' }}
         ref={chartRef}
         data={chartData}
         options={lineChartOption}

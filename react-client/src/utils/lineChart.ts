@@ -123,6 +123,7 @@ export const verticalLinePlugin = {
 
 export const lineChartOption: ChartOptions<'line'> = {
   responsive: true,
+  maintainAspectRatio: false, // 부모 컨테이너의 크기에 맞춰 크기 조정x
   interaction: {
     mode: 'index',
     intersect: false,

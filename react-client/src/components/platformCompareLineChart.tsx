@@ -66,6 +66,7 @@ export default function PlatformCompareLineChart({
   return (
     <div className='mt-2 p-4 '>
       <Line
+      style={{ height: '300px' }}
         ref={chartRef}
         data={chartData}
         options={lineChartOption}
