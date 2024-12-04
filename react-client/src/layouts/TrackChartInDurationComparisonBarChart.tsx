@@ -9,12 +9,8 @@ import { useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Range, getTrackBackground } from 'react-range';
 
-function isTrackWithArtistResponse(track: SelectedTrack): track is SelectedTrack & { track: TrackWithArtistResponse } {
-  return (track.track as TrackWithArtistResponse).titleName !== undefined;
-}
-
 interface Prob {
-  tracks: SelectedTrack[];
+  tracks: (SelectedTrack&{track:TrackWithArtistResponse})[];
   selectedPlatformName: PlatformName;
   startDate: Date;
   endDate: Date;
@@ -31,20 +27,20 @@ export function TrackChartInDurationComparisonBarChart({
     modalRef,
   } = useModal();
   const [minRank, maxRank] = appliedRange;
-  const filteredTracks = tracks.filter(isTrackWithArtistResponse);
-  const labels = filteredTracks.map((track) => track.track.titleName);
+
+  const labels = tracks.map((track) => track.track.titleName);
 
   const barChartData = {
     labels,
     datasets: [
       {
-        data: filteredTracks.map((track) => {
+        data: tracks.map((track) => {
           const platform = track.track.platforms[selectedPlatformName];
           const yAxis = pickYAxis(platform, startDate, endDate);
           // 선택된 범위 내 유지 기간 계산
           return yAxis.filter((rank) => rank !== null && rank >= minRank && rank <= maxRank).length;
         }),
-        backgroundColor: filteredTracks.map((track) => track.color),
+        backgroundColor: tracks.map((track) => track.color),
       },
     ],
   };
