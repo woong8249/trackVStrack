@@ -4,8 +4,8 @@ import {
 } from 'react';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import { useModal } from '@hooks/useModal';
-import PlatformCompareLineChart from '../PlatformCompareLineChart';
-import TrackInfoCard from '../TrackInfoCard';
+import PlatformCompareLineChart from '@components/PlatformCompareLineChart';
+import TrackInfoCard from '@components/TrackInfoCard';
 
 import 'react-resizable/css/styles.css';
 import { FaExpandAlt } from 'react-icons/fa';

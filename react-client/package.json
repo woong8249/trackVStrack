@@ -7,6 +7,7 @@
     "dev": "vite",
     "node": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node ${1:-index.ts}; }; tsc --noEmit && run",
     "build": "tsc -b && vite build",
+    "build:dev": "tsc -b &&vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
   },

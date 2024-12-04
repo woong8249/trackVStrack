@@ -15,7 +15,7 @@ services:
   api-server:
     build:
       context: ./nest-server
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: apiServer
     depends_on:
       - mysql

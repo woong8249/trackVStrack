@@ -1,4 +1,4 @@
-function required(key: string, defaultValue: undefined | string | number): string | number {
+function required(key: string, defaultValue?: undefined | string | number): string | number {
   const value: undefined | string | number = import.meta.env[key] || defaultValue;
   if (value === undefined) {
     throw new Error(`config ${key} is  undefined`);
@@ -14,7 +14,7 @@ function required(key: string, defaultValue: undefined | string | number): strin
 }
 
 const config = {
-  baseURL: required('VITE_SERVER_BASE_URL', 'prod_yet') as string,
+  baseURL: required('VITE_SERVER_BASE_URL') as string,
 };
 
 export default config;
