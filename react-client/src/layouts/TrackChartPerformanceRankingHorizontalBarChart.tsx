@@ -113,12 +113,25 @@ export function TrackChartPerformanceRankingHorizontalBarChart({
 
             <section id="chart-comparison-description" className="text-gray-500 space-y-3">
               <p>
-                선택한 기간 동안 각 트랙의 플랫폼 점수를 비교합니다. 점수는 차트 순위를 기반으로 계산됩니다.
+                선택한 기간 동안 각 트랙의 플랫폼 점수를 비교합니다.
               </p>
 
-              <p>점수가 높은 트랙이 더 나은 차트 성적을 나타냅니다.</p>
+              <p>
+                <strong className="text-gray-800">점수 계산 방식:</strong>
+                <br />
+                - 각 주의 순위를
+                {' '}
+                <strong>100에서 해당 순위를 뺀 값</strong>
+                으로 점수를 계산합니다.
+                <br />
+                - 예를 들어, 1위는 100점, 2위는 99점, 100위는 1점을 얻습니다.
+                <br />
+                - 주간 점수를 합산하여 플랫폼 점수가 산출됩니다.
+              </p>
+
             </section>
           </HelpModal>
+
         </div>
       </div>
 
