@@ -59,11 +59,6 @@ export default function PlatformAnalysisBarChart({
           display: false,
         },
       },
-      // y: {
-      //   grid: {
-      //     display: true,
-      //   },
-      // },
     },
     plugins: {
       legend: {
