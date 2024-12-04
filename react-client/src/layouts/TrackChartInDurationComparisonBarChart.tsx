@@ -67,6 +67,7 @@ export function TrackChartInDurationComparisonBarChart({
             return labels.map((label, index) => ({
               text: `${label}`, // 트랙의 titleName
               fillStyle: (datasets.backgroundColor as string[])[index], // 트랙의 color
+              lineWidth: 0,
             }));
           },
           boxWidth: 20, // 레이블 박스 크기 설정

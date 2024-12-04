@@ -131,6 +131,7 @@ export const lineChartOption: ChartOptions<'line'> = {
   plugins: {
     legend: {
       position: 'bottom' as const,
+      labels: { boxWidth: 20 },
     },
     tooltip: {
       mode: 'index' as const,
