@@ -136,7 +136,7 @@ export function TrackChartRankComparisonHBarChart({
       </div>
 
       {/* 본문 */}
-      <div className="flex flex-col lg:flex-row gap-8 p-8 lg:divide-x lg:divide-gray-100">
+      <div className="flex flex-col lg:flex-row gap-8 p-8 px-8 sm:px-14 lg:divide-x lg:divide-gray-100">
         {/* Contents 1: 순위와 TrackInfoCards */}
         <div className="w-full lg:pr-8">
           {rankedTracks.map((track, index) => (

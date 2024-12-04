@@ -36,15 +36,17 @@ export function ArtistsBox({ track }:Prob) {
         <div className="w-full flex justify-center">
           <Slider {...settings} className="w-[90%] z-[3] ">
             {track.artists.map((artist, index) => (
-              <div key={index} className="border border-gray-300 rounded-md">
-                <ArtistsInfoCard artist={artist} size={100} />
+              <div key={index} >
+                <ArtistsInfoCard artist={artist} size={80} />
+                <hr></hr>
               </div>
             ))}
           </Slider>
         </div>
       ) : (
-        <div className="border border-gray-300 rounded-md">
-          <ArtistsInfoCard artist={track.artists[0]} size={100} />
+        <div >
+          <ArtistsInfoCard artist={track.artists[0]} size={80} />
+          <hr></hr>
         </div>
       )}
 
