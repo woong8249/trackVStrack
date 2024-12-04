@@ -20,7 +20,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
+    "traceResolution": true, //컴파일 시 콘솔에 모듈 탐색 경로가 출력
     "paths": {
+    //   "*": [
+    //   "node_modules/@types/*",
+    //   "node_modules/*"
+    // ],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],
       "@layouts/*": ["src/layouts/*"],
@@ -32,5 +37,5 @@
       "@config/*": ["src/config/*"]
     }
   },
-  "include": ["src", "eslint.config.js"]
+  "include": ["src", "eslint.config.js"],
 }
