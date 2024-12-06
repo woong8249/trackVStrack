@@ -38,7 +38,7 @@ export default function PlatformAnalysisBarChart({
     labels: ['총 차트인 기간', ...ranges.map((range) => `${range[0]}~${range[1]}위`)],
     datasets: [
       {
-        label: `${platformName} 차트`,
+        label: `${platformName}`,
         data: [
           totalChartWeeks,
           ...ranges.map(([min, max]) => countRange(filteredChartWeeks, min, max)),
@@ -69,6 +69,9 @@ export default function PlatformAnalysisBarChart({
     plugins: {
       legend: {
         position: 'bottom' as const,
+        labels: {
+          boxWidth: 20, // 레이블 박스 크기 설정
+        },
       },
       title: {
         display: false,
