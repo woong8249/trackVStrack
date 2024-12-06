@@ -3,6 +3,7 @@ import TrackInfoCard from '@components/TrackInfoCard';
 import { PlatformName } from '@constants/platform';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { TrackWithArtistResponse } from '@typings/track';
+import { calculatePlatformScore } from '@utils/rank';
 import { ChartOptions, TooltipItem } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
@@ -16,28 +17,10 @@ interface Prob {
 export function TrackChartRankComparisonHBarChart({
   tracks, selectedPlatformName, startDate, endDate,
 }: Prob) {
-  // 1. 점수 계산 (선택한 기간만 고려)
-  const calculatePlatformScore = (track: TrackWithArtistResponse, platformName: PlatformName) => {
-    const platform = track.platforms[platformName];
-    if (!platform) return 0;
-
-    return platform.weeklyChartScope.reduce((acc, scope) => {
-      const scopeStartDate = new Date(scope.startDate);
-      const scopeEndDate = new Date(scope.endDate);
-
-      // 주어진 기간 내의 점수만 계산
-      if (scopeStartDate >= startDate && scopeEndDate <= endDate) {
-        return acc + (101 - Number(scope.rank));
-      }
-      return acc;
-    }, 0);
-  };
-
-  // 2. 점수 계산 후 내림차순 정렬
   const rankedTracks = tracks
     .map((selectedTrack) => ({
       ...selectedTrack,
-      score: calculatePlatformScore(selectedTrack.track, selectedPlatformName),
+      score: calculatePlatformScore(selectedTrack.track, selectedPlatformName, startDate, endDate),
     }))
     .sort((a, b) => b.score - a.score);
 
