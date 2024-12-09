@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-await-in-loop */
