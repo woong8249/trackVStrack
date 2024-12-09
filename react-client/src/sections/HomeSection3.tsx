@@ -108,7 +108,7 @@ export function HomeSection3() {
 
         <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
 
-        <div className="w-[90vw] sm:w-[80vw]">
+        <div className="w-[100vw] sm:w-[80vw]">
           <Slider {...settings} >
             {tracks.map((track, index) => (
               <div key={index} className="p-4">

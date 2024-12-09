@@ -21,7 +21,7 @@ export default function HomeSection1() {
     };
   }, [currentMessageIndex]);
   return (
-    <section className='w-full pt-[10rem] pb-[10rem] bg-slate-50 relative z-5'>
+    <section className='w-full py-[5rem] lg:py-[10rem]  bg-slate-50 relative z-5'>
       <div className='flex flex-col lg:flex-row justify-center items-center h-[300px] relative lg:right-[4rem]'>
         <div className={`w-[340px] text-left text-2xl md:text-3xl lg:text-4xl mb-8 lg:mb-0 transition-opacity duration-500 ease-in-out ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
           {homeMessages[currentMessageIndex]}

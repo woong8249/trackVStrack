@@ -80,7 +80,7 @@ export function TrackChartRankComparisonHBarChart({
     },
   };
 
-  const chartHeight = tracks.length * 60 + 50;
+  const chartHeight = tracks.length * 50 + 50;
 
   return (
     <div className="py-8">
@@ -119,9 +119,11 @@ export function TrackChartRankComparisonHBarChart({
       </div>
 
       {/* 본문 */}
-      <div className="flex flex-col lg:flex-row gap-8 p-8 px-8 sm:px-14 lg:divide-x lg:divide-gray-100">
+      <div
+      className="flex flex-col gap-8 p-4
+       sm:px-14 lg:flex-row   lg:divide-xlg:divide-gray-100">
         {/* Contents 1: 순위와 TrackInfoCards */}
-        <div className="w-full lg:pr-8">
+        <div className="w-[100%] lg:w-[50%] lg:pr-8">
           {rankedTracks.map((track, index) => (
             <div key={track.track.id}>
               <div className="flex items-center gap-4">
@@ -144,7 +146,7 @@ export function TrackChartRankComparisonHBarChart({
         </div>
 
         {/* Contents 2: Horizontal Bar Chart */}
-        <div className="w-full lg:pl-8">
+        <div className="w-[100%] lg:w-[50%] lg:pl-8">
           <Bar
             data={chartData}
             options={chartOptions}
