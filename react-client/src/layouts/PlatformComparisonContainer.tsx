@@ -36,7 +36,7 @@ export function PlatformComparisonContainer({ selectedTrack }:Prob) {
     <div className="mb-8 w-full">
       {/* Header */}
       <div className=' mb-2  flex items-center'>
-        <div className="text-lg px-2 py-1" style={{ display: 'inline-block' }}>{cachedTrack.titleName}</div>
+        <div className="text-xl font-bold px-2 py-1" style={{ display: 'inline-block' }}>{cachedTrack.titleName}</div>
         <WeekRangePicker startDate={startDate} endDate={endDate} onDateRangeChange={handleDateRangeChange} />
       </div>
 
