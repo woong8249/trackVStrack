@@ -21,14 +21,3 @@ services:
       - mysql
     ports:
       - "80:80"
-
-  # crawlingServer:
-  #   build:
-  #     context: ./ts-crawling
-  #     dockerfile: Dockerfile
-  #   container_name: crawlingServer
-  #   depends_on:
-  #    - mysql
-  #   ports:
-  #     - "4000:4000"
-
