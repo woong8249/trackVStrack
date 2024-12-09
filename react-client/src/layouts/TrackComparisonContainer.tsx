@@ -71,7 +71,7 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
           {/* 헤더자식1- h1  */}
           <div className='flex sm:flex-row sm:items-center sm:gap-2  flex-col'>
-            <h1 className='text-xl '>Track VS Track</h1>
+            <h1 className='text-xl font-bold '>Track VS Track</h1>
 
             <WeekRangePicker
             startDate={startDate}
