@@ -156,6 +156,7 @@ export class Genie implements PlatformModule {
 
       const artistNames = $(element).find('a.artist.ellipsis').text().split('&')
         .map((item) => item.trim());
+
       if (artistNames.length === 0) {
         winLogger.error('check', {
           rank, titleName, titleKeyword, trackID, albumID,
@@ -163,11 +164,15 @@ export class Genie implements PlatformModule {
       }
       const artistKeywords = extractKeyword(artistNames) as string[];
       // @ts-ignore
+
       const groupedArtistID:string = $(element).find('a.artist.ellipsis').attr('onclick').toString()
         .match(/fnViewArtist\('(\d+)'\)/)[1] as string;
 
       if (artistNames.length > 1) {
-        return this.fetchIndividualArtistIDs(groupedArtistID);
+        const artists = await this.fetchIndividualArtistIDs(groupedArtistID);
+        return {
+          rank, titleName, titleKeyword, trackID, albumID, artists,
+        };
       }
 
       return {
