@@ -21,6 +21,7 @@ const settings = {
     {
       breakpoint: 768,
       settings: {
+        arrows: false,
         draggable: true,
       },
     },
@@ -34,7 +35,7 @@ export function ArtistsBox({ track }:Prob) {
 
       {track.artists.length > 1 ? (
         <div className="w-full flex justify-center">
-          <Slider {...settings} className="w-[90%] z-[3] ">
+          <Slider {...settings} className="w-[90%] z-[3] px-4 ">
             {track.artists.map((artist, index) => (
               <div key={index} >
                 <ArtistsInfoCard artist={artist} size={80} />
