@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable no-continue */
 /* eslint-disable no-labels */
 /* eslint-disable no-restricted-syntax */
