@@ -2,7 +2,7 @@
 import ReactDOM from 'react-dom';
 import { useModal } from '@hooks/useModal';
 import TrackInfoCard from '@components/TrackInfoCard';
-import PlatformCompareLineChart from '@components/PlatformCompareLineChart';
+import PlatformCompareLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import { TrackWithArtistResponse } from '@typings/track';
 import { FaExpandAlt } from 'react-icons/fa';
 import React, { useState } from 'react';
@@ -13,7 +13,7 @@ interface Prob {
   endDate:Date
 }
 
-export default function PlatformComparisonOfTrackBox({ track, startDate, endDate }: Prob) {
+export default function PlatformChartRankComparisonLineChart({ track, startDate, endDate }: Prob) {
   const [activeModalTrack, setActiveModalTrack] = useState<TrackWithArtistResponse | null>(null);
   const { isModalOpen, setIsModalOpen, modalRef } = useModal();
 

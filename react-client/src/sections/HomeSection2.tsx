@@ -4,11 +4,13 @@ import { SelectedTrack } from '@pages/ExplorePage';
 
 export function HomeSection2() {
   return (
-    <div className="w-full bg-[#eaeff8]  flex  flex-col justify-center items-center py-[13rem]">
+    <div className="w-full bg-[#eaeff8]  flex  flex-col justify-center items-center py-[7rem] xl:py-[13rem]">
       <div>
         <div className="relative">
           <div
-            className="absolute right-1/2 transform -translate-y-[90%] translate-x-[100px] w-[200px] h-[200px] bg-cover bg-center "
+            className="absolute transform bg-cover bg-center
+            w-[100px] h-[100px]  right-1/3 -translate-y-[90%]
+            xl:right-1/2 xl:-translate-y-[90%] xl:translate-x-[100px] xl:w-[200px] xl:h-[200px]  "
             style={{
               backgroundImage: "url('lineChartBG2.png')",
               backgroundSize: 'contain', // 비율을 유지하며 이미지가 컨테이너에 맞춰짐
@@ -22,7 +24,7 @@ export function HomeSection2() {
         <h3 className="relative text-center text-[#444746] mb-12">여러 트랙의 차트성적을 비교해보세요.</h3>
       </div>
 
-      <div className='w-[85%]  flex items-center gap-4'>
+      <div className='w-[100vw] sm:w-[80vw] flex items-center gap-4'>
         <TrackComparisonContainer selectedTracks={sample as SelectedTrack[]} />
       </div>
 

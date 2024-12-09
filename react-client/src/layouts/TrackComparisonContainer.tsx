@@ -7,7 +7,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import platform, { PlatformName } from '@constants/platform';
 
 import 'chart.js/auto';
-import { TrackComparisonLineChartWrapper } from '@layouts/TrackComparisonBoxWithLineChartWrapper';
+import { TrackComparisonWrapper } from '@layouts/TrackComparisonWrapper';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { useCachedTracks } from '@hooks/useCachedTracks';
 import LoadingSpinner from '@components/LoadingSpinner';
@@ -71,7 +71,7 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
           {/* 헤더자식1- h1  */}
           <div className='flex sm:flex-row sm:items-center sm:gap-2  flex-col'>
-            <h1 className='text-xl '>Track VS Track</h1>
+            <h1 className='text-xl font-bold '>Track VS Track</h1>
 
             <WeekRangePicker
             startDate={startDate}
@@ -120,7 +120,7 @@ export function TrackComparisonContainer({ selectedTracks }:Prob) {
 
         {/* contents */}
         <div className='p-2 '>
-          <TrackComparisonLineChartWrapper
+          <TrackComparisonWrapper
               selectedTracks={mappedSelectedTracks}
               selectedPlatformName={selectedPlatformName}
               startDate={startDate}

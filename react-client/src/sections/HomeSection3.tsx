@@ -7,7 +7,7 @@ import ErrorAlert from '@components/ErrorAlert';
 import { Platform, TrackWithArtistResponse } from '@typings/track';
 import Slider from 'react-slick';
 
-import PlatformComparisonOfTrackBox from '@layouts/PlatformComparisonOfTrackBox';
+import PlatformChartRankComparisonLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import { NextArrow, PrevArrow } from '@components/SliderArrows';
 
 export function HomeSection3() {
@@ -23,7 +23,6 @@ export function HomeSection3() {
     slidesToShow: 2,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
-
     draggable: false,
     responsive: [
       {
@@ -31,11 +30,13 @@ export function HomeSection3() {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+          draggable: true,
         },
       },
       {
         breakpoint: 768,
         settings: {
+          arrows: false,
           slidesToShow: 1,
           slidesToScroll: 1,
           draggable: true,
@@ -82,7 +83,9 @@ export function HomeSection3() {
     const endDate = new Date(Math.max(...endDates.map((date) => new Date(date).getTime())));
 
     return (
-      <PlatformComparisonOfTrackBox track={track} startDate={startDate} endDate={endDate} />
+      <div className='bg-white p-4 rounded-md  border-gray-200 border-[1px]'>
+        <PlatformChartRankComparisonLineChart track={track} startDate={startDate} endDate={endDate} />
+      </div>
     );
   }
 
@@ -105,13 +108,15 @@ export function HomeSection3() {
 
         <h3 className="relative text-center text-[#444746] mb-12">플랫폼별로 서로 다른 차트 순위를 한눈에 비교해보세요.</h3>
 
-        <Slider {...settings} className="xl:w-[80rem] lg:w-[60rem] sm:w-[30rem] w-[22rem] ">
-          {tracks.map((track, index) => (
-            <div key={index} className='p-2'>
-              {PlatformComparisonOfTrackWithLineChartWrapper(track)}
-            </div>
-          ))}
-        </Slider>
+        <div className="w-[100vw] sm:w-[80vw]">
+          <Slider {...settings} >
+            {tracks.map((track, index) => (
+              <div key={index} className="p-4">
+                {PlatformComparisonOfTrackWithLineChartWrapper(track)}
+              </div>
+            ))}
+          </Slider>
+        </div>
       </div>
     </div>
   );

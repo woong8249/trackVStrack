@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import { useModal } from '@hooks/useModal';
-import PlatformCompareLineChart from '@components/PlatformCompareLineChart';
+import PlatformCompareLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import TrackInfoCard from '@components/TrackInfoCard';
 
 import 'react-resizable/css/styles.css';

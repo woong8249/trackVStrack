@@ -102,7 +102,7 @@ export const verticalLinePlugin = {
   id: 'verticalLine',
   afterDraw: (chart: Chart<'line'>) => {
     const activeTooltip = chart.tooltip as TooltipModel<'line'> & { _active: { element: { x: number } }[] };
-    if (activeTooltip._active && activeTooltip._active.length) {
+    if (activeTooltip?._active && activeTooltip?._active.length) {
       const { ctx } = chart;
       const activePoint = activeTooltip._active[0];
       const { x } = activePoint.element;
@@ -123,6 +123,7 @@ export const verticalLinePlugin = {
 
 export const lineChartOption: ChartOptions<'line'> = {
   responsive: true,
+  maintainAspectRatio: false, // 부모 컨테이너의 크기에 맞춰 크기 조정x
   interaction: {
     mode: 'index',
     intersect: false,
@@ -130,6 +131,7 @@ export const lineChartOption: ChartOptions<'line'> = {
   plugins: {
     legend: {
       position: 'bottom' as const,
+      labels: { boxWidth: 20 },
     },
     tooltip: {
       mode: 'index' as const,
@@ -153,6 +155,7 @@ export const lineChartOption: ChartOptions<'line'> = {
       title: {
         display: true,
         text: 'Week' as const,
+        font: { size: 12, weight: 'lighter' },
       },
       grid: {
         display: false,
@@ -165,6 +168,7 @@ export const lineChartOption: ChartOptions<'line'> = {
       title: {
         display: true,
         text: 'Rank' as const,
+        font: { size: 12, weight: 'lighter' },
       },
 
     },

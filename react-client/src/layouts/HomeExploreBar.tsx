@@ -165,7 +165,7 @@ export default function HomeExploreBar() {
       <input
         type="text"
         className={`w-[380px] md:w-[450px] lg:w-[540px] h-[66px] p-8 border border-gray-300 focus:outline-none ${isModalOpen ? 'rounded-t-[40px]' : 'rounded-full'}`}
-        placeholder="곡명 또는 아티스트명을 입력하세요"
+        placeholder="곡명을 입력하고 비교해 보세요."
         value={query}
         onChange={handleInputChange}
         onClick={(e) => {

@@ -34,11 +34,11 @@ export default function PlatformAnalysisBarChart({
   const filteredChartWeeks = targetPlatform.weeklyChartScope.filter((scope) => isWithinDateRange(scope, startDate, endDate));
   const totalChartWeeks = filteredChartWeeks.length;
 
-  const chartData = {
+  const data = {
     labels: ['총 차트인 기간', ...ranges.map((range) => `${range[0]}~${range[1]}위`)],
     datasets: [
       {
-        label: `${platformName} 차트`,
+        label: `${platformName}`,
         data: [
           totalChartWeeks,
           ...ranges.map(([min, max]) => countRange(filteredChartWeeks, min, max)),
@@ -46,11 +46,12 @@ export default function PlatformAnalysisBarChart({
         backgroundColor: platform[platformName].color,
         borderColor: platform[platformName].color,
         borderWidth: 1,
+        barThickness: 30, // 막대 두께 고정
       },
     ],
   };
 
-  const chartOptions:ChartOptions<'bar'> = {
+  const options:ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
@@ -59,15 +60,18 @@ export default function PlatformAnalysisBarChart({
           display: false,
         },
       },
-      // y: {
-      //   grid: {
-      //     display: true,
-      //   },
-      // },
+      y: {
+        grid: {
+          display: false,
+        },
+      },
     },
     plugins: {
       legend: {
         position: 'bottom' as const,
+        labels: {
+          boxWidth: 20, // 레이블 박스 크기 설정
+        },
       },
       title: {
         display: false,
@@ -80,7 +84,7 @@ export default function PlatformAnalysisBarChart({
             const value = context.raw || 0;
             if (label === '총 차트인 기간') return `총 차트인 기간: ${value}주`;
             // 범위 기반의 동적 툴팁 텍스트 생성
-            const rangeIndex = chartData.labels.indexOf(label) - 1; // '총 차트인 기간'이 첫 번째 항목이므로 -1
+            const rangeIndex = data.labels.indexOf(label) - 1; // '총 차트인 기간'이 첫 번째 항목이므로 -1
             if (rangeIndex >= 0 && ranges[rangeIndex]) {
               const [min, max] = ranges[rangeIndex];
               return `${min}~${max}위 횟수: ${value}`;
@@ -193,8 +197,8 @@ export default function PlatformAnalysisBarChart({
       </div>
       )}
 
-      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px] border px-2 pt-6 rounded-md">
-        <Bar data={chartData} options={chartOptions} />
+      <div className="w-full min-h-[200px] md:min-h-[160px] lg:min-h-[200px]  pt-6 rounded-md">
+        <Bar data={data} options={options} />
       </div>
     </>
   );

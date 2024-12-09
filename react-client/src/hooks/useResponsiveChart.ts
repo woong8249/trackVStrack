@@ -1,19 +1,24 @@
-import {
-  useEffect, useRef, MutableRefObject,
-} from 'react';
+import { MutableRefObject, useRef, useEffect } from 'react';
 import { Chart as ChartJS } from 'chart.js';
 
-interface UseResponsiveChartReturn {
-  chartRef: MutableRefObject<ChartJS<'line', { x: string; y: number | null }[], unknown> | null>;
+type ChartRefType =
+  | ChartJS<'line'>
+  | ChartJS<'line', { x: number; y: number | null }[]>
+  | null;
+
+export interface UseResponsiveChartReturn {
+  chartRef: MutableRefObject<ChartRefType>;
 }
 
 export function useResponsiveChart(): UseResponsiveChartReturn {
-  const chartRef = useRef<ChartJS<'line', { x: string; y: number | null }[], unknown> | null>(null);
+  const chartRef = useRef<ChartRefType>(null);
 
   useEffect(() => {
     const handleResize = () => {
       if (chartRef.current) {
-        chartRef.current.resize(); // Chart.js 강제 업데이트
+        setTimeout(() => {
+          chartRef.current?.resize(); // Chart.js 강제 업데이트
+        }, 100);
       }
     };
 
