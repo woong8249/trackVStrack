@@ -102,7 +102,7 @@ export const verticalLinePlugin = {
   id: 'verticalLine',
   afterDraw: (chart: Chart<'line'>) => {
     const activeTooltip = chart.tooltip as TooltipModel<'line'> & { _active: { element: { x: number } }[] };
-    if (activeTooltip._active && activeTooltip._active.length) {
+    if (activeTooltip?._active && activeTooltip?._active.length) {
       const { ctx } = chart;
       const activePoint = activeTooltip._active[0];
       const { x } = activePoint.element;
