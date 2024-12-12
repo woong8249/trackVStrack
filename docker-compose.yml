@@ -16,7 +16,9 @@ services:
     build:
       context: ./nest-server
       dockerfile: dockerfile
-    container_name: apiServer
+    environment:
+      APP_ENV: ${API_SERVER_DOCKER_ENV}
+    container_name: api-server
     depends_on:
       - mysql
     ports:

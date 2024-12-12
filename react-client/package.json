@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development",
-    "node": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node ${1:-index.ts}; }; tsc --noEmit && run",
-    "build": "tsc -b && vite build",
-    "build:local": "tsc -b &&vite build --mode development.local",
+    "start:dev.local": "vite --mode development.local",
+    "build:dev.docker": "tsc -b &&vite build --mode development.docker",
+    "build:prod.docker": "tsc -b && vite build --mode production.docker",
+    "preview": "vite preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "node": "run(){ NODE_OPTIONS=--experimental-import-meta-resolve vite-node ${1:-index.ts}; }; tsc --noEmit && run"
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",

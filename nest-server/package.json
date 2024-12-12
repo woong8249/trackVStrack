@@ -6,10 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start": "APP_ENV=production nest start",
-    "start:dev": "APP_ENV=development nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:dev.local": "APP_ENV=development.local nest start --watch",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"

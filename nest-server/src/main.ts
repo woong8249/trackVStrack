@@ -1,4 +1,3 @@
-// import fs from 'fs';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -6,19 +5,19 @@ import { MyLogger } from './logger/logger.service';
 import useragent from 'express-useragent';
 import { ValidationPipe } from '@nestjs/common';
 
-const port = process.env.APP_PORT || 3000;
 const env = process.env.APP_ENV;
-const origin =
-  env === 'production'
-    ? process.env.CLIENT_ORIGIN // 모든 도메인 허용 ,client 배포 후 바꿔야함
-    : ['http://localhost:4173', 'http://localhost:5173'];
+const port = process.env.APP_PORT;
+const origin = env.includes('local')
+  ? ['http://localhost:4173', 'http://localhost:5173']
+  : '*';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin,
     methods: 'GET',
-    credentials: true, // 쿠키 등을 사용할 때
+    credentials: false, // 쿠키 사용하고 있지 않음
   });
   app.useLogger(await app.resolve(MyLogger));
   app.use(useragent.express());
@@ -29,16 +28,17 @@ async function bootstrap() {
       transform: true, // query나 param 데이터를 자동으로 타입 변환 (e.g., string -> number)
     }),
   );
-  const config = new DocumentBuilder()
-    .setTitle('API specification')
-    .setDescription('This is the API specification for development.')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  //Note for Swagger UI and Swagger Editor users: Cookie authentication is currently not supported for "try it out" requests due to browser security restrictions. See this issue for more information. SwaggerHub does not have this limitation.
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  // fs.writeFileSync('./swagger.json', JSON.stringify(document, null, 2));
+  if (env.includes('development')) {
+    const config = new DocumentBuilder()
+      .setTitle('API specification')
+      .setDescription('This is the API specification for development.')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    //Note for Swagger UI and Swagger Editor users: Cookie authentication is currently not supported for "try it out" requests due to browser security restrictions. See this issue for more information. SwaggerHub does not have this limitation.
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('doc', app, document);
+  }
   await app.listen(port);
 }
 bootstrap();
