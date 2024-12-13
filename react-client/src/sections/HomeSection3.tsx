@@ -1,7 +1,5 @@
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { useEffect, useState } from 'react';
-import { fetcher, trackEndpoints } from '@utils/axios';
 import LoadingSpinner from '@components/LoadingSpinner';
 import ErrorAlert from '@components/ErrorAlert';
 import { Platform, TrackWithArtistResponse } from '@typings/track';
@@ -10,10 +8,16 @@ import Slider from 'react-slick';
 import PlatformChartRankComparisonLineChart from '@layouts/PlatformChartRankComparisonLineChart';
 import { NextArrow, PrevArrow } from '@components/SliderArrows';
 
-export function HomeSection3() {
-  const [tracks, setTracks] = useState<TrackWithArtistResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+interface Prob {
+  loading :boolean
+  tracks:TrackWithArtistResponse[]
+  error:Error |null
+  retryFunc:()=>Promise<void>
+}
+
+export function HomeSection3({
+  loading, tracks, error, retryFunc,
+}:Prob) {
   const settings = {
     dots: true,
     infinite: true,
@@ -45,25 +49,6 @@ export function HomeSection3() {
     ],
   };
 
-  async function fetchTracks() {
-    setLoading(true);
-    setError(null);
-    try {
-      const url = trackEndpoints.getTracks({
-        minWeeksOnChart: 30,
-        withArtists: true,
-        sort: 'random' as const,
-      });
-      const response = await fetcher<TrackWithArtistResponse[]>(url);
-
-      setTracks(response);
-    } catch (err) {
-      setError(err as unknown as Error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function PlatformComparisonOfTrackWithLineChartWrapper(track:TrackWithArtistResponse) {
     const { platforms } = track;
     const availablePlatforms = [
@@ -89,13 +74,8 @@ export function HomeSection3() {
     );
   }
 
-  useEffect(() => {
-    fetchTracks();
-  }, []);
-
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert error={error} retryFunc={fetchTracks} />;
-
+  if (loading) return <div className='flex justify-center'><LoadingSpinner /></div>;
+  if (error) return <div className='flex justify-center'><ErrorAlert error={error} retryFunc={retryFunc} /></div>;
   return (
     <div className="w-full bg-slate-50 flex justify-center items-center py-[10rem]">
       <div>

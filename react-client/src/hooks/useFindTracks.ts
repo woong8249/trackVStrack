@@ -3,7 +3,7 @@ import useDebounce from '@hooks/useDebounce';
 import useSWRInfinite from 'swr/infinite';
 
 export function useFindTracks(query:string) {
-  const debouncedQuery = useDebounce(query, 100);
+  const debouncedQuery = useDebounce(query, 200);
 
   const {
     data: trackData,

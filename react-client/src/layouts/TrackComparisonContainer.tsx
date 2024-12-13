@@ -16,7 +16,7 @@ import { mergeTracksDateRange } from '@utils/time';
 import { TrackWithArtistResponse } from '@typings/track';
 
 export interface Prob {
-  selectedTracks:SelectedTrack[]
+  selectedTracks:Omit<SelectedTrack, 'activate'>[]
 }
 
 export function TrackComparisonContainer({ selectedTracks }:Prob) {

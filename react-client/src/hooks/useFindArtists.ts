@@ -3,7 +3,7 @@ import useSWRInfinite from 'swr/infinite';
 import { artistEndpoints } from '@utils/axios';
 
 export function useFindArtists(query :string) {
-  const debouncedQuery = useDebounce(query, 100);
+  const debouncedQuery = useDebounce(query, 200);
   const {
     data: artistData,
     error: artistError,

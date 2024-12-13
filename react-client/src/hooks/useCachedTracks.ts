@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import { SelectedTrack } from '@pages/ExplorePage';
 import { AxiosError } from 'axios';
 
-export function useCachedTracks(selectedTracks: SelectedTrack[]) {
+export function useCachedTracks(selectedTracks: Omit<SelectedTrack, 'activate'>[]) {
   // URLs 생성
   const urls = selectedTracks.map((selectTrack) => {
     const trackId = (selectTrack.track as TrackWithArtistResponse)?.id ?? null;
