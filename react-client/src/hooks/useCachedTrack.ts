@@ -14,7 +14,7 @@ export function useCachedTrack(track: TrackWithArtistResponse |{id:number} | nul
       return trackEndpoints.getTrackById(trackId, { withArtists: true });
     },
   );
-  if (notCallCondition) return track;
+  if (notCallCondition) return track as TrackWithArtistResponse;
   if (isLoading && (track as TrackWithArtistResponse).titleName) {
     return track as TrackWithArtistResponse;
   }
