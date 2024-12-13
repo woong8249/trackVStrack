@@ -35,6 +35,7 @@ export function getConfig() {
       username: required('TYPEORM_USERNAME') as string,
       password: required('TYPEORM_PASSWORD') as string,
       database: required('TYPEORM_DATABASE') as string,
+      logging: JSON.parse(required('TYPEORM_LOGGING') as string) as boolean,
     },
   };
   return config;

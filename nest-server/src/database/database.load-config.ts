@@ -9,6 +9,6 @@ export default async (configService: ConfigService) =>
     username: configService.get<string>('typeorm.username'),
     password: configService.get<string>('typeorm.password'),
     database: configService.get<string>('typeorm.database'),
-    logging: true,
+    logging: configService.get<boolean>('typeorm.logging'),
     autoLoadEntities: true,
   }) as Promise<TypeOrmModuleOptions> | TypeOrmModuleOptions;
