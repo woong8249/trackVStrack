@@ -1,6 +1,7 @@
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
-import { ConfigService, getConfig } from './config.service';
+import { getConfig } from './configuration';
 import { Module } from '@nestjs/common';
+import { MyLogger } from 'src/logger/logger.service';
 
 @Module({
   imports: [
@@ -10,7 +11,11 @@ import { Module } from '@nestjs/common';
       load: [getConfig],
     }),
   ],
-  providers: [ConfigService],
   exports: [NestConfigModule],
 })
-export class ConfigModule {}
+export class ConfigModule {
+  constructor(private logger: MyLogger) {
+    logger.setContext(ConfigModule.name);
+    this.logger.log(getConfig());
+  }
+}

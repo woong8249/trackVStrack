@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { MyLogger } from 'src/logger/logger.service';
-
 function required(
   key: string,
   defaultValue?: undefined | string | number,
@@ -39,13 +36,4 @@ export function getConfig() {
     },
   };
   return config;
-}
-
-@Injectable()
-export class ConfigService {
-  constructor(private logger: MyLogger) {
-    logger.setContext(ConfigService.name);
-    this.logger.log(this.getConfig());
-  }
-  getConfig = () => getConfig();
 }
