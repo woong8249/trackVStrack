@@ -3,16 +3,40 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import useragent from 'express-useragent';
 import { ValidationPipe } from '@nestjs/common';
+import { createLogger } from 'winston';
+import { WinstonModule, utilities } from 'nest-winston';
+import * as winston from 'winston';
 
 const env = process.env.APP_ENV;
 const port = process.env.APP_PORT;
+const level = process.env.APP_LOG_LEVEL; // error	0 warn	1  info	2 http	3 verbose	4 debug	5 silly	6
 const origin = env.includes('local')
   ? ['http://localhost:4173', 'http://localhost:5173']
   : '*';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  // app.useLogger(await app.resolve(MyLogger)); // nest system의 logger 변경방법
+  const instance = createLogger({
+    transports: [
+      new winston.transports.Console({
+        level,
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.ms(),
+          utilities.format.nestLike('api-server', {
+            colors: true,
+            prettyPrint: true,
+            processId: true,
+            appName: true,
+          }),
+        ),
+      }),
+    ],
+  });
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      instance,
+    }),
+  });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({

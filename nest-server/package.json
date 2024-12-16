@@ -19,9 +19,12 @@
     "class-validator": "^0.14.1",
     "express-useragent": "^1.0.15",
     "mysql2": "^3.11.3",
+    "nest-winston": "^1.9.7",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "winston": "^3.17.0",
+    "winston-cloudwatch": "^6.3.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
