@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { createLogger } from 'winston';
 import { WinstonModule, utilities } from 'nest-winston';
 import * as winston from 'winston';
+import WinstonCloudwatch from 'winston-cloudwatch';
 
 const env = process.env.APP_ENV;
 const port = process.env.APP_PORT;
@@ -15,26 +16,33 @@ const origin = env.includes('local')
   : '*';
 
 async function bootstrap() {
-  const instance = createLogger({
-    transports: [
-      new winston.transports.Console({
-        level,
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.ms(),
-          utilities.format.nestLike('api-server', {
-            colors: true,
-            prettyPrint: true,
-            processId: true,
-            appName: true,
-          }),
-        ),
-      }),
-    ],
-  });
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
-      instance,
+      instance: createLogger({
+        transports: [
+          new winston.transports.Console({
+            level,
+            format: winston.format.combine(
+              winston.format.timestamp(),
+              winston.format.ms(),
+              utilities.format.nestLike('api-server', {
+                colors: true,
+                prettyPrint: true,
+                processId: true,
+                appName: true,
+              }),
+            ),
+          }),
+          new WinstonCloudwatch({
+            level,
+            logGroupName: process.env.AWS_CLOUD_WATCH_LOG_GROUP_NAME,
+            logStreamName: process.env.AWS_CLOUD_WATCH_LOG_STREAM_NAME,
+            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            awsRegion: process.env.AWS_REGION,
+            awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+          }),
+        ],
+      }),
     }),
   });
   app.setGlobalPrefix('api');
