@@ -1,22 +1,20 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Track } from './track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MyLogger } from 'src/logger/logger.service';
 import { TrackResponse, TrackWithArtistResponse } from './track.interface';
 import { ArtistsService } from 'src/artists/artists.service';
 
 @Injectable()
 export class TracksService {
+  private readonly logger = new Logger(TracksService.name);
+
   constructor(
     @InjectRepository(Track)
     private trackRepo: Repository<Track>,
-    private myLogger: MyLogger,
     @Inject(forwardRef(() => ArtistsService))
-    private readonly artistsService: ArtistsService, //
-  ) {
-    this.myLogger.setContext(TracksService.name);
-  }
+    private readonly artistsService: ArtistsService,
+  ) {}
 
   public mapTrackToResponse(track: Track): TrackResponse {
     const { bugs, melon, genie } = track.platforms;

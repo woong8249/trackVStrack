@@ -6,7 +6,7 @@ import { TrackChartInDurationComparisonBarChart } from '@layouts/TrackChartInDur
 import { TrackChartRankComparisonHBarChart } from '@layouts/TrackChartRankComparisonHBarChart';
 
 interface Prob {
-    selectedTracks:SelectedTrack[]
+    selectedTracks:Omit<SelectedTrack, 'activate'>[]
     selectedPlatformName:PlatformName
     startDate:Date
     endDate:Date
@@ -16,7 +16,7 @@ export function TrackComparisonWrapper({
   selectedTracks, startDate, endDate, selectedPlatformName,
 }:Prob) {
   const isTrackWithArtistResponse = (
-    selectedTrack: SelectedTrack,
+    selectedTrack: Omit<SelectedTrack, 'activate'>,
   ): selectedTrack is SelectedTrack & { track: TrackWithArtistResponse } => (selectedTrack.track as TrackWithArtistResponse)?.titleName !== undefined;
 
   const fSelectedTracks = selectedTracks.filter(isTrackWithArtistResponse);

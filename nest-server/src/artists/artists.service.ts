@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Artist } from './artist.entity';
 import {
   ArtistResponse,
@@ -6,19 +6,16 @@ import {
 } from 'src/artists/artist.interface';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MyLogger } from 'src/logger/logger.service';
 import { TracksService } from 'src/tracks/tracks.service';
 @Injectable()
 export class ArtistsService {
+  private readonly logger = new Logger(TracksService.name);
   constructor(
     @InjectRepository(Artist)
     private artistRepo: Repository<Artist>,
     @Inject(forwardRef(() => TracksService))
     private readonly tracksService: TracksService,
-    private myLogger: MyLogger,
-  ) {
-    this.myLogger.setContext(ArtistsService.name);
-  }
+  ) {}
 
   public mapArtistToResponse(artist: Artist): ArtistResponse {
     const { bugs, melon, genie } = artist.platforms;

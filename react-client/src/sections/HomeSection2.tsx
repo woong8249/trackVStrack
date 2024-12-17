@@ -1,8 +1,29 @@
-import sample from '@constants/sample.json';
-import { TrackComparisonContainer } from '@layouts/TrackComparisonContainer';
-import { SelectedTrack } from '@pages/ExplorePage';
+import ErrorAlert from '@components/ErrorAlert';
+import LoadingSpinner from '@components/LoadingSpinner';
 
-export function HomeSection2() {
+import { TrackComparisonContainer } from '@layouts/TrackComparisonContainer';
+import { Color, SelectedTrack } from '@pages/ExplorePage';
+import { TrackWithArtistResponse } from '@typings/track';
+
+interface Prob {
+  loading :boolean
+  tracks:TrackWithArtistResponse[]
+  error:Error |null
+  retryFunc:()=>Promise<void>
+}
+
+export function HomeSection2({
+  loading, tracks, error, retryFunc,
+}:Prob) {
+  if (loading) return <div className='flex justify-center'><LoadingSpinner /></div>;
+  if (error) return <div className='flex justify-center'><ErrorAlert error={error} retryFunc={retryFunc} /></div>;
+  const colorArray = Object.values(Color);
+  const selectedTracks :Omit<SelectedTrack, 'activate'>[] = tracks.map((track, index) => ({
+    id: index,
+    track,
+    color: colorArray[index],
+  }));
+
   return (
     <div className="w-full bg-[#eaeff8]  flex  flex-col justify-center items-center py-[7rem] xl:py-[13rem]">
       <div>
@@ -25,7 +46,7 @@ export function HomeSection2() {
       </div>
 
       <div className='w-[100vw] sm:w-[80vw] flex items-center gap-4'>
-        <TrackComparisonContainer selectedTracks={sample as SelectedTrack[]} />
+        <TrackComparisonContainer selectedTracks={selectedTracks} />
       </div>
 
     </div>

@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { MyLogger } from 'src/logger/logger.service';
-
 function required(
   key: string,
   defaultValue?: undefined | string | number,
@@ -35,16 +32,8 @@ export function getConfig() {
       username: required('TYPEORM_USERNAME') as string,
       password: required('TYPEORM_PASSWORD') as string,
       database: required('TYPEORM_DATABASE') as string,
+      logging: JSON.parse(required('TYPEORM_LOGGING') as string) as boolean,
     },
   };
   return config;
-}
-
-@Injectable()
-export class ConfigService {
-  constructor(private logger: MyLogger) {
-    logger.setContext(ConfigService.name);
-    this.logger.log(this.getConfig());
-  }
-  getConfig = () => getConfig();
 }
