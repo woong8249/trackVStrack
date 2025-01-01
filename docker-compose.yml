@@ -24,5 +24,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: "unless-stopped"  
     ports:
       - "80:80"

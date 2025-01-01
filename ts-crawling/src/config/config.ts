@@ -1,4 +1,4 @@
-function required(key: string, defaultValue: undefined | string | number): string | number {
+export function required(key: string, defaultValue: undefined | string | number): string | number {
   const value: undefined | string | number = process.env[key] || defaultValue;
   if (value === undefined) {
     throw new Error(`config ${key} is  undefined`);
@@ -17,7 +17,6 @@ const config = {
   app: {
     logLevel: required('VITE_APP_LEVEL', 'debug') as string,
     env: required('VITE_APP_ENV', 'prod') as string,
-    port: Number(required('VITE_APP_PORT', '3000')),
   },
   typeorm: {
     type: 'mysql' as const,
@@ -27,21 +26,6 @@ const config = {
     password: required('VITE_DB_PASSWORD', undefined) as string,
     database: required('VITE_DB_DATABASE', undefined) as string,
   },
-  // redis: {
-  //   socket: {
-  //     port: required('VITE_REDIS_SOCKET_PORT', undefined),
-  //     host: required('VITE_REDIS_SOCKET_HOST', undefined),
-  //   },
-  // },
-  // mysql: {
-  //   host: required('VITE_MYSQL_HOST', undefined),
-  //   password: required('VITE_MYSQL_PASSWORD', undefined),
-  //   user: required('VITE_MYSQL_USER', undefined),
-  //   database: required('VITE_MYSQL_DATABASE', undefined),
-  //   port: required('VITE_MYSQL_PORT', undefined),
-  //   connectionLimit: Number(required('VITE_MYSQL_POOL_LIMIT', undefined)),
-  //   waitForConnections: true,
-  // },
 };
 
 export default config;
