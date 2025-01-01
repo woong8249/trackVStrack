@@ -11,6 +11,7 @@
     "test": "vitest",
     "fetch": "vite-node index.ts fetch",
     "insert": "vite-node index.ts insert",
+    "backup": "vite-node index.ts backup",
     "insertAll": "vite-node index.ts insertAll"
   },
   "keywords": [],

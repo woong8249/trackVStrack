@@ -15,8 +15,8 @@ export function required(key: string, defaultValue: undefined | string | number)
 
 const config = {
   app: {
-    logLevel: required('VITE_APP_LEVEL', 'debug') as string,
-    env: required('VITE_APP_ENV', 'prod') as string,
+    logLevel: required('VITE_APP_LEVEL', undefined) as string,
+    env: required('VITE_APP_ENV', undefined) as string,
   },
   typeorm: {
     type: 'mysql' as const,
