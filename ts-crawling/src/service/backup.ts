@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import winLogger from '../logger/winston';
 import { Readable } from 'stream'; // Node.js Readable 스트림 타입
-import { uploadFileToS3 } from '../s3/uploadFileToS3';
+import { putObject } from '../s3/putObject';
 import config from '../config/config';
 
 const { app, typeorm } = config;
@@ -72,12 +72,12 @@ export async function dumpAndBackup(): Promise<void> {
     if (env.includes('development')) {
       await saveDumpToLocal(dumpStream, filePath);
 
-      await uploadFileToS3({
+      await putObject({
         Key: path.posix.join(prefix, fileName),
         Body: fs.createReadStream(filePath), // 로컬 파일 스트림 사용
       });
     } else {
-      await uploadFileToS3({
+      await putObject({
         Key: path.posix.join(prefix, fileName),
         Body: dumpStream, // 로컬 파일 스트림 사용
       });

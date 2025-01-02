@@ -1,5 +1,5 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import config, { required } from 'src/config/config';
+import config, { required } from '../config/config';
 
 // NODE_ENV 환경 변수를 사용하여 프로덕션 여부를 확인
 const { app } = config;

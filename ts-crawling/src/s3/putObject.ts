@@ -8,7 +8,7 @@ interface UploadParams {
     Body: StreamingBlobPayloadInputTypes;
 }
 
-export const uploadFileToS3 = async ({ Key, Body }: UploadParams): Promise<void> => {
+export const putObject = async ({ Key, Body }: UploadParams): Promise<void> => {
   try {
     const command = new PutObjectCommand({
       Bucket: 'trackvstrack.net',
