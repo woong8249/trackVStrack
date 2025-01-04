@@ -10,14 +10,15 @@ services:
     container_name: api-server
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/health"]
-      interval: 30s
+      interval: 180s
       timeout: 10s
       retries: 3
+      start_period: 5s
     restart: "unless-stopped"  
     ports:
       - "80:80"
   
-  mysql:
+  db:
     image: mysql:8.0
     container_name: mysql
     environment:
