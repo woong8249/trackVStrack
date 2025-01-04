@@ -11,12 +11,15 @@
     "test": "vitest",
     "fetch": "vite-node index.ts fetch",
     "insert": "vite-node index.ts insert",
+    "backup": "vite-node index.ts backup",
     "insertAll": "vite-node index.ts insertAll"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.717.0",
+    "@aws-sdk/lib-storage": "^3.717.0",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
     "cheerio": "^1.0.0",

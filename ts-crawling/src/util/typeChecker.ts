@@ -102,7 +102,7 @@ export function validateCommand(command:string | undefined) {
   if (!command) {
     throw new Error('Invalid');
   }
-  const validCommand = ['fetch', 'insert', 'insertAll'];
+  const validCommand = ['fetch', 'insert', 'insertAll', 'backup'];
   if (!validCommand.includes(command)) {
     throw new Error('Invalid command');
   }

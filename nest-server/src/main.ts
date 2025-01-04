@@ -68,7 +68,7 @@ async function bootstrap() {
       .build();
     //Note for Swagger UI and Swagger Editor users: Cookie authentication is currently not supported for "try it out" requests due to browser security restrictions. See this issue for more information. SwaggerHub does not have this limitation.
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('doc', app, document);
+    SwaggerModule.setup('api/doc', app, document);
   }
   await app.listen(port);
 }

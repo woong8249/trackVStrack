@@ -1,17 +1,6 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    volumes:
-      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql # 덤프 파일 직접 매핑
-    ports:
-      - "3306:3306"
-
   api-server:
     build:
       context: ./nest-server
@@ -19,7 +8,40 @@ services:
     environment:
       APP_ENV: ${API_SERVER_DOCKER_ENV}
     container_name: api-server
-    depends_on:
-      - mysql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 180s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: "unless-stopped"  
     ports:
       - "80:80"
+  
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./backup/dump.sql:/docker-entrypoint-initdb.d/dump.sql # SQL 백업 파일
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  backup-fetcher:
+    image: amazonlinux:latest
+    container_name: backup-fetcher
+    volumes:
+      - ./fetch_backup.sh:/fetch_backup.sh # 백업 가져오기 스크립트
+      - ./backup:/backup           # SQL 백업 파일 공유
+
+    entrypoint: ["sh", "/fetch_backup.sh"]
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+volumes:
+  mysql_data: 
+    external: false

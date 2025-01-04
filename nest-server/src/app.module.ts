@@ -6,6 +6,7 @@ import { DatabasesModule } from './database/databases.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { getConfig } from './config/configuration';
 import { ConfigModule } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: `.env.${process.env.APP_ENV}`,
       load: [getConfig],
     }),
+    HealthModule
   ],
 })
 export class AppModule {

@@ -49,4 +49,6 @@ const winLogger = createLogger({
   ],
 });
 
+winLogger.info('config', { config });
+
 export default winLogger;
